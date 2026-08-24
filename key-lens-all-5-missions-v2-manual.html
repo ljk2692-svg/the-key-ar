@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#070b13">
+<title>THE KEY / KEY LENS — ALL MISSIONS V2 MANUAL</title>
+
+<style>
+:root{
+  --bg:#070b13; --panel:rgba(8,14,23,.90); --line:rgba(255,255,255,.10);
+  --white:#f4f7fa; --muted:#9aa7b7; --cyan:#76ddea; --cyan2:#c2f7fb;
+  --gold:#d7b66d; --violet:#a76cff; --ok:#81f2c5;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button{font:inherit}
+.a-enter-vr,.a-enter-ar{display:none!important}
+a-scene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
+
+#shell{position:fixed;inset:0;background:
+  radial-gradient(circle at 82% 10%,rgba(118,221,234,.08),transparent 24%),
+  radial-gradient(circle at 16% 86%,rgba(215,182,109,.06),transparent 24%),
+  linear-gradient(180deg,#070b13,#0b111c)}
+
+#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:22px;
+background:linear-gradient(180deg,rgba(7,11,19,.98),rgba(10,16,26,.98))}
+.card{width:min(100%,540px);padding:26px 22px;border-radius:22px;border:1px solid var(--line);
+background:linear-gradient(180deg,rgba(18,26,38,.98),rgba(7,12,20,.98));
+box-shadow:0 28px 80px rgba(0,0,0,.45)}
+.eyebrow{font-size:10px;letter-spacing:.18em;color:var(--gold);font-weight:850}
+h1{margin:8px 0 6px;font-size:36px;line-height:1.04}
+.desc{color:var(--muted);font-size:14px;line-height:1.55}
+.start{width:100%;margin-top:22px;padding:16px 18px;border-radius:14px;border:1px solid rgba(118,221,234,.44);
+background:linear-gradient(180deg,#173743,#10262e);color:white;font-weight:900;letter-spacing:.04em}
+.start:disabled{opacity:.55}
+
+#topPanel{position:fixed;z-index:70;left:10px;right:10px;top:max(10px,env(safe-area-inset-top));
+padding:11px 13px;border-radius:14px;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(10px);display:none}
+#statusLine{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.micro{font-size:9px;letter-spacing:.17em;color:var(--muted)}
+#status{font-size:18px;font-weight:900;margin-top:2px}
+#targetPill{display:none;padding:6px 9px;border-radius:999px;border:1px solid rgba(129,242,197,.28);
+background:rgba(129,242,197,.09);color:var(--ok);font-size:10px;font-weight:900;white-space:nowrap}
+#missionName{margin-top:7px;font-size:11px;color:var(--cyan2);letter-spacing:.12em}
+
+#progress{display:flex;gap:6px;margin-top:9px}
+.step{height:4px;flex:1;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+.step span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));transition:width .25s ease}
+.step.done span,.step.active span{width:100%}
+
+#guide{position:fixed;z-index:58;left:50%;top:50%;transform:translate(-50%,-50%);
+width:min(86vw,540px);aspect-ratio:16/9;pointer-events:none;display:none}
+.corner{position:absolute;width:38px;height:38px;border-color:rgba(255,255,255,.92)}
+.tl{left:0;top:0;border-left:2px solid;border-top:2px solid}
+.tr{right:0;top:0;border-right:2px solid;border-top:2px solid}
+.bl{left:0;bottom:0;border-left:2px solid;border-bottom:2px solid}
+.br{right:0;bottom:0;border-right:2px solid;border-bottom:2px solid}
+.scanbar{position:absolute;left:6%;right:6%;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+opacity:.7;animation:scan 2.2s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:translateY(-70px);opacity:.18}50%{transform:translateY(70px);opacity:.85}}
+
+#bottomPanel{position:fixed;z-index:70;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));
+padding:12px 13px;border-radius:14px;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(10px);display:none}
+#message{text-align:center;font-size:14px;font-weight:800;line-height:1.38}
+#subMessage{text-align:center;margin-top:4px;font-size:11px;color:var(--muted)}
+#tech{display:none;margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.07);
+font:9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8191a6;white-space:pre-wrap}
+
+#operator{position:fixed;z-index:95;right:10px;top:120px;width:180px;display:none;padding:10px;border-radius:13px;
+background:rgba(5,10,17,.96);border:1px solid rgba(255,255,255,.13)}
+#operator button{width:100%;padding:9px 10px;margin:4px 0;border-radius:9px;border:1px solid rgba(255,255,255,.12);
+background:#111c29;color:white;font-size:11px;text-align:left}
+#operator .opTitle{font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:4px}
+
+#loader{position:fixed;inset:0;z-index:90;display:none;place-items:center;background:rgba(3,7,12,.90)}
+.loaderBox{text-align:center}.spinner{width:46px;height:46px;margin:0 auto 14px;border:3px solid rgba(255,255,255,.13);
+border-top-color:var(--cyan);border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#missionSelector{
+  display:none; margin-top:10px; padding-top:9px; border-top:1px solid rgba(255,255,255,.08);
+  grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px;
+}
+#missionSelector button{
+  margin:0; width:100%; padding:10px 8px; border-radius:10px;
+  border:1px solid rgba(118,221,234,.22); background:rgba(17,28,41,.92);
+  color:#f4f7fa; font-size:11px; font-weight:850; text-align:left;
+}
+#missionSelector button:last-child{
+  grid-column:1/-1; text-align:center; border-color:rgba(215,182,109,.28); color:#f4d99c;
+}
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar-nft.js"></script>
+</head>
+
+<body>
+<div id="shell">
+<a-scene
+  id="scene"
+  vr-mode-ui="enabled:false"
+  device-orientation-permission-ui="enabled:false"
+  loading-screen="enabled:false"
+  renderer="antialias:true; alpha:true; logarithmicDepthBuffer:true; precision:medium"
+  embedded
+  arjs="trackingMethod:best; sourceType:webcam; sourceWidth:640; sourceHeight:480; displayWidth:640; displayHeight:480; debugUIEnabled:false;">
+
+  <a-nft
+    id="nft"
+    type="nft"
+    url="https://ar-js-org.github.io/AR.js/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+    smooth="true"
+    smoothCount="10"
+    smoothTolerance="0.01"
+    smoothThreshold="5">
+
+    <!-- 전체 시스템 앵커 -->
+    <a-entity id="systemAnchor" position="150 265 -110">
+
+      <!-- AR01 ROTATE -->
+      <a-entity id="rotateRoot" visible="false">
+        <a-torus id="rotRingOuter" radius="78" radius-tubular="2.8" rotation="90 0 0"
+          material="color:#263540; metalness:.9; roughness:.28; emissive:#76ddea; emissiveIntensity:.18"></a-torus>
+        <a-torus id="rotRingInner" radius="63" radius-tubular="1.4" rotation="90 0 0"
+          material="color:#76ddea; metalness:.55; roughness:.24; emissive:#76ddea; emissiveIntensity:.5; opacity:.72; transparent:true"></a-torus>
+
+        <a-box width="162" height="72" depth="7" position="0 0 4"
+          material="color:#111922; metalness:.92; roughness:.31"></a-box>
+        <a-box width="158" height="68" depth="1.5" position="0 0 8"
+          material="color:#0a1620; metalness:.4; roughness:.3; opacity:.86; transparent:true"></a-box>
+
+        <a-entity id="rotPlate" position="0 0 11">
+          <a-text value="9981 + 1601 = 2957" align="center" width="185" color="#f4f7fa" position="0 14 0"></a-text>
+          <a-text value="1080 + 9168 = ????" align="center" width="185" color="#c2f7fb" position="0 -13 0"></a-text>
+          <a-box id="rotScan" width="145" height="2" depth="1" position="0 0 2"
+            material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.85; opacity:.85; transparent:true"></a-box>
+        </a-entity>
+        <a-text value="PERSPECTIVE SHIFT" align="center" width="165" color="#d7b66d" position="0 102 0"></a-text>
+      </a-entity>
+
+      <!-- AR02 ANALYZE -->
+      <a-entity id="analyzeRoot" visible="false">
+        <a-torus radius="82" radius-tubular="1.4" rotation="90 0 0"
+          material="color:#263540; metalness:.8; roughness:.35"></a-torus>
+        <a-entity id="node1" position="-62 38 4"><a-sphere radius="8" material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.8"></a-sphere></a-entity>
+        <a-entity id="node2" position="0 66 4"><a-sphere radius="8" material="color:#f4f7fa; emissive:#76ddea; emissiveIntensity:.35"></a-sphere></a-entity>
+        <a-entity id="node3" position="62 28 4"><a-sphere radius="8" material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.8"></a-sphere></a-entity>
+        <a-entity id="node4" position="35 -50 4"><a-sphere radius="8" material="color:#d7b66d; emissive:#d7b66d; emissiveIntensity:.55"></a-sphere></a-entity>
+        <a-entity id="node5" position="-45 -48 4"><a-sphere radius="8" material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.7"></a-sphere></a-entity>
+
+        <a-entity id="line12" line="start:-62 38 4; end:0 66 4; color:#76ddea; opacity:.85"></a-entity>
+        <a-entity id="line23" line="start:0 66 4; end:62 28 4; color:#76ddea; opacity:.85"></a-entity>
+        <a-entity id="line34" line="start:62 28 4; end:35 -50 4; color:#76ddea; opacity:.85"></a-entity>
+        <a-entity id="line45" line="start:35 -50 4; end:-45 -48 4; color:#d7b66d; opacity:.85"></a-entity>
+        <a-entity id="line51" line="start:-45 -48 4; end:-62 38 4; color:#76ddea; opacity:.85"></a-entity>
+        <a-entity id="line25" line="start:0 66 4; end:-45 -48 4; color:#c2f7fb; opacity:.55"></a-entity>
+
+        <a-text value="CONNECTION DETECTED" align="center" width="185" color="#c2f7fb" position="0 108 0"></a-text>
+      </a-entity>
+
+      <!-- AR03 ACTIVATE / CLOCK -->
+      <a-entity id="activateRoot" visible="false">
+        <a-cylinder radius="86" height="8" rotation="90 0 0"
+          material="color:#111922; metalness:.94; roughness:.3"></a-cylinder>
+        <a-torus id="clockOuter" radius="75" radius-tubular="3" rotation="90 0 0"
+          material="color:#d7b66d; metalness:.95; roughness:.22; emissive:#d7b66d; emissiveIntensity:.18"></a-torus>
+        <a-torus id="clockInner" radius="58" radius-tubular="1.4" rotation="90 0 0"
+          material="color:#76ddea; metalness:.75; roughness:.2; emissive:#76ddea; emissiveIntensity:.45"></a-torus>
+
+        <a-entity id="gearA" position="-38 -5 11">
+          <a-torus radius="22" radius-tubular="5" rotation="90 0 0"
+            material="color:#35424e; metalness:1; roughness:.34"></a-torus>
+          <a-cylinder radius="6" height="6" rotation="90 0 0"
+            material="color:#d7b66d; metalness:1; roughness:.26"></a-cylinder>
+        </a-entity>
+        <a-entity id="gearB" position="34 20 10">
+          <a-torus radius="17" radius-tubular="4" rotation="90 0 0"
+            material="color:#2c3945; metalness:1; roughness:.34"></a-torus>
+          <a-cylinder radius="5" height="6" rotation="90 0 0"
+            material="color:#76ddea; metalness:1; roughness:.26"></a-cylinder>
+        </a-entity>
+
+        <a-entity id="minuteHand" position="0 0 16">
+          <a-box width="5" height="60" depth="4" position="0 28 0"
+            material="color:#f4f7fa; metalness:.8; roughness:.22"></a-box>
+        </a-entity>
+        <a-entity id="hourHand" position="0 0 18">
+          <a-box width="7" height="42" depth="5" position="0 19 0"
+            material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.3; metalness:.7; roughness:.22"></a-box>
+        </a-entity>
+        <a-sphere radius="8" position="0 0 22" material="color:#d7b66d; metalness:1; roughness:.18"></a-sphere>
+        <a-text value="TEMPORAL MECHANISM" align="center" width="180" color="#d7b66d" position="0 112 0"></a-text>
+      </a-entity>
+
+      <!-- AR04 DECRYPT -->
+      <a-entity id="decryptRoot" visible="false">
+        <a-box id="decBack" width="170" height="98" depth="8" position="0 0 2"
+          material="color:#11131d; metalness:.88; roughness:.34"></a-box>
+        <a-box id="decLeft" width="82" height="92" depth="5" position="-42 0 10"
+          material="color:#202736; metalness:.86; roughness:.29; emissive:#4b1c69; emissiveIntensity:.12"></a-box>
+        <a-box id="decRight" width="82" height="92" depth="5" position="42 0 10"
+          material="color:#202736; metalness:.86; roughness:.29; emissive:#4b1c69; emissiveIntensity:.12"></a-box>
+
+        <a-entity id="decCore" position="0 0 13">
+          <a-torus radius="34" radius-tubular="3.5" rotation="90 0 0"
+            material="color:#a76cff; emissive:#a76cff; emissiveIntensity:.78; opacity:.92; transparent:true"></a-torus>
+          <a-torus radius="22" radius-tubular="1.5" rotation="90 0 0"
+            material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.65"></a-torus>
+          <a-text value="FRAGMENT // 07" align="center" width="110" color="#f4f7fa" position="0 0 4"></a-text>
+        </a-entity>
+        <a-plane id="uvSweep" width="160" height="10" position="0 -42 20"
+          material="color:#a76cff; emissive:#a76cff; emissiveIntensity:1; opacity:.55; transparent:true"></a-plane>
+        <a-text value="DATA FRAGMENT RECOVERED" align="center" width="185" color="#c9a7ff" position="0 112 0"></a-text>
+      </a-entity>
+
+      <!-- AR05 ASSEMBLE -->
+      <a-entity id="assembleRoot" visible="false">
+        <a-entity id="frag1" position="-130 95 18"><a-torus radius="50" radius-tubular="6" arc="0.85" rotation="90 0 0"
+          material="color:#d7b66d; metalness:1; roughness:.2; emissive:#d7b66d; emissiveIntensity:.18"></a-torus></a-entity>
+        <a-entity id="frag2" position="130 95 18"><a-torus radius="50" radius-tubular="6" arc="0.85" rotation="90 0 50"
+          material="color:#d7b66d; metalness:1; roughness:.2; emissive:#d7b66d; emissiveIntensity:.18"></a-torus></a-entity>
+        <a-entity id="frag3" position="-135 -90 18"><a-torus radius="50" radius-tubular="6" arc="0.85" rotation="90 0 110"
+          material="color:#d7b66d; metalness:1; roughness:.2; emissive:#d7b66d; emissiveIntensity:.18"></a-torus></a-entity>
+        <a-entity id="frag4" position="135 -90 18"><a-torus radius="50" radius-tubular="6" arc="0.85" rotation="90 0 170"
+          material="color:#d7b66d; metalness:1; roughness:.2; emissive:#d7b66d; emissiveIntensity:.18"></a-torus></a-entity>
+
+        <a-entity id="stem1" position="-90 -145 18">
+          <a-box width="18" height="60" depth="9" material="color:#d7b66d; metalness:1; roughness:.22"></a-box>
+        </a-entity>
+        <a-entity id="stem2" position="90 -145 18">
+          <a-box width="44" height="18" depth="9" material="color:#d7b66d; metalness:1; roughness:.22"></a-box>
+        </a-entity>
+
+        <a-torus id="finalHalo" radius="80" radius-tubular="1.5" rotation="90 0 0"
+          material="color:#76ddea; emissive:#76ddea; emissiveIntensity:.55; opacity:.0; transparent:true"></a-torus>
+        <a-text value="THE KEY ASSEMBLED" align="center" width="190" color="#f4d99c" position="0 118 0"></a-text>
+      </a-entity>
+
+    </a-entity>
+  </a-nft>
+
+  <a-entity camera></a-entity>
+</a-scene>
+
+<div id="intro">
+  <div class="card">
+    <div class="eyebrow">THE KEY SYSTEM / KEY LENS</div>
+    <h1>ALL AR MISSIONS</h1>
+    <div class="desc">
+      한 번 타깃을 인식한 뒤, 필요한 AR 미션을 직접 선택하여 개별 검증합니다. 실제 운영에서는 각 타깃이 자기 미션만 실행됩니다.
+    </div>
+    <button id="startBtn" class="start" type="button">KEY LENS ACTIVATE</button>
+  </div>
+</div>
+
+<div id="loader"><div class="loaderBox"><div class="spinner"></div><strong>KEY LENS INITIALIZING</strong></div></div>
+
+<div id="topPanel">
+  <div id="statusLine">
+    <div>
+      <div class="micro">KEY LENS / SYSTEM STATUS</div>
+      <div id="status">READY</div>
+    </div>
+    <div id="targetPill">TARGET FOUND</div>
+  </div>
+  <div id="missionName">WAITING FOR TARGET</div>
+  <div id="progress">
+    <div class="step"><span></span></div>
+    <div class="step"><span></span></div>
+    <div class="step"><span></span></div>
+    <div class="step"><span></span></div>
+    <div class="step"><span></span></div>
+  </div>
+</div>
+
+<div id="guide">
+  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+  <div class="scanbar"></div>
+</div>
+
+<div id="bottomPanel">
+  <div id="message">T-Rex 테스트 타깃을 화면 중앙에 맞추세요.</div>
+  <div id="subMessage">인식 후 원하는 AR 미션을 선택합니다.</div>
+  <div id="tech"></div>
+
+  <div id="missionSelector">
+    <button data-test="rotate">01 ROTATE</button>
+    <button data-test="analyze">02 ANALYZE</button>
+    <button data-test="activate">03 ACTIVATE</button>
+    <button data-test="decrypt">04 DECRYPT</button>
+    <button data-test="assemble">05 ASSEMBLE</button>
+    <button data-test="reset">RESET / TARGET READY</button>
+  </div>
+</div>
+
+<div id="operator">
+  <div class="opTitle">OPERATOR / DIRECT TEST</div>
+  <button data-run="rotate">01 ROTATE</button>
+  <button data-run="analyze">02 ANALYZE</button>
+  <button data-run="activate">03 ACTIVATE</button>
+  <button data-run="decrypt">04 DECRYPT</button>
+  <button data-run="assemble">05 ASSEMBLE</button>
+  <button data-run="all">RUN ALL</button>
+</div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const scene = $('scene'), nft = $('nft'), intro = $('intro'), startBtn = $('startBtn');
+  const loader = $('loader'), topPanel = $('topPanel'), bottomPanel = $('bottomPanel'), guide = $('guide');
+  const status = $('status'), targetPill = $('targetPill'), missionName = $('missionName');
+  const message = $('message'), subMessage = $('subMessage'), tech = $('tech');
+  const steps = [...document.querySelectorAll('.step')];
+  const operator = $('operator');
+  const missionSelector = $('missionSelector');
+
+  const roots = {
+    rotate:$('rotateRoot'), analyze:$('analyzeRoot'), activate:$('activateRoot'),
+    decrypt:$('decryptRoot'), assemble:$('assembleRoot')
+  };
+
+  const params = new URLSearchParams(location.search);
+  const operatorMode = params.get('operator') === '1';
+  const debugMode = params.get('debug') === '1' || operatorMode;
+
+  let started = false;
+  let targetVisible = false;
+  let running = false;
+  let completed = false;
+  let runToken = 0;
+  let lostTimer = null;
+  let audioCtx = null;
+
+  if(operatorMode) operator.style.display = 'block';
+  if(debugMode) tech.style.display = 'block';
+
+  function browserName(){
+    const ua = navigator.userAgent;
+    if(/SamsungBrowser/i.test(ua)) return 'Samsung Internet';
+    if(/EdgA/i.test(ua)) return 'Edge';
+    if(/Firefox/i.test(ua)) return 'Firefox';
+    if(/Chrome/i.test(ua)) return 'Chrome';
+    return 'Other';
+  }
+
+  function setStatus(a,b,c){
+    status.textContent = a;
+    if(b !== undefined) message.textContent = b;
+    if(c !== undefined) subMessage.textContent = c;
+  }
+
+  function progress(index){
+    steps.forEach((s,i)=>{
+      s.classList.toggle('done', i < index);
+      s.classList.toggle('active', i === index);
+    });
+  }
+
+  function clearProgress(){
+    steps.forEach(s=>s.classList.remove('done','active'));
+  }
+
+  function hideAll(){
+    Object.values(roots).forEach(r=>r.setAttribute('visible',false));
+  }
+
+  function resetEntity(el){
+    if(!el) return;
+    [...el.attributes].forEach(a=>{
+      if(a.name.startsWith('animation__')) el.removeAttribute(a.name);
+    });
+  }
+
+  function clearAnimations(){
+    document.querySelectorAll('[id]').forEach(resetEntity);
+  }
+
+  const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+  function tone(freq=700, dur=.08, type='sine', gain=.035){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+      osc.type = type; osc.frequency.value = freq; g.gain.value = gain;
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start();
+      g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);
+      osc.stop(audioCtx.currentTime+dur);
+    }catch(_){}
+  }
+
+  function anim(el,name,property,from,to,dur=800,easing='easeInOutSine',delay=0){
+    el.removeAttribute(`animation__${name}`);
+    el.setAttribute(`animation__${name}`,{
+      property, from, to, dur, easing, delay
+    });
+  }
+
+  function setVisible(root){
+    hideAll();
+    root.setAttribute('visible',true);
+  }
+
+
+  async function materialize(root, token, accent='cyan'){
+    root.setAttribute('scale','.01 .01 .01');
+    root.setAttribute('rotation','0 0 -8');
+    anim(root,'materializeScale','scale','.01 .01 .01','1 1 1',520,'easeOutBack');
+    anim(root,'materializeRot','rotation','0 0 -8','0 0 0',520,'easeOutCubic');
+    tone(accent==='violet'?430:620,.06,'triangle',.02);
+    await sleep(560);
+    if(token!==runToken) return false;
+    return true;
+  }
+
+  async function playRotate(token){
+    setVisible(roots.rotate);
+    if(!(await materialize(roots.rotate,token,'cyan'))) return;
+    missionName.textContent='AR01 / ROTATE — PERSPECTIVE SHIFT';
+    setStatus('PLAYING','관점을 바꾸면 다른 정보가 보입니다.','3D 숫자층과 기계 링의 움직임을 관찰하세요.');
+    progress(0);
+
+    const plate=$('rotPlate'), outer=$('rotRingOuter'), inner=$('rotRingInner'), scan=$('rotScan');
+    plate.setAttribute('rotation','0 0 0');
+    outer.setAttribute('rotation','90 0 0');
+    inner.setAttribute('rotation','90 0 0');
+    scan.setAttribute('position','0 -25 2');
+
+    anim(scan,'scan','position','0 -25 2','0 25 2',700,'easeInOutSine');
+    anim(outer,'spin','rotation','90 0 0','90 0 220',2200,'easeInOutSine');
+    anim(inner,'spin','rotation','90 0 0','90 0 -320',2200,'easeInOutSine');
+    tone(680,.08,'triangle');
+
+    await sleep(900); if(token!==runToken) return;
+    anim(plate,'flip','rotation','0 0 0','0 0 180',2500,'easeInOutCubic');
+    tone(840,.09,'triangle');
+    await sleep(2700); if(token!==runToken) return;
+    tone(1180,.12,'sine'); navigator.vibrate?.([35,45,70]);
+    await sleep(1100);
+  }
+
+  async function playAnalyze(token){
+    setVisible(roots.analyze);
+    if(!(await materialize(roots.analyze,token,'cyan'))) return;
+    missionName.textContent='AR02 / ANALYZE — CONNECTION DETECTED';
+    setStatus('PLAYING','흩어진 정보 사이의 관계를 확인하세요.','연결 자체가 단서이며 정답은 팀이 완성합니다.');
+    progress(1);
+
+    const nodes=['node1','node2','node3','node4','node5'].map($);
+    const lines=['line12','line23','line34','line45','line51','line25'].map($);
+    nodes.forEach(n=>{n.setAttribute('scale','0.01 0.01 0.01');});
+    lines.forEach(l=>l.setAttribute('visible',false));
+
+    for(let i=0;i<nodes.length;i++){
+      anim(nodes[i],`n${i}`,'scale','0.01 0.01 0.01','1 1 1',420,'easeOutBack');
+      tone(560+i*90,.05,'sine');
+      await sleep(300); if(token!==runToken) return;
+    }
+    for(let i=0;i<lines.length;i++){
+      lines[i].setAttribute('visible',true);
+      tone(900+i*45,.035,'triangle',.02);
+      await sleep(230); if(token!==runToken) return;
+    }
+    nodes.forEach((n,i)=>anim(n,`pulse${i}`,'scale','1 1 1','1.28 1.28 1.28',650,'easeInOutSine'));
+    await sleep(900);
+    nodes.forEach((n,i)=>anim(n,`back${i}`,'scale','1.28 1.28 1.28','1 1 1',550,'easeInOutSine'));
+    await sleep(900);
+  }
+
+  async function playActivate(token){
+    setVisible(roots.activate);
+    if(!(await materialize(roots.activate,token,'gold'))) return;
+    missionName.textContent='AR03 / ACTIVATE — TEMPORAL MECHANISM';
+    setStatus('PLAYING','기계식 시간 구조가 활성화됩니다.','멈춘 위치의 관계를 계산해 실제 장치를 해독하세요.');
+    progress(2);
+
+    const gearA=$('gearA'), gearB=$('gearB'), min=$('minuteHand'), hour=$('hourHand'), out=$('clockOuter'), inn=$('clockInner');
+    [gearA,gearB,min,hour].forEach(e=>e.setAttribute('rotation','0 0 0'));
+    out.setAttribute('rotation','90 0 0'); inn.setAttribute('rotation','90 0 0');
+
+    anim(out,'outer','rotation','90 0 0','90 0 540',3300,'easeInOutSine');
+    anim(inn,'inner','rotation','90 0 0','90 0 -720',3300,'easeInOutSine');
+    anim(gearA,'ga','rotation','0 0 0','0 0 900',3300,'linear');
+    anim(gearB,'gb','rotation','0 0 0','0 0 -1080',3300,'linear');
+    anim(min,'min','rotation','0 0 0','0 0 -470',3500,'easeInOutCubic');
+    anim(hour,'hour','rotation','0 0 0','0 0 -138',3500,'easeInOutCubic');
+    tone(380,.11,'square',.018);
+
+    for(let i=0;i<5;i++){ await sleep(520); tone(300+i*25,.035,'square',.012); if(token!==runToken) return; }
+    await sleep(1050); if(token!==runToken) return;
+    tone(980,.13,'triangle'); navigator.vibrate?.(70);
+    await sleep(900);
+  }
+
+  async function playDecrypt(token){
+    setVisible(roots.decrypt);
+    if(!(await materialize(roots.decrypt,token,'violet'))) return;
+    missionName.textContent='AR04 / DECRYPT — HIDDEN LAYER';
+    setStatus('PLAYING','보이지 않던 정보층을 분리합니다.','UV와 결합되는 데이터 파편을 확인하세요.');
+    progress(3);
+
+    const left=$('decLeft'), right=$('decRight'), core=$('decCore'), sweep=$('uvSweep');
+    left.setAttribute('position','-42 0 10'); right.setAttribute('position','42 0 10');
+    core.setAttribute('scale','.01 .01 .01'); sweep.setAttribute('position','0 -42 20');
+    anim(sweep,'uv','position','0 -42 20','0 42 20',1300,'easeInOutSine');
+    tone(520,.12,'sawtooth',.015);
+
+    await sleep(800); if(token!==runToken) return;
+    anim(left,'open','position','-42 0 10','-92 0 13',1050,'easeInOutCubic');
+    anim(right,'open','position','42 0 10','92 0 13',1050,'easeInOutCubic');
+    await sleep(650); if(token!==runToken) return;
+    anim(core,'core','scale','.01 .01 .01','1 1 1',900,'easeOutBack');
+    tone(760,.10,'triangle');
+    await sleep(1050); if(token!==runToken) return;
+    anim(core,'pulse','scale','1 1 1','1.22 1.22 1.22',550,'easeInOutSine');
+    await sleep(600); if(token!==runToken) return;
+    anim(core,'return','scale','1.22 1.22 1.22','1 1 1',450,'easeInOutSine');
+    tone(1120,.12,'sine'); navigator.vibrate?.([35,35,55]);
+    await sleep(800);
+  }
+
+  async function playAssemble(token){
+    setVisible(roots.assemble);
+    if(!(await materialize(roots.assemble,token,'gold'))) return;
+    missionName.textContent='AR05 / ASSEMBLE — FINAL KEY';
+    setStatus('PLAYING','모든 조각을 연결하세요.','THE KEY의 최종 구조가 조립됩니다.');
+    progress(4);
+
+    const f1=$('frag1'),f2=$('frag2'),f3=$('frag3'),f4=$('frag4'),s1=$('stem1'),s2=$('stem2'),halo=$('finalHalo');
+    f1.setAttribute('position','-130 95 18'); f2.setAttribute('position','130 95 18');
+    f3.setAttribute('position','-135 -90 18'); f4.setAttribute('position','135 -90 18');
+    s1.setAttribute('position','-90 -145 18'); s2.setAttribute('position','90 -145 18');
+    halo.setAttribute('material','color:#76ddea; emissive:#76ddea; emissiveIntensity:.55; opacity:0; transparent:true');
+
+    anim(f1,'in','position','-130 95 18','-22 18 18',1350,'easeInOutCubic');
+    anim(f2,'in','position','130 95 18','22 18 18',1350,'easeInOutCubic');
+    anim(f3,'in','position','-135 -90 18','-24 -18 18',1500,'easeInOutCubic');
+    anim(f4,'in','position','135 -90 18','24 -18 18',1500,'easeInOutCubic');
+    tone(480,.07,'triangle');
+
+    await sleep(1050); if(token!==runToken) return;
+    anim(s1,'stem','position','-90 -145 18','0 -58 18',1000,'easeInOutCubic');
+    anim(s2,'stem','position','90 -145 18','0 -92 18',1000,'easeInOutCubic');
+    tone(680,.08,'triangle');
+
+    await sleep(1050); if(token!==runToken) return;
+    halo.setAttribute('material','color:#76ddea; emissive:#76ddea; emissiveIntensity:.8; opacity:.78; transparent:true');
+    anim(halo,'halo','scale','.7 .7 .7','1.25 1.25 1.25',1100,'easeOutCubic');
+    tone(980,.11,'sine');
+    await sleep(1150); if(token!==runToken) return;
+    tone(1280,.18,'triangle',.045); navigator.vibrate?.([55,50,110]);
+    await sleep(900);
+  }
+
+  const missions = [
+    ['rotate',playRotate],['analyze',playAnalyze],['activate',playActivate],
+    ['decrypt',playDecrypt],['assemble',playAssemble]
+  ];
+
+  async function runOne(id){
+    const found=missions.find(m=>m[0]===id); if(!found) return;
+    runToken++; const token=runToken;
+    running=true; completed=false; clearAnimations(); hideAll(); clearProgress();
+    await found[1](token);
+    if(token!==runToken) return;
+    running=false; completed=true;
+    setStatus('MISSION COMPLETE','해당 AR 미션 연출을 완료했습니다.','다른 미션을 선택해 계속 테스트할 수 있습니다.');
+    missionSelector.style.display = targetVisible ? 'grid' : 'none';
+  }
+
+  async function runAll(){
+    if(running) return;
+    runToken++; const token=runToken;
+    running=true; completed=false; clearAnimations(); hideAll(); clearProgress();
+
+    for(let i=0;i<missions.length;i++){
+      await missions[i][1](token);
+      if(token!==runToken) return;
+      steps[i].classList.remove('active'); steps[i].classList.add('done');
+      await sleep(450); if(token!==runToken) return;
+    }
+
+    running=false; completed=true; hideAll();
+    missionName.textContent='ALL 5 AR EXPERIENCES VERIFIED';
+    setStatus('SYSTEM COMPLETE','5개 KEY LENS AR 미션 연출을 모두 확인했습니다.','ROTATE · ANALYZE · ACTIVATE · DECRYPT · ASSEMBLE');
+    targetPill.style.display='block';
+    tone(1360,.22,'triangle',.045); navigator.vibrate?.([70,60,140]);
+  }
+
+  function getVideo(){ return document.querySelector('#arjs-video') || document.querySelector('video'); }
+  function getCanvas(){ return scene.canvas || document.querySelector('.a-canvas'); }
+
+  function fitCamera(){
+    const v=getVideo(), c=getCanvas();
+    if(!v || !v.videoWidth || !v.videoHeight) return;
+
+    const vw=innerWidth, vh=innerHeight;
+    const topSafe=112, bottomSafe=132;
+    const usableH=Math.max(220,vh-topSafe-bottomSafe);
+    const aspect=v.videoWidth/v.videoHeight;
+
+    let w=Math.min(vw, usableH*aspect);
+    let h=w/aspect;
+    if(h>usableH){h=usableH;w=h*aspect;}
+
+    const left=(vw-w)/2;
+    const top=topSafe+(usableH-h)/2;
+
+    [v,c].forEach((el,i)=>{
+      if(!el) return;
+      Object.assign(el.style,{
+        position:'fixed',left:`${left}px`,top:`${top}px`,
+        width:`${w}px`,height:`${h}px`,margin:'0',transform:'none',
+        objectFit:'fill',maxWidth:'none',maxHeight:'none'
+      });
+      el.style.zIndex=i===0?'1':'2';
+    });
+
+    if(debugMode){
+      tech.textContent=[
+        `BROWSER: ${browserName()}`,
+        `SOURCE: ${v.videoWidth}x${v.videoHeight}`,
+        `VIEWPORT: ${vw}x${vh}`,
+        `DISPLAY: ${Math.round(w)}x${Math.round(h)}`,
+        `OFFSET: ${Math.round(left)},${Math.round(top)}`,
+        `DPR: ${devicePixelRatio||1}`,
+        `TARGET: ${targetVisible}`,
+        `RUNNING: ${running}`
+      ].join('\n');
+    }
+  }
+
+  function stabilizeFit(){
+    let n=0; const t=setInterval(()=>{fitCamera(); if(++n>28)clearInterval(t)},220);
+  }
+
+  startBtn.addEventListener('click',()=>{
+    if(started) return;
+    started=true; startBtn.disabled=true;
+    intro.style.display='none'; loader.style.display='grid';
+    topPanel.style.display='block'; bottomPanel.style.display='block'; guide.style.display='block';
+    setStatus('INITIALIZING...','카메라와 AR.js NFT 엔진을 준비하고 있습니다.','잠시 기다려 주세요.');
+    stabilizeFit();
+    try{audioCtx = new (window.AudioContext||window.webkitAudioContext)(); audioCtx.resume?.();}catch(_){}
+  });
+
+  window.addEventListener('arjs-video-loaded',()=>{
+    loader.style.display='none'; stabilizeFit();
+    setStatus('SCANNING...','T-Rex 테스트 타깃을 화면 중앙에 맞추세요.','인식 후 원하는 AR 미션을 선택합니다.');
+  });
+  window.addEventListener('arjs-nft-loaded',()=>{
+    loader.style.display='none'; stabilizeFit();
+    if(status.textContent==='INITIALIZING...') setStatus('SCANNING...','T-Rex 테스트 타깃을 화면 중앙에 맞추세요.','NFT DESCRIPTOR READY');
+  });
+
+  nft.addEventListener('markerFound',()=>{
+    targetVisible=true; clearTimeout(lostTimer);
+    targetPill.style.display='block';
+    status.textContent='TARGET FOUND';
+    missionName.textContent='MISSION READY / SELECT EXPERIENCE';
+    guide.style.display='none';
+    missionSelector.style.display='grid';
+    setStatus('TARGET FOUND','필요한 AR 미션을 선택해 개별 테스트하세요.','실제 운영에서는 각 타깃이 자기 미션만 자동 실행됩니다.');
+    tone(760,.08,'triangle'); navigator.vibrate?.(45);
+  });
+
+  nft.addEventListener('markerLost',()=>{
+    targetVisible=false;
+    targetPill.style.display='none';
+    missionSelector.style.display='none';
+    clearTimeout(lostTimer);
+    lostTimer=setTimeout(()=>{
+      if(!targetVisible && !completed){
+        runToken++; running=false; clearAnimations(); hideAll(); clearProgress();
+        guide.style.display='block';
+        missionName.textContent='SIGNAL LOST';
+        setStatus('SCANNING...','타깃 전체가 다시 화면 안에 들어오도록 맞추세요.','2초 이상 타깃을 잃으면 자동 연출을 처음부터 다시 시작합니다.');
+      }
+    },1800);
+  });
+
+
+  document.querySelectorAll('#missionSelector button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const id=b.dataset.test;
+      if(!targetVisible){
+        setStatus('TARGET REQUIRED','먼저 테스트 타깃을 인식해 주세요.','타깃을 찾으면 미션 선택이 활성화됩니다.');
+        return;
+      }
+      if(id==='reset'){
+        runToken++; running=false; completed=false; clearAnimations(); hideAll(); clearProgress();
+        missionName.textContent='MISSION READY / SELECT EXPERIENCE';
+        setStatus('TARGET FOUND','필요한 AR 미션을 선택해 개별 테스트하세요.','RESET COMPLETE');
+        missionSelector.style.display='grid';
+        return;
+      }
+      missionSelector.style.display='none';
+      completed=false;
+      runOne(id);
+    });
+  });
+
+  document.querySelectorAll('#operator button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const id=b.dataset.run;
+      if(id==='all'){runToken++; running=false; completed=false; runAll();}
+      else {runOne(id);}
+    });
+  });
+
+  addEventListener('resize',()=>setTimeout(stabilizeFit,120));
+  addEventListener('orientationchange',()=>setTimeout(stabilizeFit,450));
+  setTimeout(stabilizeFit,700);
+})();
+</script>
+</body>
+</html>
