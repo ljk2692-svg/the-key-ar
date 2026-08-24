@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KEY LENS THREE Camera Test</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b13;color:#f3f5f7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+#container{position:fixed;inset:0}
+#panel{position:fixed;z-index:10;left:12px;right:12px;top:12px;padding:14px;border-radius:14px;background:rgba(9,14,22,.9);border:1px solid rgba(115,217,232,.35);backdrop-filter:blur(8px)}
+.brand{font-size:11px;letter-spacing:.18em;color:#d4b36b;font-weight:800}
+h1{font-size:20px;margin:5px 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button,select{font:inherit;border-radius:10px;padding:11px 12px;border:1px solid rgba(255,255,255,.18);background:#111d2a;color:#fff}
+button{font-weight:800;cursor:pointer}
+button.primary{background:#163541;border-color:#4a8993}
+select{flex:1;min-width:220px}
+#log{margin-top:10px;font:11px/1.5 ui-monospace,monospace;color:#b9f3fa;white-space:pre-wrap}
+#hint{position:fixed;z-index:10;left:12px;right:12px;bottom:12px;padding:12px;border-radius:12px;background:rgba(9,14,22,.88);text-align:center;font-size:13px}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="container"></div>
+<div id="panel">
+  <div class="brand">THE KEY SYSTEM / KEY LENS</div>
+  <h1>Chrome / Edge 카메라 선택 테스트</h1>
+  <div class="row">
+    <button id="load" class="primary">1. 카메라 목록 불러오기</button>
+    <select id="camera"><option value="">카메라를 먼저 불러오세요</option></select>
+    <button id="start" class="primary">2. 선택 카메라로 시작</button>
+  </div>
+  <div id="log">대기 중</div>
+</div>
+<div id="hint">R1-Q02 타깃을 비춰서 청록색 사각형이 붙는지 확인하세요.</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { MindARThree } from 'mindar-image-three';
+
+const loadBtn = document.getElementById('load');
+const startBtn = document.getElementById('start');
+const select = document.getElementById('camera');
+const log = document.getElementById('log');
+const container = document.getElementById('container');
+let mindarThree = null;
+
+function setLog(t){ log.textContent = t; }
+
+async function releaseTemp(stream){
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+}
+
+async function loadCameras(){
+  try{
+    setLog('카메라 권한 요청 중...');
+    const temp = await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    await releaseTemp(temp);
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d=>d.kind==='videoinput');
+    select.innerHTML = '';
+    cams.forEach((d,i)=>{
+      const o=document.createElement('option');
+      o.value=d.deviceId;
+      o.textContent=`${i+1}. ${d.label || 'camera '+(i+1)}`;
+      select.appendChild(o);
+    });
+    setLog(`카메라 ${cams.length}개 발견\n` + cams.map((d,i)=>`${i+1}. ${d.label || '(label 없음)'}\n${d.deviceId}`).join('\n\n'));
+  }catch(e){
+    setLog('오류: '+(e?.message||e));
+  }
+}
+
+async function stopCurrent(){
+  try{
+    if(mindarThree){
+      mindarThree.stop();
+      mindarThree.renderer?.setAnimationLoop(null);
+    }
+  }catch{}
+  mindarThree=null;
+  container.querySelectorAll('canvas,video').forEach(el=>el.remove());
+}
+
+async function startSelected(){
+  try{
+    const id = select.value;
+    if(!id) throw new Error('카메라를 먼저 선택하세요.');
+    await stopCurrent();
+    setLog('선택 카메라로 MindAR 시작 중...\n'+select.options[select.selectedIndex].textContent);
+
+    mindarThree = new MindARThree({
+      container,
+      imageTargetSrc: './TK_R1_ROTATE_01_v2.mind',
+      environmentDeviceId: id,
+      maxTrack: 1,
+      filterMinCF: 0.0001,
+      filterBeta: 0.001
+    });
+
+    const {renderer, scene, camera} = mindarThree;
+    const anchor = mindarThree.addAnchor(0);
+
+    const g = new THREE.PlaneGeometry(0.62, 0.22);
+    const m = new THREE.MeshBasicMaterial({
+      color: 0x73d9e8,
+      transparent: true,
+      opacity: 0.45,
+      side: THREE.DoubleSide
+    });
+    const plane = new THREE.Mesh(g,m);
+    plane.position.set(0,-0.055,0.02);
+    anchor.group.add(plane);
+
+    await mindarThree.start();
+
+    renderer.setAnimationLoop(()=>{
+      renderer.render(scene,camera);
+    });
+
+    setLog('실행 중\n'+select.options[select.selectedIndex].textContent+'\n타깃에 청록색 사각형이 붙으면 이 카메라는 PASS');
+  }catch(e){
+    console.error(e);
+    setLog('오류: '+(e?.message||e));
+  }
+}
+
+loadBtn.addEventListener('click',loadCameras);
+startBtn.addEventListener('click',startSelected);
+</script>
+</body>
+</html>
