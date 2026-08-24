@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>MindAR Official Card Browser Control</title>
+  <meta name="theme-color" content="#080d1c" />
+  <style>
+    :root {
+      --bg: #080d1c;
+      --panel: rgba(8, 13, 28, 0.9);
+      --line: #ff5d5d;
+      --text: #f5f7fb;
+      --muted: #b9c2d6;
+      --ok: #72ffd0;
+      --warn: #ffd166;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    button, a { font: inherit; }
+    #app { position: fixed; inset: 0; }
+    a-scene { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; }
+
+    #intro {
+      position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+      padding: 22px; background: radial-gradient(circle at 80% 8%, rgba(255,93,93,.14), transparent 27%), linear-gradient(180deg, #080d1c, #11182b);
+    }
+    .panel { width: min(100%, 520px); padding: 24px 20px; border: 1px solid rgba(255,255,255,.09); border-radius: 22px; background: var(--panel); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+    .eyebrow { color: var(--line); font-size: 12px; font-weight: 800; letter-spacing: .18em; }
+    h1 { margin: 10px 0 16px; font-size: 31px; line-height: 1.08; }
+    ol { margin: 0 0 20px 20px; padding: 0; color: var(--muted); line-height: 1.7; }
+    .start-btn { width: 100%; border: 0; border-radius: 15px; padding: 17px 18px; color: white; font-weight: 800; font-size: 17px; background: linear-gradient(180deg, #ff6c6c, #e63c3c); box-shadow: 0 12px 32px rgba(230,60,60,.35); cursor: pointer; }
+    .start-btn:disabled { opacity: .58; cursor: wait; }
+    .target-link { display: block; margin-top: 12px; padding: 11px 12px; border: 1px solid rgba(255,255,255,.11); border-radius: 12px; color: var(--text); text-align: center; text-decoration: none; }
+    .hint { margin-top: 12px; color: var(--muted); font-size: 13px; }
+
+    #topBar {
+      position: absolute; left: 10px; right: 10px; top: max(10px, env(safe-area-inset-top)); z-index: 20; display: none;
+      align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; border-radius: 14px;
+      background: rgba(8,13,28,.76); border: 1px solid rgba(255,255,255,.09); backdrop-filter: blur(8px);
+    }
+    .status-label { font-size: 11px; letter-spacing: .14em; color: var(--muted); }
+    #statusValue { margin-top: 3px; font-size: 14px; font-weight: 800; }
+    #targetPill { display: none; padding: 6px 9px; border-radius: 999px; color: var(--ok); background: rgba(114,255,208,.1); border: 1px solid rgba(114,255,208,.24); font-size: 11px; font-weight: 800; white-space: nowrap; }
+
+    #bottomPanel {
+      position: absolute; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); z-index: 20; display: none;
+      padding: 11px 13px; border-radius: 14px; background: rgba(8,13,28,.76); border: 1px solid rgba(255,255,255,.09); backdrop-filter: blur(8px);
+    }
+    #guideText { text-align: center; font-weight: 700; }
+    #guideText small { display: block; margin-top: 5px; color: var(--muted); font-weight: 400; }
+    #diagnostics { margin-top: 9px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; line-height: 1.45; color: #9da9c3; overflow-wrap: anywhere; }
+
+    #loading {
+      position: absolute; inset: 0; z-index: 28; display: none; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(3,6,14,.88);
+    }
+    .spinner { width: 46px; height: 46px; margin: 0 auto 14px; border: 4px solid rgba(255,255,255,.15); border-top-color: var(--line); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #messageBox {
+      position: absolute; left: 12px; right: 12px; bottom: 128px; z-index: 26; display: none; padding: 14px; border-radius: 14px;
+      color: #ffe2e2; background: rgba(45,10,14,.94); border: 1px solid rgba(255,93,93,.45); line-height: 1.5; font-size: 13px;
+    }
+    #retryBtn { display: none; margin-top: 10px; width: 100%; border: 1px solid rgba(255,255,255,.22); border-radius: 10px; padding: 10px; background: rgba(255,255,255,.08); color: white; font-weight: 700; }
+    #flash { position: absolute; inset: 0; z-index: 12; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(255,93,93,.24), transparent 55%); }
+    #flash.active { animation: flash .42s ease-out; }
+    @keyframes flash { 0%{opacity:0} 15%{opacity:1} 100%{opacity:0} }
+  
+    #cameraFingerprint {
+      position:absolute; left:10px; right:10px; bottom:10px; z-index:24;
+      padding:10px 12px; border-radius:12px; background:rgba(4,8,18,.88);
+      border:1px solid rgba(114,255,208,.22); color:#bfeedd;
+      font:10px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+      white-space:pre-wrap; overflow-wrap:anywhere; max-height:32vh; overflow:auto;
+      display:none;
+    }
+    
+</style>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+<body>
+  <div id="app">
+    <a-scene
+      id="arScene"
+      mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.0001; filterBeta: 0.001"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: true"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      embedded>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-entity id="targetAnchor" mindar-image-target="targetIndex: 0">
+        <a-plane color="#ff5d5d" width="1.06" height="0.022" position="0 0.31 0.02"></a-plane>
+        <a-plane color="#ff5d5d" width="1.06" height="0.022" position="0 -0.31 0.02"></a-plane>
+        <a-plane color="#ff5d5d" width="0.022" height="0.62" position="-0.53 0 0.02"></a-plane>
+        <a-plane color="#ff5d5d" width="0.022" height="0.62" position="0.53 0 0.02"></a-plane>
+        <a-plane color="#080d1c" opacity="0.30" width="1.0" height="0.552" position="0 0 0.01"></a-plane>
+        <a-text value="OFFICIAL CARD DETECTED" color="#72ffd0" align="center" width="3.25" position="0 0.42 0.03"></a-text>
+        <a-text value="TARGET FOUND" color="#ffffff" align="center" width="4.4" position="0 0 0.04"></a-text>
+      </a-entity>
+    </a-scene>
+
+    <div id="intro">
+      <div class="panel">
+        <div class="eyebrow">BROWSER DIAGNOSTIC</div>
+        <h1>MINDAR OFFICIAL CONTROL</h1>
+        <ol>
+          <li>Chrome 또는 Safari에서 이 주소를 직접 여세요.</li>
+          <li>카메라 사용을 허용하세요.</li>
+          <li>테스트 이미지를 다른 화면에 띄우거나 A4로 인쇄하세요.</li>
+          <li>이미지에서 약 20~60cm 떨어져 천천히 비추세요.</li>
+        </ol>
+        <button id="startBtn" class="start-btn" type="button">AR 테스트 시작</button>
+        <a class="target-link" href="./target.html" target="_blank" rel="noopener">테스트 타깃 이미지 열기</a>
+        <div class="hint">권장 브라우저: Android Chrome / iPhone Safari</div>
+      </div>
+    </div>
+
+    <div id="loading">
+      <div>
+        <div class="spinner"></div>
+        <strong>카메라와 AR 엔진을 시작하고 있습니다</strong>
+        <div style="margin-top:8px;color:var(--muted);font-size:13px;">권한 요청이 뜨면 카메라 사용을 허용하세요.</div>
+      </div>
+    </div>
+
+    <div id="topBar">
+      <div>
+        <div class="status-label">SYSTEM STATUS</div>
+        <div id="statusValue">READY</div>
+      </div>
+      <div id="targetPill">TARGET FOUND</div>
+    </div>
+
+    <div id="bottomPanel">
+      <div id="guideText">보안 표식을 찾아 스캔하세요.<small>타깃이 화면에 충분히 크게 보이도록 맞춰 주세요.</small></div>
+      <div id="diagnostics"></div>
+    </div>
+
+    <div id="messageBox"><div id="messageText"></div><button id="retryBtn" type="button">다시 시도</button></div>
+    <div id="cameraFingerprint"></div><div id="flash"></div>
+  </div>
+
+  <script>
+    const sceneEl = document.getElementById('arScene');
+    const targetAnchor = document.getElementById('targetAnchor');
+    const intro = document.getElementById('intro');
+    const startBtn = document.getElementById('startBtn');
+    const loading = document.getElementById('loading');
+    const topBar = document.getElementById('topBar');
+    const bottomPanel = document.getElementById('bottomPanel');
+    const statusValue = document.getElementById('statusValue');
+    const targetPill = document.getElementById('targetPill');
+    const diagnostics = document.getElementById('diagnostics');
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+    const retryBtn = document.getElementById('retryBtn');
+    const flash = document.getElementById('flash');
+    const cameraFingerprint = document.getElementById('cameraFingerprint');
+
+    let started = false;
+    let arSystem = null;
+
+    const isInAppBrowser = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER|Line\//i.test(navigator.userAgent);
+    const supportInfo = {
+      protocol: location.protocol,
+      secure: window.isSecureContext,
+      mediaDevices: Boolean(navigator.mediaDevices),
+      getUserMedia: Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+      browser: navigator.userAgent
+    };
+
+    const renderDiagnostics = () => {
+      diagnostics.textContent = [
+        `PROTOCOL: ${supportInfo.protocol}`,
+        `SECURE: ${supportInfo.secure}`,
+        `MEDIA DEVICES: ${supportInfo.mediaDevices}`,
+        `CAMERA API: ${supportInfo.getUserMedia}`,
+        `BROWSER: ${supportInfo.browser}`
+      ].join('\n');
+    };
+
+    const setStatus = (status) => { statusValue.textContent = status; };
+
+    const showMessage = (html, retry = true) => {
+      messageText.innerHTML = html;
+      retryBtn.style.display = retry ? 'block' : 'none';
+      messageBox.style.display = 'block';
+    };
+
+    const hideMessage = () => { messageBox.style.display = 'none'; };
+
+    const triggerFlash = () => {
+      flash.classList.remove('active');
+      void flash.offsetWidth;
+      flash.classList.add('active');
+    };
+
+    const waitForScene = () => new Promise((resolve) => {
+      if (sceneEl.hasLoaded) resolve();
+      else sceneEl.addEventListener('loaded', resolve, { once: true });
+    });
+
+    const describeError = (error) => {
+      const name = error && error.name ? error.name : 'UnknownError';
+      const message = error && error.message ? error.message : String(error || '알 수 없는 오류');
+      return `<strong>카메라 또는 AR 실행 실패</strong><br>ERROR: ${name}<br>MESSAGE: ${message}<br><br>` +
+        `Android Chrome: 주소창 왼쪽 아이콘 → 권한 → 카메라 허용<br>` +
+        `iPhone Safari: 주소창 aA → 웹 사이트 설정 → 카메라 → 허용`;
+    };
+
+
+    const renderCameraFingerprint = () => {
+      try {
+        const video = arSystem && arSystem.video;
+        const stream = video && video.srcObject;
+        const track = stream && stream.getVideoTracks && stream.getVideoTracks()[0];
+        const settings = track && track.getSettings ? track.getSettings() : {};
+        const caps = track && track.getCapabilities ? track.getCapabilities() : {};
+        const rows = [
+          '=== CAMERA FINGERPRINT ===',
+          `UA: ${navigator.userAgent}`,
+          `VIDEO: ${video ? video.videoWidth + 'x' + video.videoHeight : 'n/a'}`,
+          `LABEL: ${track ? track.label : 'n/a'}`,
+          `facingMode: ${settings.facingMode ?? 'n/a'}`,
+          `width: ${settings.width ?? 'n/a'}`,
+          `height: ${settings.height ?? 'n/a'}`,
+          `frameRate: ${settings.frameRate ?? 'n/a'}`,
+          `aspectRatio: ${settings.aspectRatio ?? 'n/a'}`,
+          `resizeMode: ${settings.resizeMode ?? 'n/a'}`,
+          `deviceId: ${settings.deviceId ?? 'n/a'}`,
+          `groupId: ${settings.groupId ?? 'n/a'}`,
+          `zoom: ${settings.zoom ?? 'n/a'}`,
+          `focusMode: ${settings.focusMode ?? 'n/a'}`,
+          `cap.width: ${caps.width ? JSON.stringify(caps.width) : 'n/a'}`,
+          `cap.height: ${caps.height ? JSON.stringify(caps.height) : 'n/a'}`,
+          `cap.frameRate: ${caps.frameRate ? JSON.stringify(caps.frameRate) : 'n/a'}`,
+          `cap.zoom: ${caps.zoom ? JSON.stringify(caps.zoom) : 'n/a'}`
+        ];
+        cameraFingerprint.textContent = rows.join('\n');
+        cameraFingerprint.style.display = 'block';
+      } catch (e) {
+        cameraFingerprint.textContent = 'CAMERA FINGERPRINT ERROR: ' + (e?.message || e);
+        cameraFingerprint.style.display = 'block';
+      }
+    };
+
+    const startAR = async () => {
+      if (started) return;
+      started = true;
+      startBtn.disabled = true;
+      hideMessage();
+      loading.style.display = 'flex';
+      topBar.style.display = 'flex';
+      bottomPanel.style.display = 'block';
+      setStatus('CAMERA STARTING');
+      renderDiagnostics();
+
+      try {
+        if (isInAppBrowser) {
+          throw new Error('카카오톡·인스타그램 등 내부 브라우저가 감지됐습니다. 우측 메뉴에서 Chrome 또는 Safari로 열어 주세요.');
+        }
+        if (!window.isSecureContext) {
+          throw new Error('카메라는 HTTPS 보안 주소에서만 실행됩니다.');
+        }
+        if (!supportInfo.getUserMedia) {
+          throw new Error('이 브라우저에서 카메라 API를 사용할 수 없습니다. Chrome 또는 Safari 최신 버전을 사용해 주세요.');
+        }
+
+        await waitForScene();
+        arSystem = sceneEl.systems['mindar-image-system'];
+        if (!arSystem || typeof arSystem.start !== 'function') {
+          throw new Error('MindAR 엔진을 불러오지 못했습니다. 네트워크 연결을 확인해 주세요.');
+        }
+
+        intro.style.display = 'none';
+        await arSystem.start();
+      } catch (error) {
+        started = false;
+        startBtn.disabled = false;
+        loading.style.display = 'none';
+        setStatus(error && error.name === 'NotAllowedError' ? 'CAMERA PERMISSION DENIED' : 'INITIALIZATION ERROR');
+        showMessage(describeError(error));
+      }
+    };
+
+    sceneEl.addEventListener('arReady', () => {
+      setTimeout(renderCameraFingerprint, 150);
+      loading.style.display = 'none';
+      setStatus('TARGET SEARCHING');
+    });
+
+    sceneEl.addEventListener('arError', (event) => {
+      started = false;
+      loading.style.display = 'none';
+      setStatus('INITIALIZATION ERROR');
+      showMessage(describeError(event && event.detail ? event.detail : new Error('MindAR 초기화 중 오류가 발생했습니다.')));
+    });
+
+    targetAnchor.addEventListener('targetFound', () => {
+      setStatus('TARGET FOUND');
+      targetPill.style.display = 'block';
+      triggerFlash();
+    });
+
+    targetAnchor.addEventListener('targetLost', () => {
+      setStatus('TARGET LOST');
+      targetPill.style.display = 'none';
+      setTimeout(() => {
+        if (statusValue.textContent === 'TARGET LOST') setStatus('TARGET SEARCHING');
+      }, 700);
+    });
+
+    retryBtn.addEventListener('click', () => location.reload());
+    startBtn.addEventListener('click', startAR);
+    renderDiagnostics();
+  </script>
+</body>
+</html>
