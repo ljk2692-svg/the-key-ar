@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#070b13">
+  <title>THE KEY / AR.js Common Camera Base</title>
+
+  <style>
+    :root{
+      --navy:#070b13;--glass:rgba(9,14,22,.84);--white:#f3f5f7;
+      --muted:#a9b2c0;--cyan:#73d9e8;--cyan2:#b9f3fa;--gold:#d4b36b;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:var(--white);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    .a-enter-vr,.a-enter-ar{display:none!important}
+    #stage{position:fixed;inset:0;background:#000;overflow:hidden}
+    a-scene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
+    #intro{position:fixed;z-index:100;inset:0;display:grid;place-items:center;padding:20px;
+      background:radial-gradient(circle at 80% 12%,rgba(115,217,232,.10),transparent 28%),
+      linear-gradient(180deg,#080c14,#0c121d)}
+    .panel{width:min(100%,520px);padding:26px 22px;border:1px solid rgba(255,255,255,.10);
+      border-radius:20px;background:linear-gradient(180deg,rgba(18,25,36,.97),rgba(8,13,21,.97))}
+    .brand{font-size:11px;letter-spacing:.18em;color:var(--gold);font-weight:800}
+    h1{font-size:34px;margin:8px 0 6px}.sub{color:var(--muted);font-size:14px;line-height:1.55}
+    button{width:100%;margin-top:20px;padding:16px;border-radius:13px;border:1px solid rgba(115,217,232,.48);
+      background:#14313a;color:#fff;font:inherit;font-weight:850}
+    #loader{position:fixed;z-index:80;inset:0;display:none;place-items:center;background:rgba(4,7,12,.88)}
+    #loader .box{text-align:center}.spin{width:44px;height:44px;margin:0 auto 14px;border:3px solid rgba(255,255,255,.14);
+      border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    #top{position:fixed;z-index:70;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;
+      display:none;padding:11px 13px;border-radius:13px;border:1px solid rgba(255,255,255,.10);
+      background:var(--glass);backdrop-filter:blur(8px)}
+    .micro{font-size:9px;letter-spacing:.16em;color:var(--muted)}
+    #status{font-size:17px;font-weight:850;margin-top:2px}
+    #browser{font-size:10px;color:var(--cyan2);margin-top:4px}
+
+    #guide{position:fixed;z-index:65;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(86vw,520px);aspect-ratio:16/9;display:none;pointer-events:none}
+    .c{position:absolute;width:42px;height:42px}
+    .tl{left:0;top:0;border-left:2px solid #fff;border-top:2px solid #fff}
+    .tr{right:0;top:0;border-right:2px solid #fff;border-top:2px solid #fff}
+    .bl{left:0;bottom:0;border-left:2px solid #fff;border-bottom:2px solid #fff}
+    .br{right:0;bottom:0;border-right:2px solid #fff;border-bottom:2px solid #fff}
+
+    #bottom{position:fixed;z-index:70;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));
+      display:none;padding:11px 13px;border-radius:13px;border:1px solid rgba(255,255,255,.10);
+      background:var(--glass);backdrop-filter:blur(8px)}
+    #message{text-align:center;font-size:14px;font-weight:750}
+    #diag{margin-top:7px;color:#8fa0b5;font:9px/1.45 ui-monospace,monospace;white-space:pre-wrap}
+
+    /* AR.js가 삽입하는 video/canvas는 JS에서 같은 contain rect로 강제 정렬한다. */
+    video,canvas{max-width:none!important;max-height:none!important}
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar-nft.js"></script>
+</head>
+<body>
+<div id="stage">
+  <a-scene
+    id="scene"
+    vr-mode-ui="enabled:false"
+    device-orientation-permission-ui="enabled:false"
+    loading-screen="enabled:false"
+    renderer="antialias:true; alpha:true; logarithmicDepthBuffer:true; precision:medium"
+    embedded
+    arjs="trackingMethod:best; sourceType:webcam; sourceWidth:480; sourceHeight:640; displayWidth:480; displayHeight:640; debugUIEnabled:false;">
+
+    <a-nft
+      id="nft"
+      type="nft"
+      url="https://ar-js-org.github.io/AR.js/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+      smooth="true"
+      smoothCount="10"
+      smoothTolerance="0.01"
+      smoothThreshold="5">
+
+      <!-- 진단용: 타깃을 잡으면 청록색 박스/텍스트가 붙는다. -->
+      <a-box
+        position="50 150 -70"
+        rotation="90 0 0"
+        scale="45 45 8"
+        material="color:#73d9e8; opacity:0.45; transparent:true">
+      </a-box>
+
+      <a-text
+        value="KEY LENS CAMERA BASE PASS"
+        color="#ffffff"
+        align="center"
+        width="350"
+        position="50 220 -80"
+        rotation="90 0 0">
+      </a-text>
+    </a-nft>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+</div>
+
+<div id="intro">
+  <div class="panel">
+    <div class="brand">THE KEY SYSTEM / KEY LENS</div>
+    <h1>COMMON CAMERA BASE</h1>
+    <div class="sub">
+      Chrome과 Samsung Internet에서 같은 화각으로 동작하는 AR.js NFT 카메라 기반을 확인합니다.
+      이번 테스트는 공식 T-Rex 타깃을 사용합니다.
+    </div>
+    <button id="startBtn" type="button">KEY LENS ACTIVATE</button>
+  </div>
+</div>
+
+<div id="loader"><div class="box"><div class="spin"></div><strong>AR.js NFT INITIALIZING</strong></div></div>
+
+<div id="top">
+  <div class="micro">KEY LENS CAMERA BASE</div>
+  <div id="status">READY</div>
+  <div id="browser"></div>
+</div>
+
+<div id="guide"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div>
+
+<div id="bottom">
+  <div id="message">T-Rex 이미지를 화면 중앙에 맞추세요.</div>
+  <div id="diag"></div>
+</div>
+
+<script>
+(() => {
+  const intro = document.getElementById('intro');
+  const startBtn = document.getElementById('startBtn');
+  const loader = document.getElementById('loader');
+  const top = document.getElementById('top');
+  const guide = document.getElementById('guide');
+  const bottom = document.getElementById('bottom');
+  const status = document.getElementById('status');
+  const browser = document.getElementById('browser');
+  const message = document.getElementById('message');
+  const diag = document.getElementById('diag');
+  const scene = document.getElementById('scene');
+  const nft = document.getElementById('nft');
+
+  let started = false;
+  let fitTimer = null;
+
+  const getBrowser = () => {
+    const ua = navigator.userAgent;
+    if (/SamsungBrowser/i.test(ua)) return 'Samsung Internet';
+    if (/EdgA/i.test(ua)) return 'Edge';
+    if (/Firefox/i.test(ua)) return 'Firefox';
+    if (/Chrome/i.test(ua)) return 'Chrome';
+    return 'Other';
+  };
+
+  browser.textContent = `${getBrowser()} / AR.js 3.4.8`;
+
+  function getARVideo(){
+    return document.querySelector('#arjs-video') || document.querySelector('video');
+  }
+
+  function getARCanvas(){
+    return scene.canvas || document.querySelector('.a-canvas') || document.querySelector('canvas');
+  }
+
+  function containRect(sourceW, sourceH){
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const sourceAspect = sourceW / sourceH;
+    const viewAspect = vw / vh;
+
+    let width, height, left, topOffset;
+    if(viewAspect > sourceAspect){
+      height = vh;
+      width = height * sourceAspect;
+      left = (vw - width) / 2;
+      topOffset = 0;
+    }else{
+      width = vw;
+      height = width / sourceAspect;
+      left = 0;
+      topOffset = (vh - height) / 2;
+    }
+    return {width,height,left,top:topOffset};
+  }
+
+  function applyContainFit(){
+    const video = getARVideo();
+    const canvas = getARCanvas();
+    if(!video || !video.videoWidth || !video.videoHeight) return false;
+
+    const r = containRect(video.videoWidth, video.videoHeight);
+
+    // 카메라와 WebGL을 완전히 같은 사각형에 배치.
+    [video, canvas].forEach((el, index) => {
+      if(!el) return;
+      Object.assign(el.style,{
+        position:'fixed',
+        width:`${r.width}px`,
+        height:`${r.height}px`,
+        left:`${r.left}px`,
+        top:`${r.top}px`,
+        margin:'0',
+        transform:'none',
+        objectFit:'fill'
+      });
+      if(index===0) el.style.zIndex='1';
+      else el.style.zIndex='2';
+    });
+
+    diag.textContent = [
+      `BROWSER: ${getBrowser()}`,
+      `SOURCE: ${video.videoWidth}x${video.videoHeight}`,
+      `VIEWPORT: ${window.innerWidth}x${window.innerHeight}`,
+      `DISPLAY RECT: ${Math.round(r.width)}x${Math.round(r.height)}`,
+      `OFFSET: ${Math.round(r.left)}, ${Math.round(r.top)}`,
+      `DPR: ${window.devicePixelRatio || 1}`
+    ].join('\n');
+
+    return true;
+  }
+
+  function stabilizeFit(){
+    clearInterval(fitTimer);
+    let count = 0;
+    fitTimer = setInterval(() => {
+      applyContainFit();
+      count++;
+      if(count > 24) clearInterval(fitTimer); // 약 6초 동안 AR.js resize 덮어쓰기와 경쟁
+    }, 250);
+  }
+
+  function beginUI(){
+    intro.style.display='none';
+    loader.style.display='grid';
+    top.style.display='block';
+    guide.style.display='block';
+    bottom.style.display='block';
+    status.textContent='INITIALIZING...';
+  }
+
+  startBtn.addEventListener('click', async () => {
+    if(started) return;
+    started = true;
+    beginUI();
+
+    // AR.js는 scene 생성 시 이미 카메라 초기화를 시작할 수 있으므로,
+    // 사용자의 클릭 이후 실제 video가 준비됐는지 반복 확인한다.
+    stabilizeFit();
+
+    const video = getARVideo();
+    if(video && video.paused){
+      try { await video.play(); } catch(_) {}
+    }
+  });
+
+  window.addEventListener('arjs-video-loaded', () => {
+    loader.style.display='none';
+    status.textContent='SCANNING...';
+    message.textContent='T-Rex 이미지를 화면 중앙에 맞추세요.';
+    stabilizeFit();
+  });
+
+  window.addEventListener('arjs-nft-loaded', () => {
+    loader.style.display='none';
+    status.textContent='SCANNING...';
+    stabilizeFit();
+  });
+
+  nft.addEventListener('markerFound', () => {
+    loader.style.display='none';
+    status.textContent='TARGET FOUND';
+    message.textContent='Chrome / Samsung 공용 카메라 기반에서 NFT 인식을 확인했습니다.';
+    navigator.vibrate?.(60);
+  });
+
+  nft.addEventListener('markerLost', () => {
+    status.textContent='SCANNING...';
+    message.textContent='T-Rex 이미지를 다시 화면 중앙에 맞추세요.';
+  });
+
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      applyContainFit();
+      stabilizeFit();
+    }, 120);
+  });
+
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      applyContainFit();
+      stabilizeFit();
+    }, 500);
+  });
+
+  // scene가 이미 카메라를 시작한 경우를 대비한 초기 감시
+  setTimeout(stabilizeFit, 800);
+})();
+</script>
+</body>
+</html>
