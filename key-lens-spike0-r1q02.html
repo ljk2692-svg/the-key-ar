@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070b13">
+<title>THE KEY / KEY LENS - Spike0 Baseline R1-Q02</title>
+<style>
+:root{
+  --navy:#070b13;--white:#f3f5f7;--muted:#a9b2c0;
+  --cyan:#73d9e8;--cyan2:#b9f3fa;--gold:#d4b36b;
+  --glass:rgba(9,14,22,.82)
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--navy);color:var(--white);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button{font:inherit}
+#app{position:fixed;inset:0}
+a-scene{position:absolute!important;inset:0;width:100%!important;height:100%!important}
+.a-enter-vr,.a-enter-ar{display:none!important}
+
+#intro{position:absolute;inset:0;z-index:40;display:grid;place-items:center;padding:22px;
+background:radial-gradient(circle at 78% 14%,rgba(115,217,232,.10),transparent 27%),
+linear-gradient(180deg,#080c14,#0c121d)}
+.panel{width:min(100%,520px);padding:26px 22px;border:1px solid rgba(255,255,255,.10);
+border-radius:20px;background:linear-gradient(180deg,rgba(18,25,36,.97),rgba(8,13,21,.97))}
+.brand{font-size:11px;font-weight:800;letter-spacing:.18em;color:var(--gold)}
+h1{font-size:36px;margin:8px 0 6px}.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.start{width:100%;margin-top:22px;padding:16px;border-radius:13px;border:1px solid rgba(115,217,232,.48);
+background:#14313a;color:#fff;font-weight:850}
+
+#top{position:absolute;z-index:25;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;
+padding:11px 13px;border-radius:13px;border:1px solid rgba(255,255,255,.10);background:var(--glass);
+backdrop-filter:blur(8px);display:none}
+.micro{font-size:9px;letter-spacing:.16em;color:var(--muted)}
+#status{font-size:18px;font-weight:850;margin-top:2px}
+#raw{margin-top:4px;color:var(--cyan2);font-size:10px}
+
+#guide{position:absolute;z-index:18;left:50%;top:50%;transform:translate(-50%,-50%);
+width:min(88vw,520px);aspect-ratio:16/9;pointer-events:none;display:none}
+.c{position:absolute;width:42px;height:42px}
+.tl{left:0;top:0;border-left:2px solid #fff;border-top:2px solid #fff}
+.tr{right:0;top:0;border-right:2px solid #fff;border-top:2px solid #fff}
+.bl{left:0;bottom:0;border-left:2px solid #fff;border-bottom:2px solid #fff}
+.br{right:0;bottom:0;border-right:2px solid #fff;border-bottom:2px solid #fff}
+
+#bottom{position:absolute;z-index:25;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));
+padding:12px;border-radius:13px;border:1px solid rgba(255,255,255,.10);background:var(--glass);
+backdrop-filter:blur(8px);text-align:center;display:none}
+#message{font-size:14px;font-weight:750}
+#state{font-size:9px;margin-top:4px;color:#7e8999;letter-spacing:.14em}
+
+#loading{position:absolute;inset:0;z-index:35;display:none;place-items:center;background:rgba(4,7,12,.90)}
+#loading div{text-align:center}
+.spin{width:44px;height:44px;margin:0 auto 14px;border:3px solid rgba(255,255,255,.14);
+border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+<body>
+<div id="app">
+  <a-scene id="arScene"
+    mindar-image="imageTargetSrc: ./TK_R1_ROTATE_01_v2.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.0001; filterBeta: 0.001"
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    embedded>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity id="targetAnchor" mindar-image-target="targetIndex: 0">
+      <a-entity id="rotateRoot" visible="false" position="0 0 0.03">
+        <a-text value="PERSPECTIVE SHIFT" color="#f3f5f7" align="center" width="1.45" position="0 0.205 0.025"></a-text>
+
+        <a-entity id="rotateLayer" position="0.022 -0.055 0.018">
+          <a-plane width="0.59" height="0.18" color="#07111d" opacity="0.91"></a-plane>
+          <a-plane width="0.59" height="0.004" color="#73d9e8" position="0 0.09 0.012" opacity="0.75"></a-plane>
+          <a-plane width="0.59" height="0.004" color="#73d9e8" position="0 -0.09 0.012" opacity="0.75"></a-plane>
+          <a-text value="9981  +  1601  =  2957" color="#f3f5f7" align="center" width="1.25" position="0 0.045 0.018"></a-text>
+          <a-text value="1080  +  9168  =  ????" color="#b9f3fa" align="center" width="1.25" position="0 -0.045 0.018"></a-text>
+          <a-plane id="scanLine" width="0.012" height="0.16" color="#73d9e8" opacity="0.88" position="-0.27 0 0.022"></a-plane>
+        </a-entity>
+
+        <a-text id="phase" value="ANALYZING HIDDEN LAYER..." color="#d4b36b" align="center" width="1.25" position="0 -0.205 0.025"></a-text>
+      </a-entity>
+    </a-entity>
+  </a-scene>
+
+  <div id="intro"><div class="panel">
+    <div class="brand">THE KEY SYSTEM</div>
+    <h1>KEY LENS</h1>
+    <div class="sub">Spike 0에서 Android Chrome으로 성공했던 시작 구조를 그대로 사용한 R1-Q02 확인본입니다.</div>
+    <button id="startBtn" class="start">KEY LENS ACTIVATE</button>
+  </div></div>
+
+  <div id="loading"><div><div class="spin"></div><strong>KEY LENS ACTIVATING</strong></div></div>
+
+  <div id="top">
+    <div class="micro">KEY LENS STATUS</div>
+    <div id="status">READY</div>
+    <div id="raw">RAW TARGET FOUND: 0 / LOST: 0</div>
+  </div>
+
+  <div id="guide"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div>
+
+  <div id="bottom">
+    <div id="message">해독할 이미지를 화면 중앙에 맞추세요.</div>
+    <div id="state">IDLE</div>
+  </div>
+</div>
+
+<script>
+const sceneEl = document.getElementById('arScene');
+const targetAnchor = document.getElementById('targetAnchor');
+const intro = document.getElementById('intro');
+const startBtn = document.getElementById('startBtn');
+const loading = document.getElementById('loading');
+const top = document.getElementById('top');
+const guide = document.getElementById('guide');
+const bottom = document.getElementById('bottom');
+const statusEl = document.getElementById('status');
+const messageEl = document.getElementById('message');
+const stateEl = document.getElementById('state');
+const rawEl = document.getElementById('raw');
+const rotateRoot = document.getElementById('rotateRoot');
+const rotateLayer = document.getElementById('rotateLayer');
+const scanLine = document.getElementById('scanLine');
+const phase = document.getElementById('phase');
+
+let started = false;
+let arSystem = null;
+let foundCount = 0;
+let lostCount = 0;
+let playToken = 0;
+let lostTimer = null;
+let completed = false;
+
+const waitForScene = () => new Promise(resolve => {
+  if (sceneEl.hasLoaded) resolve();
+  else sceneEl.addEventListener('loaded', resolve, {once:true});
+});
+
+function setState(status, message, state){
+  statusEl.textContent = status;
+  messageEl.textContent = message;
+  stateEl.textContent = state;
+}
+
+function updateRaw(){
+  rawEl.textContent = `RAW TARGET FOUND: ${foundCount} / LOST: ${lostCount}`;
+}
+
+function resetVisual(){
+  playToken++;
+  rotateRoot.setAttribute('visible', false);
+  rotateLayer.removeAttribute('animation__shift');
+  rotateLayer.setAttribute('rotation','0 0 0');
+  scanLine.removeAttribute('animation__scan');
+  scanLine.setAttribute('position','-0.27 0 0.022');
+  phase.setAttribute('value','ANALYZING HIDDEN LAYER...');
+}
+
+function playRotate(){
+  const token = ++playToken;
+  rotateRoot.setAttribute('visible', true);
+  phase.setAttribute('value','ANALYZING HIDDEN LAYER...');
+  scanLine.setAttribute('animation__scan',{
+    property:'position',from:'-0.27 0 0.022',to:'0.27 0 0.022',
+    dur:520,dir:'alternate',loop:2,easing:'easeInOutSine'
+  });
+
+  setTimeout(()=>{
+    if(token!==playToken) return;
+    phase.setAttribute('value','PERSPECTIVE SHIFT');
+    rotateLayer.setAttribute('animation__shift',{
+      property:'rotation',from:'0 0 0',to:'0 0 180',
+      dur:2400,easing:'easeInOutSine'
+    });
+  },650);
+
+  setTimeout(()=>{
+    if(token!==playToken) return;
+    phase.setAttribute('value','PERSPECTIVE SHIFT COMPLETE');
+    completed = true;
+    setState('ANALYSIS COMPLETE','관찰한 정보를 팀원과 공유하고 해답을 완성하세요.','COMPLETED');
+    navigator.vibrate?.(90);
+  },3300);
+}
+
+async function startAR(){
+  if(started) return;
+  started = true;
+  startBtn.disabled = true;
+  loading.style.display='grid';
+  top.style.display='block';
+  bottom.style.display='block';
+  guide.style.display='block';
+  setState('CAMERA STARTING','카메라와 이미지 인식 시스템을 준비하고 있습니다.','STARTING');
+
+  try{
+    if(!window.isSecureContext) throw new Error('HTTPS 주소가 필요합니다.');
+    if(!navigator.mediaDevices?.getUserMedia) throw new Error('카메라 API를 사용할 수 없습니다.');
+
+    await waitForScene();
+    arSystem = sceneEl.systems['mindar-image-system'];
+    if(!arSystem || typeof arSystem.start!=='function') throw new Error('MindAR 엔진을 불러오지 못했습니다.');
+
+    intro.style.display='none';
+
+    // Spike 0에서 성공했던 방식 그대로: 별도 preflight 없이 MindAR가 직접 카메라 시작.
+    await arSystem.start();
+  }catch(e){
+    started=false;
+    startBtn.disabled=false;
+    loading.style.display='none';
+    setState('SYSTEM ERROR',String(e?.message||e),'ERROR');
+  }
+}
+
+sceneEl.addEventListener('arReady',()=>{
+  loading.style.display='none';
+  setState('SCANNING...','해독할 이미지를 화면 중앙에 맞추세요.','SCANNING');
+});
+
+sceneEl.addEventListener('arError',(e)=>{
+  loading.style.display='none';
+  setState('SYSTEM ERROR',String(e?.detail?.message||e?.detail||'AR 초기화 오류'),'ERROR');
+});
+
+// 중요: Spike 0처럼 targetFound를 즉시 신뢰한다. 500ms 안정화 관문 없음.
+targetAnchor.addEventListener('targetFound',()=>{
+  foundCount++;
+  updateRaw();
+  clearTimeout(lostTimer);
+
+  setState('TARGET DETECTED','숨겨진 정보층을 확인했습니다.','TARGET_FOUND');
+  navigator.vibrate?.(45);
+
+  if(!completed){
+    playRotate();
+    setState('ACCESS GRANTED','나타난 변화를 팀원과 함께 관찰하세요.','PLAYING');
+  }
+});
+
+targetAnchor.addEventListener('targetLost',()=>{
+  lostCount++;
+  updateRaw();
+
+  // 순간 흔들림은 무시하고 1.5초 후에만 SIGNAL LOST 처리.
+  clearTimeout(lostTimer);
+  lostTimer=setTimeout(()=>{
+    if(!completed){
+      setState('SIGNAL LOST','이미지 전체가 화면 안에 들어오도록 다시 맞추세요.','TARGET_LOST');
+    }
+  },1500);
+});
+
+startBtn.addEventListener('click',startAR);
+updateRaw();
+</script>
+</body>
+</html>
