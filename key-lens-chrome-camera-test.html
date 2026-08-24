@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#070b13" />
+<title>THE KEY / KEY LENS Chrome Camera Test</title>
+<style>
+:root{--navy:#070b13;--panel:#0d1520;--white:#f3f5f7;--muted:#9aa7b8;--cyan:#73d9e8;--gold:#d4b36b;--danger:#e07a7a;--ok:#75e6a8}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--navy);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+#app{position:fixed;inset:0}a-scene{position:absolute!important;inset:0;width:100%!important;height:100%!important}.a-enter-vr,.a-orientation-modal{display:none!important}
+#setup{position:absolute;z-index:50;inset:0;overflow:auto;background:linear-gradient(180deg,#080d15,#0b1420);padding:22px}
+.card{max-width:560px;margin:24px auto;padding:22px;border:1px solid #2b3a49;border-radius:18px;background:rgba(13,21,32,.98);box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.brand{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.18em}.title{font-size:28px;font-weight:850;margin:8px 0 8px}.desc{font-size:14px;line-height:1.6;color:var(--muted)}
+button,select{width:100%;margin-top:12px;padding:14px;border-radius:12px;font:inherit}button{border:1px solid rgba(115,217,232,.5);background:#14323b;color:white;font-weight:800}button:disabled{opacity:.45}select{border:1px solid #385262;background:#101d2a;color:white}
+#deviceInfo{margin-top:14px;padding:12px;border-radius:10px;background:#09111a;color:#aebccc;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
+#hud{position:absolute;z-index:30;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.11);border-radius:14px;background:rgba(8,14,23,.86);backdrop-filter:blur(8px);display:none}
+#status{font-size:20px;font-weight:900}.small{font-size:10px;color:var(--muted);letter-spacing:.1em;margin-top:4px}.ok{color:var(--ok)}.bad{color:var(--danger)}
+#guide{position:absolute;z-index:20;left:50%;top:53%;transform:translate(-50%,-50%);width:min(88vw,520px);aspect-ratio:16/9;pointer-events:none;display:none}.c{position:absolute;width:38px;height:38px}.tl{left:0;top:0;border-left:2px solid white;border-top:2px solid white}.tr{right:0;top:0;border-right:2px solid white;border-top:2px solid white}.bl{left:0;bottom:0;border-left:2px solid white;border-bottom:2px solid white}.br{right:0;bottom:0;border-right:2px solid white;border-bottom:2px solid white}
+#bottom{position:absolute;z-index:30;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:12px 14px;border-radius:14px;background:rgba(8,14,23,.88);border:1px solid rgba(255,255,255,.1);display:none;text-align:center;font-weight:800}
+</style>
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+<body>
+<div id="app">
+  <a-scene id="scene" mindar-image="imageTargetSrc: ./TK_R1_ROTATE_01_v2.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1" color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" embedded>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-entity id="target" mindar-image-target="targetIndex: 0">
+      <a-plane color="#0b1822" opacity="0.82" width="0.72" height="0.18" position="0 0 0.03"></a-plane>
+      <a-text value="CHROME CAMERA TEST" color="#73d9e8" align="center" width="1.25" position="0 0.025 0.05"></a-text>
+      <a-text value="TARGET FOUND" color="#f3f5f7" align="center" width="1.05" position="0 -0.04 0.05"></a-text>
+    </a-entity>
+  </a-scene>
+
+  <div id="setup"><div class="card">
+    <div class="brand">THE KEY SYSTEM / KEY LENS</div>
+    <div class="title">Chrome Camera Selector Test</div>
+    <div class="desc">Chrome이 후면 카메라를 잘못 선택하는지 확인하는 진단용입니다. 먼저 카메라 권한을 열고, 목록에서 카메라를 하나씩 선택해 R1-Q02 타깃이 잡히는지 확인합니다.</div>
+    <button id="loadBtn">1. 카메라 권한 + 목록 불러오기</button>
+    <select id="cameraSelect" disabled><option>카메라 목록을 먼저 불러오세요</option></select>
+    <button id="startBtn" disabled>2. 선택한 카메라로 KEY LENS 시작</button>
+    <div id="deviceInfo">대기 중</div>
+  </div></div>
+
+  <div id="hud"><div class="brand">KEY LENS CHROME DIAGNOSTIC</div><div id="status">SEARCHING...</div><div id="active" class="small"></div></div>
+  <div id="guide"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div>
+  <div id="bottom">R1-Q02 이미지를 가이드 안에 크게 맞추세요.</div>
+</div>
+<script>
+const scene=document.getElementById('scene');
+const target=document.getElementById('target');
+const setup=document.getElementById('setup');
+const loadBtn=document.getElementById('loadBtn');
+const startBtn=document.getElementById('startBtn');
+const select=document.getElementById('cameraSelect');
+const deviceInfo=document.getElementById('deviceInfo');
+const hud=document.getElementById('hud');
+const guide=document.getElementById('guide');
+const bottom=document.getElementById('bottom');
+const status=document.getElementById('status');
+const active=document.getElementById('active');
+let devices=[];
+
+const waitScene=()=>scene.hasLoaded?Promise.resolve():new Promise(r=>scene.addEventListener('loaded',r,{once:true}));
+
+loadBtn.addEventListener('click', async()=>{
+  loadBtn.disabled=true; deviceInfo.textContent='카메라 권한 요청 중...';
+  try{
+    const s=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:'environment'}});
+    s.getTracks().forEach(t=>t.stop());
+    const all=await navigator.mediaDevices.enumerateDevices();
+    devices=all.filter(d=>d.kind==='videoinput');
+    select.innerHTML='';
+    devices.forEach((d,i)=>{
+      const o=document.createElement('option');
+      o.value=d.deviceId;
+      o.textContent=`${i+1}. ${d.label || 'camera '+(i+1)}`;
+      select.appendChild(o);
+    });
+    if(!devices.length) throw new Error('사용 가능한 카메라가 없습니다.');
+    select.disabled=false; startBtn.disabled=false;
+    deviceInfo.textContent=`카메라 ${devices.length}개 발견\n\n`+devices.map((d,i)=>`${i+1}. ${d.label || '(label 없음)'}`).join('\n');
+  }catch(e){deviceInfo.textContent='오류: '+(e.message||e); loadBtn.disabled=false;}
+});
+
+function patchCamera(arSystem, deviceId){
+  arSystem._startVideo=function(){
+    this.video=document.createElement('video');
+    this.video.setAttribute('autoplay',''); this.video.setAttribute('muted',''); this.video.setAttribute('playsinline','');
+    this.video.style.position='absolute'; this.video.style.top='0px'; this.video.style.left='0px'; this.video.style.zIndex='-2';
+    this.container.appendChild(this.video);
+    const constraints={audio:false,video:{deviceId:{exact:deviceId},width:{ideal:1920},height:{ideal:1080}}};
+    navigator.mediaDevices.getUserMedia(constraints).then(async stream=>{
+      const track=stream.getVideoTracks()[0];
+      try{
+        const caps=track.getCapabilities?track.getCapabilities():{};
+        const adv={};
+        if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous')) adv.focusMode='continuous';
+        if(caps.zoom && caps.zoom.min!=null && caps.zoom.max!=null && caps.zoom.min<=1 && caps.zoom.max>=1) adv.zoom=1;
+        if(Object.keys(adv).length) await track.applyConstraints({advanced:[adv]});
+      }catch(e){console.warn('advanced camera constraints skipped',e);}
+      this.video.addEventListener('loadedmetadata',()=>{
+        this.video.setAttribute('width',this.video.videoWidth); this.video.setAttribute('height',this.video.videoHeight);
+        const st=track.getSettings?track.getSettings():{};
+        active.textContent=`${track.label || 'camera'} / ${st.width||this.video.videoWidth}x${st.height||this.video.videoHeight} / deviceId=${(st.deviceId||'').slice(0,10)}...`;
+        this._startAR();
+      },{once:true});
+      this.video.srcObject=stream;
+    }).catch(err=>{console.error(err); this.el.emit('arError',{error:'VIDEO_FAIL'});});
+  };
+}
+
+startBtn.addEventListener('click', async()=>{
+  const deviceId=select.value;
+  if(!deviceId) return;
+  startBtn.disabled=true; deviceInfo.textContent='선택한 카메라로 시작 중...';
+  try{
+    await waitScene();
+    const arSystem=scene.systems['mindar-image-system'];
+    patchCamera(arSystem,deviceId);
+    setup.style.display='none'; hud.style.display='block'; guide.style.display='block'; bottom.style.display='block';
+    await arSystem.start();
+  }catch(e){setup.style.display='block'; deviceInfo.textContent='시작 오류: '+(e.message||e); startBtn.disabled=false;}
+});
+
+target.addEventListener('targetFound',()=>{status.textContent='TARGET FOUND';status.className='ok';bottom.textContent='이 카메라는 R1-Q02 인식에 성공했습니다.';});
+target.addEventListener('targetLost',()=>{status.textContent='TARGET LOST';status.className='bad';bottom.textContent='타깃이 사라졌습니다.';});
+scene.addEventListener('arReady',()=>{if(status.textContent!=='TARGET FOUND') status.textContent='SEARCHING...';});
+scene.addEventListener('arError',()=>{status.textContent='CAMERA / AR ERROR';status.className='bad';});
+</script>
+</body>
+</html>
