@@ -9,10 +9,10 @@ export const EVENT_PROFILE = Object.freeze({
 export const KEY_LENS_CONFIG = Object.freeze({
   appName: 'THE KEY / KEY LENS',
   systemName: 'THE KEY SYSTEM',
-  version: '0.2.3-ar01',
+  version: '0.2.4-ar01',
   stableDetectionMs: 500,
   targetLostGraceMs: 1500,
-  targetData: './TK_R1_ROTATE_01.mind',
+  targetData: './TK_R1_ROTATE_01_v2.mind',
   targetAspectRatio: 941 / 1672,
   targets: [
     {

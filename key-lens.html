@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#070b13" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>THE KEY / KEY LENS</title>
   <style>
     :root{--navy:#070b13;--charcoal:#0c1119;--graphite:#1b232f;--white:#f3f5f7;--muted:#a9b2c0;--cyan:#73d9e8;--cyan2:#b9f3fa;--gold:#d4b36b;--danger:#e07a7a;--glass:rgba(9,14,22,.78)}
@@ -15,13 +18,14 @@
     #guide{position:absolute;z-index:18;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,520px);aspect-ratio:16/9;pointer-events:none}.corner{position:absolute;width:40px;height:40px;border-color:rgba(243,245,247,.62)}.tl{left:0;top:0;border-left:2px solid;border-top:2px solid}.tr{right:0;top:0;border-right:2px solid;border-top:2px solid}.bl{left:0;bottom:0;border-left:2px solid;border-bottom:2px solid}.br{right:0;bottom:0;border-right:2px solid;border-bottom:2px solid}.guideTag{position:absolute;left:50%;bottom:-28px;transform:translateX(-50%);white-space:nowrap;font-size:9px;letter-spacing:.17em;color:rgba(243,245,247,.65)}
     #bottomPanel{position:absolute;z-index:25;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:11px 13px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:var(--glass);backdrop-filter:blur(8px)}#guideText{text-align:center;font-size:14px;font-weight:750;line-height:1.45}#stateCode{text-align:center;margin-top:4px;font-size:9px;color:#7e8999;letter-spacing:.14em}#actionBar{display:flex;gap:8px;margin-top:9px}.secondary{flex:1;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px;background:rgba(255,255,255,.06);color:var(--white);font-weight:750;font-size:12px}.secondary.gold{border-color:rgba(212,179,107,.36);color:#f2ddb0}#diagnostics{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08);white-space:pre-wrap;color:#8e9bad;font:9px/1.45 ui-monospace,monospace}
     #loading{position:absolute;z-index:35;inset:0;display:grid;place-items:center;background:rgba(4,7,12,.90);text-align:center;padding:22px}.spinner{width:46px;height:46px;margin:0 auto 15px;border:3px solid rgba(255,255,255,.12);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}#errorBox{position:absolute;z-index:34;left:12px;right:12px;bottom:126px;padding:14px;border:1px solid rgba(224,122,122,.42);border-radius:13px;background:rgba(43,15,18,.95);font-size:13px;line-height:1.55}.retry{width:100%;margin-top:10px;padding:10px;border-radius:9px;border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.06);color:white;font-weight:750}#flash{position:absolute;z-index:15;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(115,217,232,.20),transparent 58%)}#flash.active{animation:flash .45s ease-out}@keyframes flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+  .a-enter-vr,.a-enter-vr-button,.a-orientation-modal,.a-enter-ar{display:none!important}
   </style>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
 <div id="app">
-  <a-scene id="arScene" mindar-image="imageTargetSrc: ./TK_R1_ROTATE_01.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.0001; filterBeta: 0.001" color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" embedded>
+  <a-scene id="arScene" mindar-image="imageTargetSrc: ./TK_R1_ROTATE_01_v2.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.0001; filterBeta: 0.001" color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" embedded>
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
     <a-entity id="targetAnchor" mindar-image-target="targetIndex: 0">
       <a-entity id="rotateRoot" visible="false" position="0 0 0.03">
@@ -56,7 +60,7 @@
   <div id="errorBox" hidden><div id="errorText"></div><button id="retryBtn" class="retry" type="button">KEY LENS 다시 활성화</button></div><div id="flash"></div>
 </div>
 <script type="module">
-import { KeyLensController } from './key-lens-controller.js';
+import { KeyLensController } from './key-lens-controller.js?v=024';
 const $=(id)=>document.getElementById(id);
 new KeyLensController({scene:$('arScene'),targetAnchor:$('targetAnchor'),rotateRoot:$('rotateRoot'),rotateLayer:$('rotateLayer'),scanLine:$('scanLine'),rotatePhase:$('rotatePhase'),intro:$('intro'),startBtn:$('startBtn'),loading:$('loading'),topBar:$('topBar'),bottomPanel:$('bottomPanel'),guide:$('guide'),statusValue:$('statusValue'),targetPill:$('targetPill'),mode:$('mode'),version:$('version'),guideText:$('guideText'),stateCode:$('stateCode'),actionBar:$('actionBar'),replayBtn:$('replayBtn'),backBtn:$('backBtn'),diagnostics:$('diagnostics'),errorBox:$('errorBox'),errorText:$('errorText'),retryBtn:$('retryBtn'),flash:$('flash')});
 </script>

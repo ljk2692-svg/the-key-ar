@@ -1,0 +1,8 @@
+UPLOAD THESE 3 FILES TO THE REPOSITORY ROOT:
+1. key-lens.html        (replace existing)
+2. targets.js           (replace existing)
+3. TK_R1_ROTATE_01_v2.mind (new file)
+
+Do not delete the old .mind file yet.
+Test URL:
+https://ljk2692-svg.github.io/the-key-ar/key-lens.html?v=024
