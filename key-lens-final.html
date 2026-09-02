@@ -12,6 +12,10 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}
 button{font:inherit}.a-enter-vr,.a-enter-ar{display:none!important}
 #sceneMount,a-scene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
+#sceneMount{z-index:0!important;background:#000!important;overflow:hidden!important}
+#arScene{z-index:2!important;background:transparent!important}
+#arjs-video{position:fixed!important;max-width:none!important;max-height:none!important;z-index:1!important;background:#000!important;visibility:visible!important;opacity:1!important}
+#arScene canvas,.a-canvas{position:fixed!important;max-width:none!important;max-height:none!important;z-index:2!important;background:transparent!important;visibility:visible!important;opacity:1!important}
 #intro{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:22px;
 background:radial-gradient(circle at 82% 9%,rgba(118,221,234,.10),transparent 27%),
 linear-gradient(180deg,#060a11,#0b121d)}
@@ -46,7 +50,7 @@ border-radius:12px;background:rgba(4,8,14,.96)}#operator button{width:100%;margi
 border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 
 </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=28744"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=33896"></script>
 <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
 <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script></head>
 <body><div id="sceneMount"></div>
@@ -225,6 +229,52 @@ function markerLost(key){
     setHud("SCANNING...","안내된 미션 이미지를 화면 중앙에 맞춰주세요.","미션 이미지를 화면 중앙에 맞춰주세요.");
   },1200)
 }
+function getARVideo(){
+  return document.querySelector('#arjs-video') || document.querySelector('video');
+}
+function getARCanvas(){
+  return scene?.canvas || document.querySelector('#arScene canvas') || document.querySelector('.a-canvas');
+}
+function containRect(sw,sh){
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const sa=sw/sh, va=vw/vh;
+  let width,height,left,top;
+  if(va>sa){height=vh;width=height*sa;left=(vw-width)/2;top=0}
+  else{width=vw;height=width/sa;left=0;top=(vh-height)/2}
+  return {width,height,left,top};
+}
+function forceCameraVisible(){
+  const video=getARVideo();
+  const canvas=getARCanvas();
+  if(!video) return false;
+  const sw=video.videoWidth||640, sh=video.videoHeight||480;
+  const r=containRect(sw,sh);
+  Object.assign(video.style,{
+    position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',
+    margin:'0',transform:'none',objectFit:'fill',zIndex:'1',display:'block',visibility:'visible',opacity:'1',background:'#000'
+  });
+  if(canvas){
+    Object.assign(canvas.style,{
+      position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',
+      margin:'0',transform:'none',zIndex:'2',display:'block',visibility:'visible',opacity:'1',background:'transparent'
+    });
+  }
+  video.setAttribute('playsinline','');
+  video.setAttribute('autoplay','');
+  video.muted=true;
+  if(video.paused) video.play().catch(()=>{});
+  return true;
+}
+function stabilizeCameraLayers(){
+  let n=0;
+  const timer=setInterval(()=>{
+    forceCameraVisible();
+    if(++n>=32) clearInterval(timer);
+  },250);
+}
+window.addEventListener('resize',()=>setTimeout(stabilizeCameraLayers,120));
+window.addEventListener('orientationchange',()=>setTimeout(stabilizeCameraLayers,500));
+
 function makeScene(){
   $("#sceneMount").innerHTML=`
   <a-scene id="arScene" embedded vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false"
@@ -320,8 +370,11 @@ function makeScene(){
     const m=$("#m-"+key);m.addEventListener("markerFound",()=>markerFound(key));m.addEventListener("markerLost",()=>markerLost(key));
   });
   window.addEventListener("arjs-video-loaded",()=>{
+    stabilizeCameraLayers();
     $("#loader").style.display="none";$("#guide").style.display="block";setHud("SCANNING...","안내된 미션 이미지를 화면 중앙에 맞춰주세요.","미션 이미지의 인식 영역을 화면 중앙에 맞추면 숨겨진 정보가 열립니다.");
   },{once:true});
+  scene.addEventListener("loaded",()=>stabilizeCameraLayers(),{once:true});
+  setTimeout(stabilizeCameraLayers,700);
 }
 $("#activate").addEventListener("click",()=>{
   if(started)return;started=true;$("#activate").disabled=true;
@@ -329,6 +382,7 @@ $("#activate").addEventListener("click",()=>{
   $("#intro").style.display="none";$("#hud").style.display="block";$("#bottom").style.display="block";$("#loader").style.display="grid";
   setHud("INITIALIZING...","KEY LENS를 활성화하고 있습니다.","이 순간부터 카메라와 AR 엔진이 시작됩니다.");
   makeScene();
+  setTimeout(stabilizeCameraLayers,400);
 });
 if(new URLSearchParams(location.search).get("operator")==="1"){
   $("#operator").style.display="block";
