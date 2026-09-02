@@ -16,6 +16,7 @@ button{font:inherit}.a-enter-vr,.a-enter-ar{display:none!important}
 #arScene{z-index:2!important;background:transparent!important}
 #arjs-video{position:fixed!important;max-width:none!important;max-height:none!important;z-index:1!important;background:#000!important;visibility:visible!important;opacity:1!important}
 #arScene canvas,.a-canvas{position:fixed!important;max-width:none!important;max-height:none!important;z-index:2!important;background:transparent!important;visibility:visible!important;opacity:1!important}
+#cameraMirror{position:fixed;inset:0;z-index:1;display:none;background:#000;object-fit:fill;visibility:visible;opacity:1}
 #intro{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:22px;
 background:radial-gradient(circle at 82% 9%,rgba(118,221,234,.10),transparent 27%),
 linear-gradient(180deg,#060a11,#0b121d)}
@@ -50,10 +51,10 @@ border-radius:12px;background:rgba(4,8,14,.96)}#operator button{width:100%;margi
 border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 
 </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=33896"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=34992"></script>
 <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
 <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script></head>
-<body><div id="sceneMount"></div>
+<body><video id="cameraMirror" autoplay muted playsinline></video><div id="sceneMount"></div>
 <div id="intro"><div class="introCard"><div class="brand">THE KEY SYSTEM</div><h1>KEY LENS</h1><div class="lead">미션 카드에 숨겨진 정보를 확인합니다.<br><br><b>KEY LENS START</b>를 누르고 카메라 사용을 허용한 뒤, 안내된 미션 이미지를 화면 중앙에 맞춰주세요.</div><button id="activate" class="activate">KEY LENS START</button></div></div>
 <div id="loader"><div><div class="spin"></div><div class="loaderText">KEY LENS INITIALIZING<br>CAMERA + AR ENGINE</div></div></div>
 <div id="hud"><div class="hudRow"><div><div class="micro">KEY LENS / SYSTEM STATUS</div><div id="status">READY</div></div><div id="pill" class="pill">TARGET FOUND</div></div><div id="mission">SCANNER READY</div></div>
@@ -126,6 +127,9 @@ async function runRotate(){
 }
 async function runAnalyze(){
   const g=$("#exp-analyze");resetGroup("analyze");materialize(g);await wait(550);
+  const halo=$("#a-halo"),core=$("#a-core");
+  if(halo){halo.setAttribute("rotation","90 0 0");anim(halo,"spin","rotation","90 0 0","90 540 0",2600,"easeInOutSine");}
+  if(core){core.setAttribute("scale",".05 .05 .05");anim(core,"pulse","scale",".05 .05 .05","1 1 1",500,"easeOutBack");}
   const nodes=[1,2,3,4,5].map(n=>$("#a-node"+n)),bars=[1,2,3,4,5,6].map(n=>$("#a-bar"+n));
   nodes.forEach(n=>{n.setAttribute("scale",".05 .05 .05")});
   bars.forEach(b=>b.setAttribute("scale",".01 1 1"));
@@ -243,26 +247,45 @@ function containRect(sw,sh){
   else{width=vw;height=width/sa;left=0;top=(vh-height)/2}
   return {width,height,left,top};
 }
+function isSamsungInternet(){ return /SamsungBrowser/i.test(navigator.userAgent); }
+async function syncSamsungCameraMirror(){
+  if(!isSamsungInternet()) return false;
+  const src=getARVideo();
+  const mirror=document.querySelector('#cameraMirror');
+  if(!src || !mirror || !src.srcObject) return false;
+  try{
+    if(mirror.srcObject!==src.srcObject) mirror.srcObject=src.srcObject;
+    mirror.setAttribute('playsinline',''); mirror.setAttribute('autoplay',''); mirror.muted=true;
+    mirror.style.display='block';
+    await mirror.play().catch(()=>{});
+    return true;
+  }catch(_){ return false; }
+}
+function fitCameraElement(el, sw, sh, z){
+  if(!el) return;
+  const r=containRect(sw||640,sh||480);
+  Object.assign(el.style,{position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',margin:'0',transform:'none',objectFit:'fill',zIndex:String(z),display:'block',visibility:'visible',opacity:'1',background:'#000'});
+}
 function forceCameraVisible(){
   const video=getARVideo();
   const canvas=getARCanvas();
   if(!video) return false;
-  const sw=video.videoWidth||640, sh=video.videoHeight||480;
+  const sw=video.videoWidth||480, sh=video.videoHeight||640;
   const r=containRect(sw,sh);
-  Object.assign(video.style,{
-    position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',
-    margin:'0',transform:'none',objectFit:'fill',zIndex:'1',display:'block',visibility:'visible',opacity:'1',background:'#000'
-  });
+  Object.assign(video.style,{position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',margin:'0',transform:'none',objectFit:'fill',zIndex:'1',display:'block',visibility:'visible',opacity:isSamsungInternet()?'0':'1',background:'#000'});
   if(canvas){
-    Object.assign(canvas.style,{
-      position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',
-      margin:'0',transform:'none',zIndex:'2',display:'block',visibility:'visible',opacity:'1',background:'transparent'
-    });
+    Object.assign(canvas.style,{position:'fixed',width:r.width+'px',height:r.height+'px',left:r.left+'px',top:r.top+'px',margin:'0',transform:'none',zIndex:'2',display:'block',visibility:'visible',opacity:'1',background:'transparent'});
   }
-  video.setAttribute('playsinline','');
-  video.setAttribute('autoplay','');
-  video.muted=true;
+  video.setAttribute('playsinline',''); video.setAttribute('autoplay',''); video.muted=true;
   if(video.paused) video.play().catch(()=>{});
+  if(isSamsungInternet()){
+    const mirror=document.querySelector('#cameraMirror');
+    if(mirror){
+      if(video.srcObject && mirror.srcObject!==video.srcObject) mirror.srcObject=video.srcObject;
+      fitCameraElement(mirror,sw,sh,1);
+      mirror.play().catch(()=>{});
+    }
+  }
   return true;
 }
 function stabilizeCameraLayers(){
@@ -279,13 +302,13 @@ function makeScene(){
   $("#sceneMount").innerHTML=`
   <a-scene id="arScene" embedded vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false"
     loading-screen="enabled:false" renderer="antialias:true;alpha:true;logarithmicDepthBuffer:true;precision:medium"
-    arjs="trackingMethod:best;sourceType:webcam;debugUIEnabled:false;patternRatio:0.5;maxDetectionRate:60;">
+    arjs="trackingMethod:best;sourceType:webcam;sourceWidth:480;sourceHeight:640;displayWidth:480;displayHeight:640;debugUIEnabled:false;patternRatio:0.5;maxDetectionRate:60;">
     <a-entity light="type:ambient;intensity:1.1;color:#9db4c7"></a-entity>
     <a-entity light="type:directional;intensity:1.35;color:#ffffff" position="1 4 2"></a-entity>
     <a-entity light="type:directional;intensity:.7;color:#76ddea" position="-3 2 1"></a-entity>
 
     <a-marker id="m-rotate" type="pattern" url="${getPatternUrl("rotate")}" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-rotate" position="-1.55 0 -0.05" visible="false">
+      <a-entity id="exp-rotate" position="0 0 0" visible="false">
         <a-torus id="r-outer" position="0 .22 0" rotation="90 0 0" radius=".72" radius-tubular=".07" material="color:#465664;metalness:.95;roughness:.24"></a-torus>
         <a-torus id="r-inner" position="0 .25 0" rotation="90 0 0" radius=".55" radius-tubular=".025" material="color:#76ddea;metalness:.6;roughness:.18;emissive:#23545c"></a-torus>
         <a-entity id="r-plate" position="0 .16 0">
@@ -298,7 +321,9 @@ function makeScene(){
     </a-marker>
 
     <a-marker id="m-analyze" type="pattern" url="${getPatternUrl("analyze")}" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-analyze" position="-1.45 0 0" visible="false">
+      <a-entity id="exp-analyze" position="0 0 0" visible="false">
+        <a-torus id="a-halo" position="0 .20 0" rotation="90 0 0" radius=".88" radius-tubular=".035" material="color:#76ddea;metalness:.72;roughness:.18;emissive:#1b4d55;emissiveIntensity:.75;opacity:.9;transparent:true"></a-torus>
+        <a-cylinder id="a-core" position="0 .10 0" radius=".22" height=".16" material="color:#172631;metalness:.9;roughness:.2;emissive:#173e46;emissiveIntensity:.45"></a-cylinder>
         <a-sphere id="a-node1" data-base="-1.0 .25 -.55" position="-1.0 .03 -.55" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
         <a-sphere id="a-node2" data-base="-.25 .25 -.85" position="-.25 .03 -.85" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
         <a-sphere id="a-node3" data-base=".65 .25 -.45" position=".65 .03 -.45" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
@@ -314,7 +339,7 @@ function makeScene(){
     </a-marker>
 
     <a-marker id="m-activate" type="pattern" url="${getPatternUrl("activate")}" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-activate" position="-1.45 0 0" visible="false">
+      <a-entity id="exp-activate" position="0 0 0" visible="false">
         <a-cylinder position="0 .05 0" radius=".86" height=".08" material="color:#101720;metalness:.95;roughness:.28"></a-cylinder>
         <a-torus id="f-outer" position="0 .15 0" rotation="90 0 0" radius=".76" radius-tubular=".045" material="color:#465664;metalness:.95;roughness:.2;emissive:#19373d"></a-torus>
         <a-torus id="f-inner" position="0 .18 0" rotation="90 0 0" radius=".58" radius-tubular=".022" material="color:#76ddea;metalness:.75;roughness:.18;emissive:#1e4d55"></a-torus>
@@ -331,7 +356,7 @@ function makeScene(){
     </a-marker>
 
     <a-marker id="m-decrypt" type="pattern" url="${getPatternUrl("decrypt")}" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-decrypt" position="-1.55 0 0" visible="false">
+      <a-entity id="exp-decrypt" position="0 0 0" visible="false">
         <a-box width="2.45" height=".08" depth="1.22" position="0 .05 0" material="color:#0e1420;metalness:.9;roughness:.3"></a-box>
         <a-box id="d-left" width="1.12" height=".14" depth="1.06" position="-.48 .10 0" material="color:#252938;metalness:.9;roughness:.25;emissive:#122d38"></a-box>
         <a-box id="d-right" width="1.12" height=".14" depth="1.06" position=".48 .10 0" material="color:#252938;metalness:.9;roughness:.25;emissive:#122d38"></a-box>
@@ -349,7 +374,7 @@ function makeScene(){
     </a-marker>
 
     <a-marker id="m-assemble" type="pattern" url="${getPatternUrl("assemble")}" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-assemble" position="-1.45 0 0" visible="false">
+      <a-entity id="exp-assemble" position="0 0 0" visible="false">
         <a-box id="k-f1" width=".55" height=".13" depth=".16" position="-1.6 .8 -.8" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
         <a-box id="k-f2" width=".55" height=".13" depth=".16" position="1.55 .75 -.75" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
         <a-box id="k-f3" width=".55" height=".13" depth=".16" position="-1.55 .68 .9" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
@@ -370,6 +395,7 @@ function makeScene(){
     const m=$("#m-"+key);m.addEventListener("markerFound",()=>markerFound(key));m.addEventListener("markerLost",()=>markerLost(key));
   });
   window.addEventListener("arjs-video-loaded",()=>{
+    syncSamsungCameraMirror();
     stabilizeCameraLayers();
     $("#loader").style.display="none";$("#guide").style.display="block";setHud("SCANNING...","안내된 미션 이미지를 화면 중앙에 맞춰주세요.","미션 이미지의 인식 영역을 화면 중앙에 맞추면 숨겨진 정보가 열립니다.");
   },{once:true});
