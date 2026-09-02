@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-CROSS-BROWSER-V12">
+<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14">
 <style>
 
 :root{
@@ -14,7 +14,7 @@
   --violet:#a76cff;--ok:#7ff0c2;--danger:#ff8585
 }
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:none;
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}
 button{font:inherit}.a-enter-vr,.a-enter-ar{display:none!important}
 #sceneMount,a-scene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
@@ -60,18 +60,6 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 #readyLine.ok{color:var(--ok)}
 #readyLine.warn{color:#f2cf86}
 
-/* Samsung Internet can expose a desktop-sized layout viewport on some devices/settings.
-   Keep the participant UI physically readable even when CSS pixels are heavily zoomed out. */
-@media (orientation:portrait) and (min-width:700px){
-  #hud{left:24px;right:24px;padding:24px 28px;border-radius:28px}
-  .micro{font-size:20px}.hudRow{gap:20px}#status{font-size:44px;margin-top:5px}
-  .pill{font-size:21px;padding:12px 18px}#mission{font-size:22px;margin-top:12px}
-  #bottom{left:24px;right:24px;padding:24px 28px;border-radius:28px}
-  #message{font-size:31px}#sub{font-size:22px;margin-top:8px}
-  #guide{width:min(82vw,880px)}
-  .holoLabel{font-size:25px;padding:16px 24px}.holoSub{font-size:17px;margin-top:6px}
-}
-
 /* Production visual layer: AR.js handles recognition/pose; this DOM layer renders the visible hologram.
    It avoids mobile WebGL/video compositing failures while remaining anchored to the detected marker. */
 #spatialLayer{position:fixed;inset:0;z-index:700;pointer-events:none;overflow:hidden;display:none;perspective:900px}
@@ -106,13 +94,20 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 /* Decrypt */
 .decryptDeck{position:absolute;left:50%;top:50%;width:78%;height:43%;transform:translate(-50%,-50%) translateZ(24px);border:1px solid rgba(118,221,234,.28);background:linear-gradient(180deg,rgba(14,25,38,.94),rgba(5,9,16,.95));border-radius:14px;box-shadow:0 0 24px rgba(118,221,234,.16);display:flex;align-items:flex-end;justify-content:center;gap:4%;padding:0 8% 15%}
 .dataSlot{width:14%;height:31%;border-radius:6px;background:linear-gradient(180deg,#143a44,#09161d);border:1px solid rgba(118,221,234,.5);box-shadow:0 0 12px rgba(118,221,234,.2);transform:scale(.05);animation:dataPop .3s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}.dataSlot.gold{background:linear-gradient(180deg,#5a4824,#20180c);border-color:rgba(215,182,109,.62);box-shadow:0 0 12px rgba(215,182,109,.25)}
+.dataSlot:after{content:"DATA " attr(data-label);position:absolute;left:50%;top:-150%;transform:translateX(-50%);font-size:7px;letter-spacing:.08em;color:#bdeff5;white-space:nowrap}.dataSlot.gold:after{color:#f0d488}
 @keyframes dataPop{to{transform:scale(1)}}
 /* Final */
-.finalGlow{position:absolute;left:50%;top:48%;width:76%;height:76%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(215,182,109,.23),rgba(215,182,109,.04) 45%,transparent 68%);animation:finalGlow 1.25s ease-in-out infinite alternate}@keyframes finalGlow{to{transform:translate(-50%,-50%) scale(1.12);opacity:.75}}
-.keyShape{position:absolute;left:50%;top:45%;width:38%;height:48%;transform:translate(-50%,-50%) translateZ(42px) scale(.08);animation:keyAssemble 1.2s .65s cubic-bezier(.2,.9,.2,1.25) forwards}
-.keyRing{position:absolute;left:50%;top:23%;width:62%;aspect-ratio:1;border:9px solid #d7b66d;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 22px rgba(215,182,109,.72),inset 0 0 12px rgba(255,236,181,.28)}
-.keyStem{position:absolute;left:50%;top:50%;width:16%;height:48%;transform:translateX(-50%);background:linear-gradient(90deg,#8f7337,#f1d48a,#8f7337);box-shadow:0 0 14px rgba(215,182,109,.58)}
-@keyframes keyAssemble{to{transform:translate(-50%,-50%) translateZ(42px) scale(1)}}
+.finalGlow{position:absolute;left:50%;top:48%;width:82%;height:82%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(215,182,109,.28),rgba(215,182,109,.06) 42%,transparent 68%);animation:finalGlow 1.25s ease-in-out infinite alternate}@keyframes finalGlow{to{transform:translate(-50%,-50%) scale(1.12);opacity:.82}}
+.finalAssembly{position:absolute;left:50%;top:47%;width:58%;height:62%;transform:translate(-50%,-50%) translateZ(44px)}
+.finalFrag{position:absolute;left:50%;top:44%;width:31%;height:10%;border-radius:7px;background:linear-gradient(180deg,#fff2bd,#d7b66d 44%,#7c612a);border:1px solid rgba(255,246,214,.72);box-shadow:0 0 18px rgba(215,182,109,.62);opacity:0;transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.76);animation:fragJoin .76s cubic-bezier(.18,.88,.18,1.2) forwards;animation-delay:var(--delay)}
+.finalFrag.f1{--sx:-155%;--sy:-150%;--sr:-42deg;--delay:.28s;margin-left:-34%;margin-top:-24%}.finalFrag.f2{--sx:150%;--sy:-140%;--sr:38deg;--delay:.68s;margin-left:3%;margin-top:-24%}.finalFrag.f3{--sx:-170%;--sy:120%;--sr:34deg;--delay:1.08s;margin-left:-34%;margin-top:4%}.finalFrag.f4{--sx:165%;--sy:120%;--sr:-38deg;--delay:1.48s;margin-left:3%;margin-top:4%}.finalFrag.f5{width:12%;height:33%;left:44%;top:52%;--sx:0%;--sy:190%;--sr:12deg;--delay:1.88s;background:linear-gradient(90deg,#8d6c28,#f6da8e,#8d6c28)}
+@keyframes fragJoin{to{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}}
+.keyholeFinal{position:absolute;left:50%;top:42%;width:48%;height:58%;transform:translate(-50%,-50%) scale(.1);opacity:0;animation:keyholeReveal .72s 2.58s cubic-bezier(.18,.9,.18,1.25) forwards;filter:drop-shadow(0 0 18px rgba(215,182,109,.72))}
+.keyholeFinal:before{content:"";position:absolute;left:50%;top:5%;width:62%;aspect-ratio:1;border:8px solid #f0d488;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 20px rgba(215,182,109,.7),inset 0 0 10px rgba(255,244,208,.28)}
+.keyholeFinal:after{content:"";position:absolute;left:44%;top:49%;width:12%;height:46%;border-radius:5px;background:linear-gradient(90deg,#8e6d2e,#f5d989,#8e6d2e);box-shadow:0 0 14px rgba(215,182,109,.62)}
+@keyframes keyholeReveal{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.finalHolo .holoLabel{opacity:0;animation:finalLabelIn .45s 3.05s ease-out forwards}@keyframes finalLabelIn{to{opacity:1}}
+.sweepGold{position:absolute;left:10%;right:10%;top:47%;height:1px;background:linear-gradient(90deg,transparent,#f0d488,transparent);box-shadow:0 0 12px #d7b66d;opacity:0;animation:goldSweep 1.2s 2.45s ease-out forwards}@keyframes goldSweep{0%{opacity:0;transform:translateY(34px)}40%{opacity:1}100%{opacity:0;transform:translateY(-46px)}}
 .spatialDebug{display:none;position:absolute;left:50%;top:-16px;transform:translateX(-50%);font:8px ui-monospace,monospace;color:#76ddea;background:#031018aa;padding:3px 6px;border-radius:5px;white-space:nowrap}
 
 </style>
@@ -548,17 +543,43 @@ setTimeout(()=>{
 let spatialKey=null,spatialMarker=null,spatialRAF=0,spatialHideTimer=null,lastSpatialAnchor=null;
 const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
 const runtimeQS=new URLSearchParams(location.search);
-const samsungDesktopViewport=isSamsung && innerHeight>innerWidth && innerWidth>=700;
-const samsungVisualBoost=samsungDesktopViewport?Math.min(2.6,Math.max(1.7,innerWidth/390)):1;
-const samsungCropDefault=samsungDesktopViewport?1.30:1.26;
-const samsungCropOverride=parseFloat(runtimeQS.get("sbzoom"));
-const samsungCrop=isSamsung?(Number.isFinite(samsungCropOverride)?Math.min(1.55,Math.max(1.0,samsungCropOverride)):samsungCropDefault):1;
+// Samsung must use the same participant UI scale as Chrome.
+// Do not enlarge the page/HUD/hologram to compensate for Samsung's camera aspect.
+const samsungUIScale=1;
+const samsungVisualBoost=1;
+
+// Samsung often supplies a wider landscape camera stream in portrait mode.
+// We normalize ONLY the camera/projection rectangle to the same 3:4 portrait window used by Chrome.
+function samsungPortraitRect(sourceW,sourceH){
+  const vw=window.innerWidth,vh=window.innerHeight;
+  const targetAspect=480/640; // Chrome reference window
+  let frameW=vw,frameH=vw/targetAspect;
+  if(frameH>vh){frameH=vh;frameW=vh*targetAspect}
+  const frameLeft=(vw-frameW)/2,frameTop=(vh-frameH)/2;
+  const sourceAspect=sourceW/sourceH;
+  let width,height,left,top;
+  if(sourceAspect>targetAspect){
+    height=frameH;width=height*sourceAspect;
+    left=frameLeft+(frameW-width)/2;top=frameTop;
+  }else{
+    width=frameW;height=width/sourceAspect;
+    left=frameLeft;top=frameTop+(frameH-height)/2;
+  }
+  return {width,height,left,top};
+}
+
+// Re-assert a 1:1 mobile viewport on Samsung. This prevents a previously pinched/desktop-like
+// viewport from being amplified by our application UI.
+if(isSamsung){
+  const vp=document.querySelector('meta[name="viewport"]');
+  if(vp)vp.setAttribute('content','width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no');
+}
 function spatialMarkup(key){
   if(key==="rotate")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="rotatePanel">PERSPECTIVE SHIFT<small>ROTATE · OBSERVE · REFRAME</small></div><div class="scanBeam"></div></div><div class="holoLabel">PERSPECTIVE SHIFT<span class="holoSub">보이는 정보만으로 판단하지 마십시오.</span></div></div>`;
   if(key==="analyze")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="holoCore"></div><svg class="network" viewBox="0 0 100 100"><line x1="18" y1="28" x2="47" y2="18" style="--d:.25s"/><line x1="47" y1="18" x2="78" y2="30" style="--d:.45s"/><line x1="78" y1="30" x2="66" y2="72" style="--d:.65s"/><line class="gold" x1="66" y1="72" x2="28" y2="72" style="--d:.85s"/><line x1="28" y1="72" x2="18" y2="28" style="--d:1.05s"/><line x1="18" y1="28" x2="66" y2="72" style="--d:1.2s"/></svg><i class="holoNode" style="left:18%;top:28%;--d:.12s"></i><i class="holoNode" style="left:47%;top:18%;--d:.28s"></i><i class="holoNode" style="left:78%;top:30%;--d:.44s"></i><i class="holoNode gold" style="left:66%;top:72%;--d:.60s"></i><i class="holoNode" style="left:28%;top:72%;--d:.76s"></i></div><div class="holoLabel">CONNECTION DETECTED<span class="holoSub">조건을 분리하지 말고 관계를 연결하십시오.</span></div></div>`;
   if(key==="activate")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="holoCore"></div><div class="formationGrid"><div class="formCell" style="--d:.10s">HEART</div><div class="formCell" style="--d:.24s">MIRROR</div><div class="formCell" style="--d:.38s">LINK</div><div class="formCell" style="--d:.52s">WAVE</div></div></div><div class="holoLabel">FORMATION ANALYSIS<span class="holoSub">각 장면을 완성한 구성에 주목하십시오.</span></div></div>`;
-  if(key==="decrypt")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoCore"></div><div class="decryptDeck"><i class="dataSlot" style="--d:.15s"></i><i class="dataSlot" style="--d:.32s"></i><i class="dataSlot gold" style="--d:.49s"></i><i class="dataSlot" style="--d:.66s"></i><i class="dataSlot" style="--d:.83s"></i></div></div><div class="holoLabel">DECRYPTION READY<span class="holoSub">5개의 MUSIC DATA가 확보되었습니다.</span></div></div>`;
-  return `<div class="holo"><div class="holoTilt"><div class="finalGlow"></div><div class="holoRing outer" style="border-color:#d7b66d;box-shadow:0 0 20px rgba(215,182,109,.6)"></div><div class="keyShape"><div class="keyRing"></div><div class="keyStem"></div></div></div><div class="holoLabel" style="border-color:rgba(215,182,109,.55);color:#fff2c9">FINAL ACCESS AUTHORIZED<span class="holoSub" style="color:#d8bf82">THE KEY ASSEMBLED · MISSION COMPLETE</span></div></div>`;
+  if(key==="decrypt")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoCore"></div><div class="decryptDeck"><i class="dataSlot" data-label="01" style="--d:.15s"></i><i class="dataSlot" data-label="02" style="--d:.32s"></i><i class="dataSlot gold" data-label="03" style="--d:.49s"></i><i class="dataSlot" data-label="04" style="--d:.66s"></i><i class="dataSlot" data-label="05" style="--d:.83s"></i></div></div><div class="holoLabel">DECRYPTION READY<span class="holoSub">5개의 MUSIC DATA가 확보되었습니다.</span></div></div>`;
+  return `<div class="holo finalHolo"><div class="holoTilt"><div class="finalGlow"></div><div class="holoRing outer" style="border-color:#d7b66d;box-shadow:0 0 20px rgba(215,182,109,.6)"></div><div class="finalAssembly"><i class="finalFrag f1"></i><i class="finalFrag f2"></i><i class="finalFrag f3"></i><i class="finalFrag f4"></i><i class="finalFrag f5"></i><div class="keyholeFinal"></div><div class="sweepGold"></div></div></div><div class="holoLabel" style="border-color:rgba(215,182,109,.55);color:#fff2c9">FINAL ACCESS AUTHORIZED<span class="holoSub" style="color:#d8bf82">THE KEY ASSEMBLED · MISSION COMPLETE</span></div></div>`;
 }
 function showSpatial(key){
   clearTimeout(spatialHideTimer);spatialKey=key;spatialMarker=$("#m-"+key);
@@ -600,7 +621,7 @@ function updateSpatialAnchor(){
   }catch(_){ }
   const a=lastSpatialAnchor||{x:rect.left+rect.width/2,y:rect.top+rect.height/2,size:Math.max(240*samsungVisualBoost,Math.min(400*samsungVisualBoost,rect.width*.78))};
   content.style.left=a.x+"px";content.style.top=a.y+"px";content.style.width=a.size+"px";content.style.height=a.size+"px";
-  const dbg=$("#spatialDebug");if(dbg&&new URLSearchParams(location.search).get("diag")==="1"){dbg.style.display="block";dbg.textContent=`${spatialKey} ${Math.round(a.x)},${Math.round(a.y)} ${Math.round(a.size)}px | ${innerWidth}x${innerHeight} | SBcrop ${samsungCrop.toFixed(2)} | boost ${samsungVisualBoost.toFixed(2)}`}
+  const dbg=$("#spatialDebug");if(dbg&&new URLSearchParams(location.search).get("diag")==="1"){dbg.style.display="block";dbg.textContent=`${spatialKey} ${Math.round(a.x)},${Math.round(a.y)} ${Math.round(a.size)}px | ${innerWidth}x${innerHeight} | UI 1.00 | Samsung portrait-normalized`}
   return true;
 }
 function spatialLoop(){
@@ -620,9 +641,11 @@ const _markerFound=markerFound;markerFound=function(key){clearTimeout(spatialHid
 const _markerLost=markerLost;markerLost=function(key){_markerLost(key);scheduleSpatialHide(key)};
 // DOM boot hologram: verifies the visible overlay without depending on WebGL compositing.
 const _enterScanner=enterScanner;enterScanner=function(){const was=scannerStarted;_enterScanner();if(!was&&scannerStarted){const content=$("#spatialContent");$("#spatialLayer").classList.add("active");content.innerHTML='<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="holoCore"></div></div><div class="holoLabel">KEY LENS READY<span class="holoSub">CAMERA · TARGET ENGINE · SPATIAL LAYER</span></div></div><div class="spatialDebug" id="spatialDebug"></div>';const rect=getARCanvas()?.getBoundingClientRect();content.style.left=((rect?.left||0)+(rect?.width||innerWidth)/2)+"px";content.style.top=((rect?.top||0)+(rect?.height||innerHeight)/2)+"px";content.style.width=Math.max(250*samsungVisualBoost,Math.min(360*samsungVisualBoost,(rect?.width||innerWidth)*.68))+"px";content.style.height=content.style.width;setTimeout(()=>{if(!spatialKey)$("#spatialLayer").classList.remove("active")},1300)}};
-// Normalize Samsung Internet's wider camera presentation by cropping BOTH video and projection canvas equally.
-// Optional runtime tuning without another upload: ?sbzoom=1.20 ... 1.55
-const _containRect=containRect;containRect=function(sourceW,sourceH){const r=_containRect(sourceW,sourceH);const crop=samsungCrop;if(crop!==1){const nw=r.width*crop,nh=r.height*crop;r.left-=(nw-r.width)/2;r.top-=(nh-r.height)/2;r.width=nw;r.height=nh}return r};
+// Browser-normalized camera fit. Chrome keeps its proven fit; Samsung gets a deterministic
+// center-cropped 3:4 portrait window without changing page zoom or participant UI scale.
+const _containRect=containRect;containRect=function(sourceW,sourceH){
+  return isSamsung?samsungPortraitRect(sourceW,sourceH):_containRect(sourceW,sourceH);
+};
 
 if(new URLSearchParams(location.search).get("operator")==="1"){
   $("#operator").style.display="block";
