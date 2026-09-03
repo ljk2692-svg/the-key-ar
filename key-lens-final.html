@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-PRODUCTION-V18-TRUE-3D-AR-ENGINE">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V19-FOV-LOCKED-3D-VISIBLE">
 <style>
 
 :root{
@@ -18,29 +18,32 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}
 button{font:inherit;touch-action:manipulation}.a-enter-vr,.a-enter-ar{display:none!important}
 #sceneMount,a-scene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
-#sceneMount{position:fixed;inset:0;background:#000;overflow:hidden;z-index:0!important}
-#arScene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;background:transparent!important;z-index:0!important;pointer-events:none!important}
+/* AR.js appends its camera video directly to body. Keep the transparent WebGL scene one layer
+   above it so real geometry is composited over the camera instead of behind it. */
+#sceneMount{position:fixed;inset:0;background:transparent!important;overflow:hidden;z-index:2!important;pointer-events:none!important}
+#arScene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;background:transparent!important;z-index:2!important;pointer-events:none!important}
 #arjs-video{max-width:none!important;max-height:none!important;visibility:visible!important;opacity:1!important;background:#000!important;touch-action:pinch-zoom!important}
 #arScene canvas,.a-canvas{max-width:none!important;max-height:none!important;background:transparent!important;visibility:visible!important;opacity:0!important;pointer-events:none!important;transition:opacity .18s ease}
 html.key-lens-webgl-visible #arScene canvas,html.key-lens-webgl-visible .a-canvas{opacity:1!important}
-/* Samsung camera ownership: AR.js writes layout-viewport cover dimensions on every tick and
-   dispatches a synthetic resize every second. Keep its stream/tracking pipeline, but make the
-   Visual Viewport rectangle authoritative for the displayed video and A-Frame canvas. */
+/* Camera presentation ownership: AR.js writes viewport-cover dimensions on every render tick and
+   also dispatches synthetic resize events. Keep its stream/tracking pipeline, but make one
+   aspect-preserving rectangle authoritative for both the video and the A-Frame canvas. */
 html.key-lens-samsung-camera body{
   margin:0!important;width:100%!important;height:100%!important
 }
-html.key-lens-samsung-camera #arjs-video,
-html.key-lens-samsung-camera #arScene canvas,
-html.key-lens-samsung-camera .a-canvas{
+html.key-lens-camera-stage #arjs-video,
+html.key-lens-camera-stage #arScene canvas,
+html.key-lens-camera-stage .a-canvas{
   position:fixed!important;
   width:var(--kl-camera-width)!important;height:var(--kl-camera-height)!important;
   left:var(--kl-camera-left)!important;top:var(--kl-camera-top)!important;
+  right:auto!important;bottom:auto!important;
   margin:0!important;transform:none!important;object-fit:fill!important;
   max-width:none!important;max-height:none!important
 }
-html.key-lens-samsung-camera #arjs-video{z-index:1!important;background:#000!important}
-html.key-lens-samsung-camera #arScene canvas,
-html.key-lens-samsung-camera .a-canvas{z-index:2!important;background:transparent!important}
+html.key-lens-camera-stage #arjs-video{z-index:1!important;background:#000!important}
+html.key-lens-camera-stage #arScene canvas,
+html.key-lens-camera-stage .a-canvas{z-index:2!important;background:transparent!important}
 #intro{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:22px;
 background:radial-gradient(circle at 82% 9%,rgba(118,221,234,.10),transparent 27%),
 linear-gradient(180deg,#060a11,#0b121d)}
@@ -356,7 +359,23 @@ scene=$("#arScene");
 const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
 const viewportGuard=window.__KEY_LENS_VIEWPORT__;
 let cameraReady=false, renderReady=false, startRequested=false, scannerStarted=false;
-let fitTimer=null;
+let fitTimer=null,lastRendererRect="";
+
+// Some Chromium camera stacks expose a zoom above the native 1x baseline on the rear track.
+// Normalize only that optional setting; do not switch devices or touch Samsung's proven stream.
+window.addEventListener("camera-init",event=>{
+  if(isSamsung)return;
+  const track=event.detail?.stream?.getVideoTracks?.()[0];
+  if(!track?.getCapabilities||!track?.getSettings||!track?.applyConstraints)return;
+  try{
+    const capabilities=track.getCapabilities(),settings=track.getSettings();
+    const minZoom=Number(capabilities.zoom?.min),maxZoom=Number(capabilities.zoom?.max),currentZoom=Number(settings.zoom);
+    const baseZoom=minZoom<=1&&maxZoom>=1?1:minZoom;
+    if(Number.isFinite(baseZoom)&&Number.isFinite(currentZoom)&&currentZoom>baseZoom+.001){
+      track.applyConstraints({advanced:[{zoom:baseZoom}]}).then(()=>setTimeout(applyCameraFit,120)).catch(()=>{});
+    }
+  }catch(_){ }
+});
 
 function getARVideo(){return document.querySelector("#arjs-video") || document.querySelector("video")}
 function getARCanvas(){return scene?.canvas || document.querySelector("#arScene canvas") || document.querySelector(".a-canvas") || document.querySelector("canvas")}
@@ -371,14 +390,14 @@ function applyCameraFit(){
   const video=getARVideo(),canvas=getARCanvas();
   if(!video || !video.videoWidth || !video.videoHeight)return false;
   const r=containRect(video.videoWidth,video.videoHeight);
-  if(isSamsung){
-    const root=document.documentElement;
-    root.style.setProperty("--kl-camera-width",r.width+"px");
-    root.style.setProperty("--kl-camera-height",r.height+"px");
-    root.style.setProperty("--kl-camera-left",r.left+"px");
-    root.style.setProperty("--kl-camera-top",r.top+"px");
-    root.classList.add("key-lens-samsung-camera");
-  }
+  const rectKey=[r.width,r.height,r.left,r.top].map(v=>Math.round(v*100)/100).join(":");
+  const root=document.documentElement;
+  root.style.setProperty("--kl-camera-width",r.width+"px");
+  root.style.setProperty("--kl-camera-height",r.height+"px");
+  root.style.setProperty("--kl-camera-left",r.left+"px");
+  root.style.setProperty("--kl-camera-top",r.top+"px");
+  root.classList.add("key-lens-camera-stage");
+  if(isSamsung)root.classList.add("key-lens-samsung-camera");
   [video,canvas].forEach((el,index)=>{
     if(!el)return;
     Object.assign(el.style,{
@@ -390,21 +409,20 @@ function applyCameraFit(){
   });
   video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.muted=true;
   if(video.paused)video.play().catch(()=>{});
-  if(scene?.renderer){scene.renderer.setClearColor(0x000000,0);scene.renderer.setClearAlpha(0)}
+  if(scene?.renderer&&lastRendererRect!==rectKey){
+    scene.renderer.setSize(Math.max(2,Math.round(r.width)),Math.max(2,Math.round(r.height)),false);
+    scene.renderer.setClearColor(0x000000,0);scene.renderer.setClearAlpha(0);
+    lastRendererRect=rectKey;
+  }
   cameraReady=true;
   updateReadyState();
   return true;
 }
 function stabilizeFit(){
   clearInterval(fitTimer);
-  if(isSamsung){
-    let n=0;
-    if(applyCameraFit())return;
-    fitTimer=setInterval(()=>{if(applyCameraFit()||++n>28)clearInterval(fitTimer)},250);
-    return;
-  }
   let n=0;
-  fitTimer=setInterval(()=>{applyCameraFit();if(++n>28)clearInterval(fitTimer)},250);
+  if(applyCameraFit())return;
+  fitTimer=setInterval(()=>{if(applyCameraFit()||++n>28)clearInterval(fitTimer)},250);
 }
 function verifyRenderer(){
   if(!scene || !scene.renderer || !scene.camera)return false;
@@ -493,7 +511,13 @@ scene.addEventListener("loaded",()=>{setTimeout(()=>{verifyRenderer();applyCamer
   m.addEventListener("markerLost",()=>{if(scannerStarted)markerLost(key)});
 });
 
-window.addEventListener("resize",()=>{if(!isSamsung)setTimeout(()=>{applyCameraFit();stabilizeFit()},120)});
+let lastLayoutViewport=innerWidth+"x"+innerHeight;
+window.addEventListener("resize",()=>{
+  const nextLayoutViewport=innerWidth+"x"+innerHeight;
+  if(nextLayoutViewport===lastLayoutViewport)return;
+  lastLayoutViewport=nextLayoutViewport;
+  if(!isSamsung)setTimeout(()=>{applyCameraFit();stabilizeFit()},120);
+});
 window.addEventListener("orientationchange",()=>setTimeout(()=>{applyCameraFit();if(!isSamsung)stabilizeFit()},500));
 let viewportRefitTimer=null;
 window.addEventListener("keylensviewportchange",()=>{
