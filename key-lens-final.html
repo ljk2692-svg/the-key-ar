@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14">
+<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14.1-BOOT-TEST01">
 <style>
 
 :root{
@@ -111,8 +111,9 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 .spatialDebug{display:none;position:absolute;left:50%;top:-16px;transform:translateX(-50%);font:8px ui-monospace,monospace;color:#76ddea;background:#031018aa;padding:3px 6px;border-radius:5px;white-space:nowrap}
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
-<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
+<!-- CHANGE 01: keep the AR engines in order, but do not let either download block the first HTML paint. -->
+<script defer src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+<script defer src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
 <div id="sceneMount">
@@ -233,6 +234,7 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 <div id="bottom"><div id="message">카메라 연결을 준비하고 있습니다.</div><div id="sub">잠시 후 KEY LENS를 시작할 수 있습니다.</div></div>
 <div id="operator"><div class="micro">SYSTEM CONTROLLER</div><button data-op="rotate">PLAY AR01 ROTATE</button><button data-op="analyze">PLAY AR02 ANALYZE</button><button data-op="activate">PLAY AR03 FORMATION</button><button data-op="decrypt">PLAY AR04 DECRYPT</button><button data-op="assemble">PLAY AR05 FINAL</button><button id="operator-reset">RESET ALL</button></div>
 <script>
+window.addEventListener("DOMContentLoaded",()=>{
 const EXPERIENCE = {
   rotate:{name:"AR01 / ROTATE",title:"PERSPECTIVE SHIFT",msg:"보이는 정보만으로 판단하지 마십시오."},
   analyze:{name:"AR02 / ANALYZE",title:"CONNECTION DETECTED",msg:"조건을 분리하지 말고 관계를 연결하십시오."},
@@ -652,6 +654,8 @@ if(new URLSearchParams(location.search).get("operator")==="1"){
   $("#operator-reset").onclick=()=>{completed.clear();current=null;["rotate","analyze","activate","decrypt","assemble"].forEach(resetGroup);setHud("OPERATOR RESET","모든 미션 재생 상태를 초기화했습니다.","타깃을 다시 비추면 재생됩니다.")};
   document.querySelectorAll("[data-op]").forEach(b=>b.onclick=()=>{const k=b.dataset.op;completed.delete(k);resetGroup(k);runExperience(k)});
 }
+
+});
 
 </script>
 </body></html>
