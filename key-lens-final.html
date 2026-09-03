@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14.2-UI-TEST02">
+<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14.3-BOOT-FIRST-TEST03">
 <style>
 
 :root{
@@ -112,10 +112,25 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 
 </style>
 <!-- CHANGE 01 RESULT: FAIL. The deferred-engine boot test did not change Samsung Internet. Rolled back. -->
-<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
-<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
+<!-- CHANGE 03 — BOOT UI BEFORE ENGINES (TEST03)
+Problem: Samsung Internet paints only the document background while synchronous engine downloads
+in <head> prevent the participant UI in <body> from being parsed.
+Change: parse the single intro card first, then load A-Frame and AR.js in their required order,
+then parse <a-scene>. The AR components still load before the scene that uses them.
+Preserved: engine versions, camera/projection code, AR scene, five markers and all experiences.
+Verification: source-order/syntax/preservation checks PASS; Samsung hardware NOT TESTED.
+-->
+<div id="intro"><div class="introCard">
+  <div class="brand">THE KEY SYSTEM</div>
+  <h1>KEY LENS</h1>
+  <div class="lead">카메라 사용을 허용한 뒤 <b>KEY LENS START</b>를 눌러주세요.<br>이후 안내된 미션 이미지를 화면 중앙에 맞추면 숨겨진 정보가 열립니다.</div>
+  <div id="readyLine">CAMERA + 3D ENGINE 준비 중</div>
+  <button id="activate" class="activate" disabled>KEY LENS START</button>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 <div id="sceneMount">
   <a-scene id="arScene" embedded vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false"
     loading-screen="enabled:false" renderer="antialias:true;alpha:true;logarithmicDepthBuffer:true;precision:medium;sortObjects:true"
@@ -221,13 +236,6 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
     </a-entity>
   </a-scene></div>
 <div id="spatialLayer"><div id="spatialContent"><div class="spatialDebug" id="spatialDebug"></div></div></div>
-<div id="intro"><div class="introCard">
-  <div class="brand">THE KEY SYSTEM</div>
-  <h1>KEY LENS</h1>
-  <div class="lead">카메라 사용을 허용한 뒤 <b>KEY LENS START</b>를 눌러주세요.<br>이후 안내된 미션 이미지를 화면 중앙에 맞추면 숨겨진 정보가 열립니다.</div>
-  <div id="readyLine">CAMERA + 3D ENGINE 준비 중</div>
-  <button id="activate" class="activate" disabled>KEY LENS START</button>
-</div></div>
 <div id="loader"><div><div class="spin"></div><div class="loaderText">KEY LENS INITIALIZING<br>CAMERA + AR ENGINE</div></div></div>
 <div id="hud"><div class="hudRow"><div><div class="micro">KEY LENS / SYSTEM STATUS</div><div id="status">READY</div></div><div id="pill" class="pill">TARGET FOUND</div></div><div id="mission">SCANNER READY</div></div>
 <div id="guide"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div class="scan"></div></div>
@@ -544,58 +552,10 @@ setTimeout(()=>{
 let spatialKey=null,spatialMarker=null,spatialRAF=0,spatialHideTimer=null,lastSpatialAnchor=null;
 const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
 const runtimeQS=new URLSearchParams(location.search);
-// CHANGE 02 — Samsung physical UI normalization (TEST02)
-// Problem: the intro can be outside the visible area and scanner UI is rendered extremely small.
-// Cause: Samsung Internet or an Android custom tab can expose a desktop-sized CSS layout
-// viewport on a portrait phone while V14 fixes the participant UI scale at 1.
-// Change: derive one bounded physical UI scale from layout/screen/visualViewport ratios and
-// apply it only to participant overlays; keep the intro inside the visible viewport.
-// Preserved: V14 camera/projection rectangle, AR scene, marker mappings and experience logic.
-// Verification: syntax/diff/formula checks PASS; Samsung hardware result NOT TESTED.
-const portrait=innerHeight>innerWidth;
-const screenShort=Math.max(320,Math.min(Number(screen.width)||innerWidth,Number(screen.height)||innerHeight));
-const vvScale=(window.visualViewport&&Number(window.visualViewport.scale))||1;
-const samsungLayoutRatio=portrait?Math.max(1,innerWidth/screenShort):1;
-const visualScaleRatio=portrait&&vvScale>0&&vvScale<1?1/vvScale:1;
-const needsPhysicalUI=portrait&&(isSamsung||samsungLayoutRatio>=1.35||visualScaleRatio>=1.35);
-const samsungUIScale=needsPhysicalUI?Math.min(4.2,Math.max(1,samsungLayoutRatio,visualScaleRatio)):1;
-const samsungVisualBoost=samsungUIScale;
-
-function installPhysicalUIScale(){
-  if(samsungUIScale<=1.05)return;
-  const s=samsungUIScale;
-  const px=n=>Math.round(n*s*10)/10;
-  const st=document.createElement("style");
-  st.id="samsung-physical-ui-scale";
-  st.textContent=`
-    #intro{padding:${px(22)}px}
-    .introCard{width:calc(100% - ${px(44)}px);max-width:${px(520)}px;padding:${px(27)}px ${px(22)}px;border-radius:${px(22)}px}
-    .brand{font-size:${px(10)}px}h1{font-size:${px(38)}px;margin:${px(8)}px 0}.lead{font-size:${px(14)}px}
-    #readyLine{font-size:${px(11)}px;margin-top:${px(12)}px}.activate{font-size:${px(16)}px;margin-top:${px(22)}px;padding:${px(16)}px;border-radius:${px(14)}px}
-    #hud{left:${px(10)}px;right:${px(10)}px;padding:${px(11)}px ${px(13)}px;border-radius:${px(14)}px}
-    .micro{font-size:${px(9)}px}#status{font-size:${px(19)}px;margin-top:${px(2)}px}
-    .pill{font-size:${px(10)}px;padding:${px(6)}px ${px(9)}px}#mission{font-size:${px(10)}px;margin-top:${px(6)}px}
-    #bottom{left:${px(10)}px;right:${px(10)}px;padding:${px(12)}px ${px(13)}px;border-radius:${px(14)}px}
-    #message{font-size:${px(14)}px}#sub{font-size:${px(11)}px;margin-top:${px(4)}px}
-    #guide{width:min(86vw,${px(520)}px)}.corner{width:${px(42)}px;height:${px(42)}px}
-    .holoLabel{font-size:${px(12)}px;padding:${px(8)}px ${px(13)}px}.holoSub{font-size:${px(8)}px;margin-top:${px(3)}px}
-    .rotatePanel{font-size:${px(16)}px;border-radius:${px(12)}px}.rotatePanel small{font-size:${px(9)}px}
-    .formCell{font-size:${px(11)}px;border-radius:${px(10)}px}.decryptDeck{border-radius:${px(14)}px}.dataSlot{border-radius:${px(6)}px}
-    .spatialDebug{font-size:${px(8)}px;padding:${px(3)}px ${px(6)}px}
-  `;
-  document.head.appendChild(st);
-  document.documentElement.dataset.keyLensUiScale=s.toFixed(2);
-}
-function placeIntroInVisualViewport(){
-  if(samsungUIScale<=1.05||!window.visualViewport)return;
-  const vv=window.visualViewport,intro=document.querySelector("#intro");
-  if(!intro)return;
-  Object.assign(intro.style,{left:vv.offsetLeft+"px",top:vv.offsetTop+"px",right:"auto",bottom:"auto",width:vv.width+"px",height:vv.height+"px"});
-}
-installPhysicalUIScale();
-placeIntroInVisualViewport();
-window.visualViewport?.addEventListener("resize",placeIntroInVisualViewport);
-window.visualViewport?.addEventListener("scroll",placeIntroInVisualViewport);
+// CHANGE 02 RESULT: FAIL. Physical UI scaling did not expose the Samsung intro.
+// Rolled back to V14's proven participant scale so CHANGE 03 has one variable only.
+const samsungUIScale=1;
+const samsungVisualBoost=1;
 
 // Samsung often supplies a wider landscape camera stream in portrait mode.
 // We normalize ONLY the camera/projection rectangle to the same 3:4 portrait window used by Chrome.
