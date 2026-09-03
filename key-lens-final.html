@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-PRODUCTION-V15-SAMSUNG-VISUAL-VIEWPORT">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V16-AR-VISUAL-POLISH">
 <style>
 
 :root{
@@ -94,49 +94,55 @@ html.key-lens-visual-viewport #operator{
 
 /* Production visual layer: AR.js handles recognition/pose; this DOM layer renders the visible hologram.
    It avoids mobile WebGL/video compositing failures while remaining anchored to the detected marker. */
+/* V16 visual polish: retain the proven geometry and timing while increasing contrast against bright
+   venue backgrounds with a lightweight smoked-glass base, stronger material highlights and larger labels. */
 #spatialLayer{position:fixed;inset:0;z-index:700;pointer-events:none;overflow:hidden;display:none;perspective:900px}
 #spatialLayer.active{display:block}
-#spatialContent{position:absolute;left:50%;top:50%;width:320px;height:320px;transform:translate(-50%,-50%);transform-origin:center center;filter:drop-shadow(0 18px 34px rgba(0,0,0,.48))}
-.holo{position:absolute;inset:0;transform-style:preserve-3d;animation:holoIn .38s cubic-bezier(.2,.9,.25,1.2) both}
+#spatialContent{position:absolute;left:50%;top:50%;width:320px;height:320px;transform:translate(-50%,-50%);transform-origin:center center;filter:drop-shadow(0 18px 34px rgba(0,0,0,.56))}
+.holo{position:absolute;inset:0;isolation:isolate;transform-style:preserve-3d;animation:holoIn .38s cubic-bezier(.2,.9,.25,1.2) both}
+.holo:before{content:"";position:absolute;z-index:0;left:5%;right:5%;top:16%;bottom:20%;border-radius:50%;
+background:radial-gradient(ellipse at 50% 48%,rgba(5,15,24,.72) 0%,rgba(6,17,26,.58) 38%,rgba(5,14,22,.30) 57%,rgba(5,14,22,0) 76%);
+border:1px solid rgba(118,221,234,.10);box-shadow:0 18px 44px rgba(0,0,0,.27),inset 0 0 34px rgba(118,221,234,.045);
+transform:perspective(620px) rotateX(58deg) rotateZ(-4deg) scale(1.06)}
 @keyframes holoIn{from{opacity:0;transform:scale(.72) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.holoTilt{position:absolute;inset:8% 5% 15%;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-4deg)}
-.holoRing{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);border:3px solid rgba(118,221,234,.92);box-shadow:0 0 16px rgba(118,221,234,.65),inset 0 0 14px rgba(118,221,234,.22)}
+.holoTilt{position:absolute;z-index:1;inset:8% 5% 15%;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-4deg)}
+.holoRing{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);border:3px solid rgba(139,238,249,.98);box-shadow:0 0 9px rgba(185,248,255,.92),0 0 24px rgba(118,221,234,.64),inset 0 0 16px rgba(118,221,234,.28)}
 .holoRing.outer{width:72%;height:72%;animation:ringSpin 4.2s linear infinite}.holoRing.inner{width:48%;height:48%;border-width:2px;border-color:rgba(215,182,109,.92);box-shadow:0 0 14px rgba(215,182,109,.5);animation:ringSpinReverse 3.3s linear infinite}
 @keyframes ringSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}@keyframes ringSpinReverse{to{transform:translate(-50%,-50%) rotate(-360deg)}}
-.holoCore{position:absolute;left:50%;top:50%;width:18%;height:18%;transform:translate(-50%,-50%) translateZ(36px);border-radius:18%;background:radial-gradient(circle at 35% 30%,#e6fdff,#76ddea 28%,#173e46 66%,#071018);border:1px solid rgba(255,255,255,.65);box-shadow:0 0 22px rgba(118,221,234,.9),0 0 52px rgba(118,221,234,.28);animation:corePulse 1.55s ease-in-out infinite alternate}
+.holoCore{position:absolute;left:50%;top:50%;width:18%;height:18%;transform:translate(-50%,-50%) translateZ(36px);border-radius:18%;background:radial-gradient(circle at 32% 27%,#fff,#c9faff 13%,#76ddea 31%,#173e46 67%,#071018);border:1px solid rgba(232,253,255,.9);box-shadow:0 0 10px rgba(226,253,255,.95),0 0 25px rgba(118,221,234,.9),0 0 56px rgba(118,221,234,.32);animation:corePulse 1.55s ease-in-out infinite alternate}
 @keyframes corePulse{to{transform:translate(-50%,-50%) translateZ(50px) scale(1.08);filter:brightness(1.18)}}
-.holoLabel{position:absolute;left:50%;bottom:0;transform:translateX(-50%);min-width:72%;padding:8px 13px;border-radius:999px;text-align:center;font-weight:900;font-size:12px;letter-spacing:.16em;color:#ecfdff;border:1px solid rgba(118,221,234,.42);background:linear-gradient(180deg,rgba(7,20,29,.84),rgba(3,8,14,.9));box-shadow:0 9px 30px rgba(0,0,0,.42),0 0 18px rgba(118,221,234,.11)}
-.holoSub{display:block;margin-top:3px;font-size:8px;letter-spacing:.12em;color:#9fcbd2;font-weight:700}
+.holoLabel{position:absolute;z-index:3;left:50%;bottom:0;transform:translateX(-50%);min-width:76%;padding:9px 14px 8px;border-radius:999px;text-align:center;font-weight:900;font-size:13px;line-height:1.1;letter-spacing:.15em;color:#f3feff;text-shadow:0 0 10px rgba(118,221,234,.26);border:1px solid rgba(118,221,234,.58);background:linear-gradient(180deg,rgba(8,23,32,.97),rgba(3,8,14,.99));box-shadow:0 10px 32px rgba(0,0,0,.54),0 0 18px rgba(118,221,234,.16)}
+.holoSub{display:block;margin-top:4px;font-size:9px;line-height:1.25;letter-spacing:.10em;color:#b5dce1;font-weight:700;text-shadow:none}
 /* Analyze */
 .network{position:absolute;inset:9%;width:82%;height:82%;overflow:visible;transform:translateZ(18px)}
-.network line{stroke:#76ddea;stroke-width:2.1;opacity:.75;filter:drop-shadow(0 0 4px #76ddea);stroke-dasharray:120;stroke-dashoffset:120;animation:drawLine .55s ease-out forwards;animation-delay:var(--d,0s)}
+.network line{stroke:#8debf5;stroke-width:2.55;opacity:.92;filter:drop-shadow(0 0 4px #76ddea);stroke-dasharray:120;stroke-dashoffset:120;animation:drawLine .55s ease-out forwards;animation-delay:var(--d,0s)}
 .network line.gold{stroke:#d7b66d;filter:drop-shadow(0 0 4px #d7b66d)}
 @keyframes drawLine{to{stroke-dashoffset:0}}
-.holoNode{position:absolute;width:10%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f0feff,#76ddea 35%,#163842 72%);border:1px solid rgba(255,255,255,.7);box-shadow:0 0 15px rgba(118,221,234,.8);transform:translate(-50%,-50%) translateZ(30px) scale(.05);animation:nodePop .38s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}
+.holoNode{position:absolute;width:10.5%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 32% 26%,#fff,#cafaff 16%,#76ddea 38%,#163842 74%);border:1px solid rgba(237,254,255,.9);box-shadow:0 0 8px rgba(225,253,255,.88),0 0 18px rgba(118,221,234,.86);transform:translate(-50%,-50%) translateZ(30px) scale(.05);animation:nodePop .38s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}
 .holoNode.gold{background:radial-gradient(circle at 35% 30%,#fff5d7,#d7b66d 38%,#493b1f 75%);box-shadow:0 0 16px rgba(215,182,109,.78)}
 @keyframes nodePop{to{transform:translate(-50%,-50%) translateZ(30px) scale(1)}}
 /* Rotate */
-.rotatePanel{position:absolute;left:50%;top:50%;width:70%;height:28%;transform:translate(-50%,-50%) translateZ(26px);border:1px solid rgba(118,221,234,.38);background:linear-gradient(180deg,rgba(15,29,41,.92),rgba(6,12,20,.94));border-radius:12px;box-shadow:0 0 26px rgba(118,221,234,.18);display:grid;place-items:center;color:#e9fcff;font-weight:900;font-size:16px;letter-spacing:.08em}
-.rotatePanel small{display:block;font-size:9px;color:#91cbd2;text-align:center;margin-top:4px}
+.rotatePanel{position:absolute;left:50%;top:50%;width:74%;height:30%;transform:translate(-50%,-50%) translateZ(26px);border:1px solid rgba(118,221,234,.58);background:linear-gradient(180deg,rgba(15,31,43,.97),rgba(5,11,18,.98));border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.38),0 0 26px rgba(118,221,234,.25),inset 0 1px rgba(255,255,255,.06);display:grid;place-items:center;color:#f2feff;font-weight:900;font-size:17px;letter-spacing:.09em;text-shadow:0 0 10px rgba(118,221,234,.28)}
+.rotatePanel small{display:block;font-size:9.5px;color:#acd7dd;text-align:center;margin-top:5px}
 .scanBeam{position:absolute;left:20%;right:20%;height:2px;top:28%;background:linear-gradient(90deg,transparent,#76ddea,transparent);box-shadow:0 0 10px #76ddea;animation:beamMove 1.6s ease-in-out infinite alternate}@keyframes beamMove{to{top:70%}}
 /* Formation */
 .formationGrid{position:absolute;inset:18% 12% 22%;display:grid;grid-template-columns:1fr 1fr;gap:8%;transform:translateZ(24px)}
-.formCell{border:1px solid rgba(118,221,234,.42);background:linear-gradient(180deg,rgba(16,32,43,.88),rgba(5,11,18,.9));border-radius:10px;display:grid;place-items:center;color:#dffcff;font-size:11px;font-weight:900;letter-spacing:.10em;box-shadow:0 0 15px rgba(118,221,234,.12);animation:cellIn .45s cubic-bezier(.2,.9,.2,1.2) both;animation-delay:var(--d,0s)}
+.formCell{border:1px solid rgba(118,221,234,.62);background:linear-gradient(180deg,rgba(16,35,47,.97),rgba(5,11,18,.98));border-radius:10px;display:grid;place-items:center;color:#effeff;font-size:11.5px;font-weight:900;letter-spacing:.11em;text-shadow:0 0 9px rgba(118,221,234,.28);box-shadow:0 7px 18px rgba(0,0,0,.34),0 0 16px rgba(118,221,234,.18),inset 0 1px rgba(255,255,255,.06);animation:cellIn .45s cubic-bezier(.2,.9,.2,1.2) both;animation-delay:var(--d,0s)}
 @keyframes cellIn{from{opacity:0;transform:scale(.5) translateZ(-20px)}to{opacity:1;transform:scale(1) translateZ(18px)}}
 /* Decrypt */
-.decryptDeck{position:absolute;left:50%;top:50%;width:78%;height:43%;transform:translate(-50%,-50%) translateZ(24px);border:1px solid rgba(118,221,234,.28);background:linear-gradient(180deg,rgba(14,25,38,.94),rgba(5,9,16,.95));border-radius:14px;box-shadow:0 0 24px rgba(118,221,234,.16);display:flex;align-items:flex-end;justify-content:center;gap:4%;padding:0 8% 15%}
-.dataSlot{width:14%;height:31%;border-radius:6px;background:linear-gradient(180deg,#143a44,#09161d);border:1px solid rgba(118,221,234,.5);box-shadow:0 0 12px rgba(118,221,234,.2);transform:scale(.05);animation:dataPop .3s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}.dataSlot.gold{background:linear-gradient(180deg,#5a4824,#20180c);border-color:rgba(215,182,109,.62);box-shadow:0 0 12px rgba(215,182,109,.25)}
-.dataSlot:after{content:"DATA " attr(data-label);position:absolute;left:50%;top:-150%;transform:translateX(-50%);font-size:7px;letter-spacing:.08em;color:#bdeff5;white-space:nowrap}.dataSlot.gold:after{color:#f0d488}
+.decryptDeck{position:absolute;left:50%;top:50%;width:80%;height:44%;transform:translate(-50%,-50%) translateZ(24px);border:1px solid rgba(118,221,234,.46);background:linear-gradient(180deg,rgba(14,29,41,.97),rgba(4,9,16,.98));border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.36),0 0 26px rgba(118,221,234,.20),inset 0 1px rgba(255,255,255,.06);display:flex;align-items:flex-end;justify-content:center;gap:4%;padding:0 8% 15%}
+.dataSlot{width:14%;height:31%;border-radius:6px;background:linear-gradient(180deg,#1b4a56,#09171e);border:1px solid rgba(139,235,245,.76);box-shadow:0 0 8px rgba(199,250,255,.34),0 0 14px rgba(118,221,234,.28),inset 0 1px rgba(255,255,255,.08);transform:scale(.05);animation:dataPop .3s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}.dataSlot.gold{background:linear-gradient(180deg,#6a5427,#21190c);border-color:rgba(232,203,133,.82);box-shadow:0 0 8px rgba(255,237,190,.3),0 0 14px rgba(215,182,109,.34)}
+.dataSlot:after{content:"DATA " attr(data-label);position:absolute;left:50%;top:-155%;transform:translateX(-50%);font-size:8px;font-weight:800;letter-spacing:.08em;color:#c9f7fb;white-space:nowrap}.dataSlot.gold:after{color:#f5dc9d}
 @keyframes dataPop{to{transform:scale(1)}}
 /* Final */
 .finalGlow{position:absolute;left:50%;top:48%;width:82%;height:82%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(215,182,109,.28),rgba(215,182,109,.06) 42%,transparent 68%);animation:finalGlow 1.25s ease-in-out infinite alternate}@keyframes finalGlow{to{transform:translate(-50%,-50%) scale(1.12);opacity:.82}}
 .finalAssembly{position:absolute;left:50%;top:47%;width:58%;height:62%;transform:translate(-50%,-50%) translateZ(44px)}
-.finalFrag{position:absolute;left:50%;top:44%;width:31%;height:10%;border-radius:7px;background:linear-gradient(180deg,#fff2bd,#d7b66d 44%,#7c612a);border:1px solid rgba(255,246,214,.72);box-shadow:0 0 18px rgba(215,182,109,.62);opacity:0;transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.76);animation:fragJoin .76s cubic-bezier(.18,.88,.18,1.2) forwards;animation-delay:var(--delay)}
+.finalFrag{position:absolute;left:50%;top:44%;width:31%;height:10%;border-radius:7px;background:linear-gradient(180deg,#fff8d5 0%,#edcf82 24%,#d7b66d 50%,#806329 100%);border:1px solid rgba(255,248,220,.9);box-shadow:0 0 8px rgba(255,243,205,.68),0 0 22px rgba(215,182,109,.72);opacity:0;transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.76);animation:fragJoin .76s cubic-bezier(.18,.88,.18,1.2) forwards;animation-delay:var(--delay)}
 .finalFrag.f1{--sx:-155%;--sy:-150%;--sr:-42deg;--delay:.28s;margin-left:-34%;margin-top:-24%}.finalFrag.f2{--sx:150%;--sy:-140%;--sr:38deg;--delay:.68s;margin-left:3%;margin-top:-24%}.finalFrag.f3{--sx:-170%;--sy:120%;--sr:34deg;--delay:1.08s;margin-left:-34%;margin-top:4%}.finalFrag.f4{--sx:165%;--sy:120%;--sr:-38deg;--delay:1.48s;margin-left:3%;margin-top:4%}.finalFrag.f5{width:12%;height:33%;left:44%;top:52%;--sx:0%;--sy:190%;--sr:12deg;--delay:1.88s;background:linear-gradient(90deg,#8d6c28,#f6da8e,#8d6c28)}
 @keyframes fragJoin{to{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}}
 .keyholeFinal{position:absolute;left:50%;top:42%;width:48%;height:58%;transform:translate(-50%,-50%) scale(.1);opacity:0;animation:keyholeReveal .72s 2.58s cubic-bezier(.18,.9,.18,1.25) forwards;filter:drop-shadow(0 0 18px rgba(215,182,109,.72))}
-.keyholeFinal:before{content:"";position:absolute;left:50%;top:5%;width:62%;aspect-ratio:1;border:8px solid #f0d488;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 20px rgba(215,182,109,.7),inset 0 0 10px rgba(255,244,208,.28)}
-.keyholeFinal:after{content:"";position:absolute;left:44%;top:49%;width:12%;height:46%;border-radius:5px;background:linear-gradient(90deg,#8e6d2e,#f5d989,#8e6d2e);box-shadow:0 0 14px rgba(215,182,109,.62)}
+.keyholeFinal:before{content:"";position:absolute;left:50%;top:5%;width:62%;aspect-ratio:1;border:9px solid #f0d488;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 8px rgba(255,246,215,.78),0 0 24px rgba(215,182,109,.78),inset 0 0 12px rgba(255,244,208,.34)}
+.keyholeFinal:after{content:"";position:absolute;left:43%;top:48%;width:14%;height:48%;border-radius:5px;background:linear-gradient(90deg,#8e6d2e,#f8df99 48%,#8e6d2e);box-shadow:0 0 8px rgba(255,240,196,.54),0 0 16px rgba(215,182,109,.7)}
 @keyframes keyholeReveal{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 .finalHolo .holoLabel{opacity:0;animation:finalLabelIn .45s 3.05s ease-out forwards}@keyframes finalLabelIn{to{opacity:1}}
 .sweepGold{position:absolute;left:10%;right:10%;top:47%;height:1px;background:linear-gradient(90deg,transparent,#f0d488,transparent);box-shadow:0 0 12px #d7b66d;opacity:0;animation:goldSweep 1.2s 2.45s ease-out forwards}@keyframes goldSweep{0%{opacity:0;transform:translateY(34px)}40%{opacity:1}100%{opacity:0;transform:translateY(-46px)}}
