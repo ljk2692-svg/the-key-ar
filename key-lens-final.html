@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14.3-BOOT-FIRST-TEST03">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V15-SAMSUNG-VISUAL-VIEWPORT">
 <style>
 
 :root{
@@ -14,13 +14,13 @@
   --violet:#a76cff;--ok:#7ff0c2;--danger:#ff8585
 }
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:none;
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pinch-zoom;
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}
-button{font:inherit}.a-enter-vr,.a-enter-ar{display:none!important}
+button{font:inherit;touch-action:manipulation}.a-enter-vr,.a-enter-ar{display:none!important}
 #sceneMount,a-scene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
 #sceneMount{position:fixed;inset:0;background:#000;overflow:hidden;z-index:0!important}
 #arScene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;background:transparent!important;z-index:0!important;pointer-events:none!important}
-#arjs-video{max-width:none!important;max-height:none!important;visibility:visible!important;opacity:1!important;background:#000!important}
+#arjs-video{max-width:none!important;max-height:none!important;visibility:visible!important;opacity:1!important;background:#000!important;touch-action:pinch-zoom!important}
 #arScene canvas,.a-canvas{max-width:none!important;max-height:none!important;background:transparent!important;visibility:visible!important;opacity:0!important;pointer-events:none!important}
 #intro{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:22px;
 background:radial-gradient(circle at 82% 9%,rgba(118,221,234,.10),transparent 27%),
@@ -59,6 +59,38 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 #readyLine{margin-top:12px;font-size:11px;color:var(--muted);line-height:1.5}
 #readyLine.ok{color:var(--ok)}
 #readyLine.warn{color:#f2cf86}
+
+/* Samsung Internet can keep a layout viewport that is wider than the part the user can see.
+   Only when that condition exists, anchor participant UI to the Visual Viewport. Chrome at its
+   normal 1:1 viewport never enters this branch. */
+html.key-lens-visual-viewport #intro,
+html.key-lens-visual-viewport #loader{
+  position:absolute;inset:auto;
+  left:var(--kl-vv-left,0px);top:var(--kl-vv-top,0px);
+  width:var(--kl-vv-width,100vw);height:var(--kl-vv-height,100vh)
+}
+html.key-lens-visual-viewport #hud{
+  position:absolute;right:auto;
+  left:calc(var(--kl-vv-left,0px) + 10px);
+  top:calc(var(--kl-vv-top,0px) + max(10px,env(safe-area-inset-top)));
+  width:calc(var(--kl-vv-width,100vw) - 20px)
+}
+html.key-lens-visual-viewport #guide{
+  position:absolute;
+  left:var(--kl-vv-center-x,50vw);top:var(--kl-vv-center-y,50vh);
+  width:var(--kl-guide-width,min(86vw,520px))
+}
+html.key-lens-visual-viewport #bottom{
+  position:absolute;right:auto;bottom:auto;
+  left:calc(var(--kl-vv-left,0px) + 10px);
+  top:calc(var(--kl-vv-top,0px) + var(--kl-vv-height,100vh) - max(10px,env(safe-area-inset-bottom)));
+  width:calc(var(--kl-vv-width,100vw) - 20px);transform:translateY(-100%)
+}
+html.key-lens-visual-viewport #operator{
+  position:absolute;right:auto;
+  left:calc(var(--kl-vv-left,0px) + var(--kl-vv-width,100vw) - 180px);
+  top:calc(var(--kl-vv-top,0px) + 130px)
+}
 
 /* Production visual layer: AR.js handles recognition/pose; this DOM layer renders the visible hologram.
    It avoids mobile WebGL/video compositing failures while remaining anchored to the detected marker. */
@@ -114,13 +146,11 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 <!-- CHANGE 01 RESULT: FAIL. The deferred-engine boot test did not change Samsung Internet. Rolled back. -->
 </head>
 <body>
-<!-- CHANGE 03 — BOOT UI BEFORE ENGINES (TEST03)
-Problem: Samsung Internet paints only the document background while synchronous engine downloads
-in <head> prevent the participant UI in <body> from being parsed.
-Change: parse the single intro card first, then load A-Frame and AR.js in their required order,
-then parse <a-scene>. The AR components still load before the scene that uses them.
-Preserved: engine versions, camera/projection code, AR scene, five markers and all experiences.
-Verification: source-order/syntax/preservation checks PASS; Samsung hardware NOT TESTED.
+<!-- V15 — SAMSUNG VISUAL VIEWPORT PRODUCTION FIX
+Evidence: the Samsung blank screenshots contain the #intro gradient, so the DOM was already parsed;
+the card was outside the visible slice of a larger layout viewport. A second screenshot shows the
+same mismatch as a full-width scanner with extremely small UI. V15 uses the Visual Viewport as the
+single presentation rectangle without guessing a 2x/3x page scale. Chrome's normal path is unchanged.
 -->
 <div id="intro"><div class="introCard">
   <div class="brand">THE KEY SYSTEM</div>
@@ -129,6 +159,47 @@ Verification: source-order/syntax/preservation checks PASS; Samsung hardware NOT
   <div id="readyLine">CAMERA + 3D ENGINE 준비 중</div>
   <button id="activate" class="activate" disabled>KEY LENS START</button>
 </div></div>
+<script>
+/* Runs before the AR engines so the start card is placed in the actually visible rectangle first. */
+(function installKeyLensViewportGuard(){
+  const root=document.documentElement;
+  const samsung=/SamsungBrowser/i.test(navigator.userAgent);
+  const state={active:false,samsung,rect:{left:0,top:0,width:innerWidth,height:innerHeight}};
+  let frame=0;
+  function sync(){
+    frame=0;
+    const vv=window.visualViewport;
+    const width=Math.max(1,vv?.width||innerWidth);
+    const height=Math.max(1,vv?.height||innerHeight);
+    const left=vv?.offsetLeft||0;
+    const top=vv?.offsetTop||0;
+    const viewportMismatch=Math.abs(left)>.5||width<innerWidth-1;
+    const desktopPortrait=innerHeight>innerWidth&&innerWidth>=700;
+    state.active=samsung||viewportMismatch||desktopPortrait;
+    state.rect={left,top,width,height};
+    root.classList.toggle("key-lens-visual-viewport",state.active);
+    root.style.setProperty("--kl-vv-left",left+"px");
+    root.style.setProperty("--kl-vv-top",top+"px");
+    root.style.setProperty("--kl-vv-width",width+"px");
+    root.style.setProperty("--kl-vv-height",height+"px");
+    root.style.setProperty("--kl-vv-center-x",left+width/2+"px");
+    root.style.setProperty("--kl-vv-center-y",top+height/2+"px");
+    root.style.setProperty("--kl-guide-width",Math.min(520,width*.86)+"px");
+    window.dispatchEvent(new Event("keylensviewportchange"));
+  }
+  function queue(){if(!frame)frame=requestAnimationFrame(sync)}
+  state.sync=sync;
+  window.__KEY_LENS_VIEWPORT__=state;
+  sync();
+  window.addEventListener("resize",queue,{passive:true});
+  window.addEventListener("orientationchange",queue,{passive:true});
+  window.addEventListener("pageshow",queue,{passive:true});
+  window.visualViewport?.addEventListener("resize",queue,{passive:true});
+  window.visualViewport?.addEventListener("scroll",queue,{passive:true});
+  setTimeout(sync,250);
+  setTimeout(sync,1000);
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
 <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 <div id="sceneMount">
@@ -538,6 +609,13 @@ scene.addEventListener("loaded",()=>{setTimeout(()=>{verifyRenderer();applyCamer
 
 window.addEventListener("resize",()=>setTimeout(()=>{applyCameraFit();stabilizeFit()},120));
 window.addEventListener("orientationchange",()=>setTimeout(()=>{applyCameraFit();stabilizeFit()},500));
+let viewportRefitTimer=null;
+window.addEventListener("keylensviewportchange",()=>{
+  if(!cameraReady)return;
+  applyCameraFit();
+  clearTimeout(viewportRefitTimer);
+  viewportRefitTimer=setTimeout(stabilizeFit,180);
+});
 
 setTimeout(()=>{applyCameraFit();verifyRenderer();stabilizeFit()},700);
 setTimeout(()=>{
@@ -552,19 +630,19 @@ setTimeout(()=>{
 let spatialKey=null,spatialMarker=null,spatialRAF=0,spatialHideTimer=null,lastSpatialAnchor=null;
 const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
 const runtimeQS=new URLSearchParams(location.search);
-// CHANGE 02 RESULT: FAIL. Physical UI scaling did not expose the Samsung intro.
-// Rolled back to V14's proven participant scale so CHANGE 03 has one variable only.
 const samsungUIScale=1;
 const samsungVisualBoost=1;
+const viewportGuard=window.__KEY_LENS_VIEWPORT__;
 
-// Samsung often supplies a wider landscape camera stream in portrait mode.
-// We normalize ONLY the camera/projection rectangle to the same 3:4 portrait window used by Chrome.
+// Samsung and mismatched Android custom tabs use one Visual Viewport rectangle for both the
+// camera video and tracking canvas. The existing Chrome containRect() remains untouched at 1:1.
 function samsungPortraitRect(sourceW,sourceH){
-  const vw=window.innerWidth,vh=window.innerHeight;
+  const visible=viewportGuard?.rect||{left:0,top:0,width:innerWidth,height:innerHeight};
+  const vw=visible.width,vh=visible.height;
   const targetAspect=480/640; // Chrome reference window
   let frameW=vw,frameH=vw/targetAspect;
   if(frameH>vh){frameH=vh;frameW=vh*targetAspect}
-  const frameLeft=(vw-frameW)/2,frameTop=(vh-frameH)/2;
+  const frameLeft=visible.left+(vw-frameW)/2,frameTop=visible.top+(vh-frameH)/2;
   const sourceAspect=sourceW/sourceH;
   let width,height,left,top;
   if(sourceAspect>targetAspect){
@@ -575,13 +653,6 @@ function samsungPortraitRect(sourceW,sourceH){
     left=frameLeft;top=frameTop+(frameH-height)/2;
   }
   return {width,height,left,top};
-}
-
-// Re-assert a 1:1 mobile viewport on Samsung. This prevents a previously pinched/desktop-like
-// viewport from being amplified by our application UI.
-if(isSamsung){
-  const vp=document.querySelector('meta[name="viewport"]');
-  if(vp)vp.setAttribute('content','width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no');
 }
 function spatialMarkup(key){
   if(key==="rotate")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="rotatePanel">PERSPECTIVE SHIFT<small>ROTATE · OBSERVE · REFRAME</small></div><div class="scanBeam"></div></div><div class="holoLabel">PERSPECTIVE SHIFT<span class="holoSub">보이는 정보만으로 판단하지 마십시오.</span></div></div>`;
@@ -653,7 +724,7 @@ const _enterScanner=enterScanner;enterScanner=function(){const was=scannerStarte
 // Browser-normalized camera fit. Chrome keeps its proven fit; Samsung gets a deterministic
 // center-cropped 3:4 portrait window without changing page zoom or participant UI scale.
 const _containRect=containRect;containRect=function(sourceW,sourceH){
-  return isSamsung?samsungPortraitRect(sourceW,sourceH):_containRect(sourceW,sourceH);
+  return (isSamsung||viewportGuard?.active)?samsungPortraitRect(sourceW,sourceH):_containRect(sourceW,sourceH);
 };
 
 if(new URLSearchParams(location.search).get("operator")==="1"){
