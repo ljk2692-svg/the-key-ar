@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-PRODUCTION-V16-AR-VISUAL-POLISH">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V18-TRUE-3D-AR-ENGINE">
 <style>
 
 :root{
@@ -21,7 +21,26 @@ button{font:inherit;touch-action:manipulation}.a-enter-vr,.a-enter-ar{display:no
 #sceneMount{position:fixed;inset:0;background:#000;overflow:hidden;z-index:0!important}
 #arScene{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;background:transparent!important;z-index:0!important;pointer-events:none!important}
 #arjs-video{max-width:none!important;max-height:none!important;visibility:visible!important;opacity:1!important;background:#000!important;touch-action:pinch-zoom!important}
-#arScene canvas,.a-canvas{max-width:none!important;max-height:none!important;background:transparent!important;visibility:visible!important;opacity:0!important;pointer-events:none!important}
+#arScene canvas,.a-canvas{max-width:none!important;max-height:none!important;background:transparent!important;visibility:visible!important;opacity:0!important;pointer-events:none!important;transition:opacity .18s ease}
+html.key-lens-webgl-visible #arScene canvas,html.key-lens-webgl-visible .a-canvas{opacity:1!important}
+/* Samsung camera ownership: AR.js writes layout-viewport cover dimensions on every tick and
+   dispatches a synthetic resize every second. Keep its stream/tracking pipeline, but make the
+   Visual Viewport rectangle authoritative for the displayed video and A-Frame canvas. */
+html.key-lens-samsung-camera body{
+  margin:0!important;width:100%!important;height:100%!important
+}
+html.key-lens-samsung-camera #arjs-video,
+html.key-lens-samsung-camera #arScene canvas,
+html.key-lens-samsung-camera .a-canvas{
+  position:fixed!important;
+  width:var(--kl-camera-width)!important;height:var(--kl-camera-height)!important;
+  left:var(--kl-camera-left)!important;top:var(--kl-camera-top)!important;
+  margin:0!important;transform:none!important;object-fit:fill!important;
+  max-width:none!important;max-height:none!important
+}
+html.key-lens-samsung-camera #arjs-video{z-index:1!important;background:#000!important}
+html.key-lens-samsung-camera #arScene canvas,
+html.key-lens-samsung-camera .a-canvas{z-index:2!important;background:transparent!important}
 #intro{position:fixed;z-index:1000;inset:0;display:grid;place-items:center;padding:22px;
 background:radial-gradient(circle at 82% 9%,rgba(118,221,234,.10),transparent 27%),
 linear-gradient(180deg,#060a11,#0b121d)}
@@ -92,10 +111,8 @@ html.key-lens-visual-viewport #operator{
   top:calc(var(--kl-vv-top,0px) + 130px)
 }
 
-/* Production visual layer: AR.js handles recognition/pose; this DOM layer renders the visible hologram.
-   It avoids mobile WebGL/video compositing failures while remaining anchored to the detected marker. */
-/* V16 visual polish: retain the proven geometry and timing while increasing contrast against bright
-   venue backgrounds with a lightweight smoked-glass base, stronger material highlights and larger labels. */
+/* V18 hybrid presentation: real geometry follows the AR.js marker pose in WebGL, while this DOM
+   layer keeps short mission labels crisp and readable against a live camera background. */
 #spatialLayer{position:fixed;inset:0;z-index:700;pointer-events:none;overflow:hidden;display:none;perspective:900px}
 #spatialLayer.active{display:block}
 #spatialContent{position:absolute;left:50%;top:50%;width:320px;height:320px;transform:translate(-50%,-50%);transform-origin:center center;filter:drop-shadow(0 18px 34px rgba(0,0,0,.56))}
@@ -113,43 +130,30 @@ transform:perspective(620px) rotateX(58deg) rotateZ(-4deg) scale(1.06)}
 @keyframes corePulse{to{transform:translate(-50%,-50%) translateZ(50px) scale(1.08);filter:brightness(1.18)}}
 .holoLabel{position:absolute;z-index:3;left:50%;bottom:0;transform:translateX(-50%);min-width:76%;padding:9px 14px 8px;border-radius:999px;text-align:center;font-weight:900;font-size:13px;line-height:1.1;letter-spacing:.15em;color:#f3feff;text-shadow:0 0 10px rgba(118,221,234,.26);border:1px solid rgba(118,221,234,.58);background:linear-gradient(180deg,rgba(8,23,32,.97),rgba(3,8,14,.99));box-shadow:0 10px 32px rgba(0,0,0,.54),0 0 18px rgba(118,221,234,.16)}
 .holoSub{display:block;margin-top:4px;font-size:9px;line-height:1.25;letter-spacing:.10em;color:#b5dce1;font-weight:700;text-shadow:none}
-/* Analyze */
-.network{position:absolute;inset:9%;width:82%;height:82%;overflow:visible;transform:translateZ(18px)}
-.network line{stroke:#8debf5;stroke-width:2.55;opacity:.92;filter:drop-shadow(0 0 4px #76ddea);stroke-dasharray:120;stroke-dashoffset:120;animation:drawLine .55s ease-out forwards;animation-delay:var(--d,0s)}
-.network line.gold{stroke:#d7b66d;filter:drop-shadow(0 0 4px #d7b66d)}
-@keyframes drawLine{to{stroke-dashoffset:0}}
-.holoNode{position:absolute;width:10.5%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 32% 26%,#fff,#cafaff 16%,#76ddea 38%,#163842 74%);border:1px solid rgba(237,254,255,.9);box-shadow:0 0 8px rgba(225,253,255,.88),0 0 18px rgba(118,221,234,.86);transform:translate(-50%,-50%) translateZ(30px) scale(.05);animation:nodePop .38s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}
-.holoNode.gold{background:radial-gradient(circle at 35% 30%,#fff5d7,#d7b66d 38%,#493b1f 75%);box-shadow:0 0 16px rgba(215,182,109,.78)}
-@keyframes nodePop{to{transform:translate(-50%,-50%) translateZ(30px) scale(1)}}
-/* Rotate */
-.rotatePanel{position:absolute;left:50%;top:50%;width:74%;height:30%;transform:translate(-50%,-50%) translateZ(26px);border:1px solid rgba(118,221,234,.58);background:linear-gradient(180deg,rgba(15,31,43,.97),rgba(5,11,18,.98));border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.38),0 0 26px rgba(118,221,234,.25),inset 0 1px rgba(255,255,255,.06);display:grid;place-items:center;color:#f2feff;font-weight:900;font-size:17px;letter-spacing:.09em;text-shadow:0 0 10px rgba(118,221,234,.28)}
-.rotatePanel small{display:block;font-size:9.5px;color:#acd7dd;text-align:center;margin-top:5px}
-.scanBeam{position:absolute;left:20%;right:20%;height:2px;top:28%;background:linear-gradient(90deg,transparent,#76ddea,transparent);box-shadow:0 0 10px #76ddea;animation:beamMove 1.6s ease-in-out infinite alternate}@keyframes beamMove{to{top:70%}}
-/* Formation */
-.formationGrid{position:absolute;inset:18% 12% 22%;display:grid;grid-template-columns:1fr 1fr;gap:8%;transform:translateZ(24px)}
-.formCell{border:1px solid rgba(118,221,234,.62);background:linear-gradient(180deg,rgba(16,35,47,.97),rgba(5,11,18,.98));border-radius:10px;display:grid;place-items:center;color:#effeff;font-size:11.5px;font-weight:900;letter-spacing:.11em;text-shadow:0 0 9px rgba(118,221,234,.28);box-shadow:0 7px 18px rgba(0,0,0,.34),0 0 16px rgba(118,221,234,.18),inset 0 1px rgba(255,255,255,.06);animation:cellIn .45s cubic-bezier(.2,.9,.2,1.2) both;animation-delay:var(--d,0s)}
-@keyframes cellIn{from{opacity:0;transform:scale(.5) translateZ(-20px)}to{opacity:1;transform:scale(1) translateZ(18px)}}
-/* Decrypt */
-.decryptDeck{position:absolute;left:50%;top:50%;width:80%;height:44%;transform:translate(-50%,-50%) translateZ(24px);border:1px solid rgba(118,221,234,.46);background:linear-gradient(180deg,rgba(14,29,41,.97),rgba(4,9,16,.98));border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.36),0 0 26px rgba(118,221,234,.20),inset 0 1px rgba(255,255,255,.06);display:flex;align-items:flex-end;justify-content:center;gap:4%;padding:0 8% 15%}
-.dataSlot{width:14%;height:31%;border-radius:6px;background:linear-gradient(180deg,#1b4a56,#09171e);border:1px solid rgba(139,235,245,.76);box-shadow:0 0 8px rgba(199,250,255,.34),0 0 14px rgba(118,221,234,.28),inset 0 1px rgba(255,255,255,.08);transform:scale(.05);animation:dataPop .3s cubic-bezier(.2,.9,.2,1.4) forwards;animation-delay:var(--d,0s)}.dataSlot.gold{background:linear-gradient(180deg,#6a5427,#21190c);border-color:rgba(232,203,133,.82);box-shadow:0 0 8px rgba(255,237,190,.3),0 0 14px rgba(215,182,109,.34)}
-.dataSlot:after{content:"DATA " attr(data-label);position:absolute;left:50%;top:-155%;transform:translateX(-50%);font-size:8px;font-weight:800;letter-spacing:.08em;color:#c9f7fb;white-space:nowrap}.dataSlot.gold:after{color:#f5dc9d}
-@keyframes dataPop{to{transform:scale(1)}}
-/* Final */
-.finalGlow{position:absolute;left:50%;top:48%;width:82%;height:82%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(215,182,109,.28),rgba(215,182,109,.06) 42%,transparent 68%);animation:finalGlow 1.25s ease-in-out infinite alternate}@keyframes finalGlow{to{transform:translate(-50%,-50%) scale(1.12);opacity:.82}}
-.finalAssembly{position:absolute;left:50%;top:47%;width:58%;height:62%;transform:translate(-50%,-50%) translateZ(44px)}
-.finalFrag{position:absolute;left:50%;top:44%;width:31%;height:10%;border-radius:7px;background:linear-gradient(180deg,#fff8d5 0%,#edcf82 24%,#d7b66d 50%,#806329 100%);border:1px solid rgba(255,248,220,.9);box-shadow:0 0 8px rgba(255,243,205,.68),0 0 22px rgba(215,182,109,.72);opacity:0;transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.76);animation:fragJoin .76s cubic-bezier(.18,.88,.18,1.2) forwards;animation-delay:var(--delay)}
-.finalFrag.f1{--sx:-155%;--sy:-150%;--sr:-42deg;--delay:.28s;margin-left:-34%;margin-top:-24%}.finalFrag.f2{--sx:150%;--sy:-140%;--sr:38deg;--delay:.68s;margin-left:3%;margin-top:-24%}.finalFrag.f3{--sx:-170%;--sy:120%;--sr:34deg;--delay:1.08s;margin-left:-34%;margin-top:4%}.finalFrag.f4{--sx:165%;--sy:120%;--sr:-38deg;--delay:1.48s;margin-left:3%;margin-top:4%}.finalFrag.f5{width:12%;height:33%;left:44%;top:52%;--sx:0%;--sy:190%;--sr:12deg;--delay:1.88s;background:linear-gradient(90deg,#8d6c28,#f6da8e,#8d6c28)}
-@keyframes fragJoin{to{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}}
-.keyholeFinal{position:absolute;left:50%;top:42%;width:48%;height:58%;transform:translate(-50%,-50%) scale(.1);opacity:0;animation:keyholeReveal .72s 2.58s cubic-bezier(.18,.9,.18,1.25) forwards;filter:drop-shadow(0 0 18px rgba(215,182,109,.72))}
-.keyholeFinal:before{content:"";position:absolute;left:50%;top:5%;width:62%;aspect-ratio:1;border:9px solid #f0d488;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 8px rgba(255,246,215,.78),0 0 24px rgba(215,182,109,.78),inset 0 0 12px rgba(255,244,208,.34)}
-.keyholeFinal:after{content:"";position:absolute;left:43%;top:48%;width:14%;height:48%;border-radius:5px;background:linear-gradient(90deg,#8e6d2e,#f8df99 48%,#8e6d2e);box-shadow:0 0 8px rgba(255,240,196,.54),0 0 16px rgba(215,182,109,.7)}
-@keyframes keyholeReveal{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-.finalHolo .holoLabel{opacity:0;animation:finalLabelIn .45s 3.05s ease-out forwards}@keyframes finalLabelIn{to{opacity:1}}
-.sweepGold{position:absolute;left:10%;right:10%;top:47%;height:1px;background:linear-gradient(90deg,transparent,#f0d488,transparent);box-shadow:0 0 12px #d7b66d;opacity:0;animation:goldSweep 1.2s 2.45s ease-out forwards}@keyframes goldSweep{0%{opacity:0;transform:translateY(34px)}40%{opacity:1}100%{opacity:0;transform:translateY(-46px)}}
+@keyframes finalLabelIn{to{opacity:1}}
+.hybridHolo:before{left:9%;right:9%;top:25%;bottom:17%;opacity:.62}
+.hybridPanel{position:absolute;z-index:4;left:50%;transform:translateX(-50%);width:88%;padding:10px 12px;border:1px solid rgba(118,221,234,.48);border-radius:10px;background:linear-gradient(180deg,rgba(7,20,30,.94),rgba(3,8,14,.97));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(118,221,234,.14);color:#eafeff;text-align:center;font-weight:850;letter-spacing:.10em}
+.hybridPanel strong{display:block;font-size:12px}.hybridPanel small{display:block;margin-top:4px;font-size:8px;color:#a9d7dc;letter-spacing:.08em;line-height:1.4}
+.rotateReadout{top:7%;display:flex;justify-content:space-around;align-items:center;gap:7px;width:92%;padding:7px}
+.rotateReadout b{min-width:27%;padding:5px 6px;border:1px solid rgba(118,221,234,.28);background:rgba(8,23,34,.84);border-radius:6px;font:800 9px ui-monospace,monospace;color:#d9fbff}
+.personTags{position:absolute;z-index:4;left:7%;right:7%;top:9%;display:flex;justify-content:space-between}
+.personTags b{width:30%;padding:6px 3px;border:1px solid rgba(118,221,234,.36);border-radius:7px;background:rgba(4,14,22,.92);font-size:10px;letter-spacing:.12em;text-align:center;color:#eaffff;box-shadow:0 0 13px rgba(118,221,234,.12)}
+.conditionRail{top:auto;bottom:13%;display:flex;justify-content:center;gap:6px;padding:7px 8px}
+.conditionRail span{padding:4px 7px;border-radius:999px;border:1px solid rgba(118,221,234,.26);font:800 7px ui-monospace,monospace;color:#a9d7dc}
+.directivePanel{top:0;width:94%;clip-path:polygon(5% 0,95% 0,100% 18%,100% 82%,95% 100%,5% 100%,0 82%,0 18%);border-color:rgba(215,182,109,.48)}
+.directiveState{color:#76ddea!important}.directiveBody{color:#fff!important;font-size:10px!important}.directivePanel[data-stage="active"]{border-color:rgba(215,182,109,.82);box-shadow:0 12px 34px rgba(0,0,0,.52),0 0 24px rgba(215,182,109,.22)}
+.directivePanel[data-stage="active"] .directiveState{color:#f0cf83!important}
+.dataRibbon{top:5%;display:flex;justify-content:center;gap:5px;padding:8px;width:94%}
+.dataRibbon span{flex:1;padding:5px 1px;border:1px solid rgba(118,221,234,.27);border-radius:5px;font:800 7px ui-monospace,monospace;color:#c9f7fb;background:rgba(5,18,28,.84)}
+.dataRibbon span.on{color:#fff;border-color:rgba(118,221,234,.82);box-shadow:0 0 10px rgba(118,221,234,.38)}
+.rulePanel{top:auto;bottom:13%;border-color:rgba(215,182,109,.38)}
+.fragmentRail{top:3%;display:flex;justify-content:center;gap:5px;width:94%;padding:7px}
+.fragmentRail span{width:16%;padding:5px 1px;border:1px solid rgba(215,182,109,.25);border-radius:5px;font:800 7px ui-monospace,monospace;color:#b8aa86;background:rgba(18,14,7,.78)}
+.fragmentRail span.on{color:#fff3c9;border-color:rgba(240,212,136,.82);box-shadow:0 0 11px rgba(215,182,109,.42)}
+.finalHolo3D .holoLabel{opacity:0;animation:finalLabelIn .45s 8.55s ease-out forwards}
 .spatialDebug{display:none;position:absolute;left:50%;top:-16px;transform:translateX(-50%);font:8px ui-monospace,monospace;color:#76ddea;background:#031018aa;padding:3px 6px;border-radius:5px;white-space:nowrap}
 
 </style>
-<!-- CHANGE 01 RESULT: FAIL. The deferred-engine boot test did not change Samsung Internet. Rolled back. -->
 </head>
 <body>
 <!-- V15 — SAMSUNG VISUAL VIEWPORT PRODUCTION FIX
@@ -181,7 +185,10 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
     const top=vv?.offsetTop||0;
     const viewportMismatch=Math.abs(left)>.5||width<innerWidth-1;
     const desktopPortrait=innerHeight>innerWidth&&innerWidth>=700;
-    state.active=samsung||viewportMismatch||desktopPortrait;
+    const active=samsung||viewportMismatch||desktopPortrait;
+    const previous=state.rect;
+    const changed=state.active!==active||Math.abs(previous.left-left)>.5||Math.abs(previous.top-top)>.5||Math.abs(previous.width-width)>.5||Math.abs(previous.height-height)>.5;
+    state.active=active;
     state.rect={left,top,width,height};
     root.classList.toggle("key-lens-visual-viewport",state.active);
     root.style.setProperty("--kl-vv-left",left+"px");
@@ -191,7 +198,7 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
     root.style.setProperty("--kl-vv-center-x",left+width/2+"px");
     root.style.setProperty("--kl-vv-center-y",top+height/2+"px");
     root.style.setProperty("--kl-guide-width",Math.min(520,width*.86)+"px");
-    window.dispatchEvent(new Event("keylensviewportchange"));
+    if(changed)window.dispatchEvent(new Event("keylensviewportchange"));
   }
   function queue(){if(!frame)frame=requestAnimationFrame(sync)}
   state.sync=sync;
@@ -217,88 +224,23 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
     <a-entity light="type:directional;intensity:.7;color:#76ddea" position="-3 2 1"></a-entity>
 
     <a-marker id="m-rotate" type="pattern" url="./access-node-01.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-rotate" position="0 0 0" visible="true">
-        <a-torus id="r-outer" position="0 .22 0" rotation="90 0 0" radius=".72" radius-tubular=".07" material="color:#465664;metalness:.95;roughness:.24"></a-torus>
-        <a-torus id="r-inner" position="0 .25 0" rotation="90 0 0" radius=".55" radius-tubular=".025" material="color:#76ddea;metalness:.6;roughness:.18;emissive:#23545c"></a-torus>
-        <a-entity id="r-plate" position="0 .16 0">
-          <a-box width="2.2" height=".10" depth=".85" material="color:#111922;metalness:.9;roughness:.28"></a-box>
-          <a-text value="9981 + 1601 = 2957" position="0 .065 -.13" rotation="-90 0 0" align="center" width="2.1" color="#f4f7fa"></a-text>
-          <a-text value="1080 + 9168 = ????" position="0 .066 .16" rotation="-90 0 0" align="center" width="2.1" color="#bdf4fa"></a-text>
-          <a-box id="r-scan" width="2.0" height=".018" depth=".045" position="0 .16 .46" material="color:#76ddea;emissive:#76ddea;emissiveIntensity:.8"></a-box>
-        </a-entity>
-      </a-entity>
+      <a-entity id="exp-rotate" position="0 0 0" visible="true"></a-entity>
     </a-marker>
 
     <a-marker id="m-analyze" type="pattern" url="./access-node-02.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-analyze" position="0 0 0" visible="true">
-        <a-box id="a-base" position="0 .04 0" width="1.72" height=".06" depth="1.72" material="color:#081821;opacity:.55;transparent:true;metalness:.45;roughness:.3"></a-box>
-        <a-torus id="a-halo" position="0 .20 0" rotation="90 0 0" radius=".88" radius-tubular=".035" material="color:#76ddea;metalness:.72;roughness:.18;emissive:#1b4d55;emissiveIntensity:.75;opacity:.9;transparent:true"></a-torus>
-        <a-cylinder id="a-core" position="0 .10 0" radius=".22" height=".16" material="color:#172631;metalness:.9;roughness:.2;emissive:#173e46;emissiveIntensity:.45"></a-cylinder>
-        <a-cylinder id="a-beacon" position="0 .34 0" radius=".075" height=".55" material="color:#76ddea;emissive:#76ddea;emissiveIntensity:1.1;opacity:.92;transparent:true"></a-cylinder>
-        <a-text value="ANALYZE" position="0 .62 0" rotation="-90 0 0" align="center" width="1.8" color="#d9fbff"></a-text>
-        <a-sphere id="a-node1" data-base="-1.0 .25 -.55" position="-1.0 .03 -.55" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
-        <a-sphere id="a-node2" data-base="-.25 .25 -.85" position="-.25 .03 -.85" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
-        <a-sphere id="a-node3" data-base=".65 .25 -.45" position=".65 .03 -.45" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
-        <a-sphere id="a-node4" data-base=".35 .25 .55" position=".35 .03 .55" radius=".15" material="color:#d7b66d;metalness:.8;roughness:.2;emissive:#4b3c1f"></a-sphere>
-        <a-sphere id="a-node5" data-base="-.75 .25 .55" position="-.75 .03 .55" radius=".13" material="color:#76ddea;metalness:.55;roughness:.18;emissive:#173f46"></a-sphere>
-        <a-box id="a-bar1" position="-.62 .12 -.70" width=".80" height=".035" depth=".035" rotation="0 22 0" material="color:#76ddea;metalness:.7"></a-box>
-        <a-box id="a-bar2" position=".20 .12 -.65" width="1.0" height=".035" depth=".035" rotation="0 -25 0" material="color:#76ddea;metalness:.7"></a-box>
-        <a-box id="a-bar3" position=".50 .12 .05" width="1.02" height=".035" depth=".035" rotation="0 73 0" material="color:#76ddea;metalness:.7"></a-box>
-        <a-box id="a-bar4" position="-.20 .12 .55" width="1.1" height=".035" depth=".035" rotation="0 0 0" material="color:#d7b66d;metalness:.8"></a-box>
-        <a-box id="a-bar5" position="-.88 .12 0" width="1.1" height=".035" depth=".035" rotation="0 78 0" material="color:#76ddea;metalness:.7"></a-box>
-        <a-box id="a-bar6" position="-.47 .12 -.12" width="1.45" height=".035" depth=".035" rotation="0 76 0" material="color:#bdf4fa;metalness:.6"></a-box>
-      </a-entity>
+      <a-entity id="exp-analyze" position="0 0 0" visible="true"></a-entity>
     </a-marker>
 
     <a-marker id="m-activate" type="pattern" url="./access-node-03.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-activate" position="0 0 0" visible="true">
-        <a-cylinder position="0 .05 0" radius=".86" height=".08" material="color:#101720;metalness:.95;roughness:.28"></a-cylinder>
-        <a-torus id="f-outer" position="0 .15 0" rotation="90 0 0" radius=".76" radius-tubular=".045" material="color:#465664;metalness:.95;roughness:.2;emissive:#19373d"></a-torus>
-        <a-torus id="f-inner" position="0 .18 0" rotation="90 0 0" radius=".58" radius-tubular=".022" material="color:#76ddea;metalness:.75;roughness:.18;emissive:#1e4d55"></a-torus>
-        <a-cylinder id="f-core" position="0 .28 0" radius=".18" height=".20" material="color:#d7b66d;metalness:1;roughness:.18;emissive:#493b1f"></a-cylinder>
-        <a-box id="f-slot1" position="-.75 .30 -.72" width=".52" height=".12" depth=".32" material="color:#172631;metalness:.8;emissive:#173e46"></a-box>
-        <a-box id="f-slot2" position=".75 .30 -.72" width=".52" height=".12" depth=".32" material="color:#172631;metalness:.8;emissive:#173e46"></a-box>
-        <a-box id="f-slot3" position="-.75 .30 .72" width=".52" height=".12" depth=".32" material="color:#172631;metalness:.8;emissive:#173e46"></a-box>
-        <a-box id="f-slot4" position=".75 .30 .72" width=".52" height=".12" depth=".32" material="color:#172631;metalness:.8;emissive:#173e46"></a-box>
-        <a-text value="HEART" position="-.75 .38 -.72" rotation="-90 0 0" align="center" width="1.2" color="#c2f7fb"></a-text>
-        <a-text value="MIRROR" position=".75 .38 -.72" rotation="-90 0 0" align="center" width="1.2" color="#c2f7fb"></a-text>
-        <a-text value="LINK" position="-.75 .38 .72" rotation="-90 0 0" align="center" width="1.2" color="#c2f7fb"></a-text>
-        <a-text value="WAVE" position=".75 .38 .72" rotation="-90 0 0" align="center" width="1.2" color="#c2f7fb"></a-text>
-      </a-entity>
+      <a-entity id="exp-activate" position="0 0 0" visible="true"></a-entity>
     </a-marker>
 
     <a-marker id="m-decrypt" type="pattern" url="./access-node-04.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-decrypt" position="0 0 0" visible="true">
-        <a-box width="2.45" height=".08" depth="1.22" position="0 .05 0" material="color:#0e1420;metalness:.9;roughness:.3"></a-box>
-        <a-box id="d-left" width="1.12" height=".14" depth="1.06" position="-.48 .10 0" material="color:#252938;metalness:.9;roughness:.25;emissive:#122d38"></a-box>
-        <a-box id="d-right" width="1.12" height=".14" depth="1.06" position=".48 .10 0" material="color:#252938;metalness:.9;roughness:.25;emissive:#122d38"></a-box>
-        <a-entity id="d-core" position="0 .06 0" scale=".01 .01 .01">
-          <a-torus id="d-ring" position="0 0 0" rotation="90 0 0" radius=".38" radius-tubular=".055" material="color:#76ddea;metalness:.7;roughness:.2;emissive:#24505a"></a-torus>
-          <a-torus position="0 .05 0" rotation="90 0 0" radius=".24" radius-tubular=".025" material="color:#d7b66d;metalness:.8;emissive:#493b1f"></a-torus>
-        </a-entity>
-        <a-box id="d-slot1" position="-.92 .26 -.58" width=".32" height=".12" depth=".20" material="color:#76ddea;metalness:.7;emissive:#173e46"></a-box>
-        <a-box id="d-slot2" position="-.46 .26 -.58" width=".32" height=".12" depth=".20" material="color:#76ddea;metalness:.7;emissive:#173e46"></a-box>
-        <a-box id="d-slot3" position="0 .26 -.58" width=".32" height=".12" depth=".20" material="color:#d7b66d;metalness:.8;emissive:#493b1f"></a-box>
-        <a-box id="d-slot4" position=".46 .26 -.58" width=".32" height=".12" depth=".20" material="color:#76ddea;metalness:.7;emissive:#173e46"></a-box>
-        <a-box id="d-slot5" position=".92 .26 -.58" width=".32" height=".12" depth=".20" material="color:#76ddea;metalness:.7;emissive:#173e46"></a-box>
-        <a-text value="DATA 01  DATA 02  DATA 03  DATA 04  DATA 05" position="0 .36 .63" rotation="-90 0 0" align="center" width="2.35" color="#c2f7fb"></a-text>
-      </a-entity>
+      <a-entity id="exp-decrypt" position="0 0 0" visible="true"></a-entity>
     </a-marker>
 
     <a-marker id="m-assemble" type="pattern" url="./access-node-05.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-assemble" position="0 0 0" visible="true">
-        <a-box id="k-f1" width=".55" height=".13" depth=".16" position="-1.6 .8 -.8" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
-        <a-box id="k-f2" width=".55" height=".13" depth=".16" position="1.55 .75 -.75" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
-        <a-box id="k-f3" width=".55" height=".13" depth=".16" position="-1.55 .68 .9" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
-        <a-box id="k-f4" width=".55" height=".13" depth=".16" position="1.6 .78 .88" material="color:#8fa3b4;metalness:1;roughness:.18"></a-box>
-        <a-box id="k-f5" width=".25" height=".16" depth=".83" position="0 1.2 1.6" material="color:#d7b66d;metalness:1;roughness:.18"></a-box>
-        <a-entity id="k-final" scale=".01 .01 .01">
-          <a-torus position="0 .32 0" rotation="90 0 0" radius=".60" radius-tubular=".075" material="color:#d7b66d;metalness:1;roughness:.16;emissive:#443613"></a-torus>
-          <a-torus position="0 .36 0" rotation="90 0 0" radius=".42" radius-tubular=".018" material="color:#f4d58b;metalness:.7;emissive:#5b451b"></a-torus>
-          <a-cylinder position="0 .33 0" radius=".11" height=".18" material="color:#d7b66d;metalness:1;roughness:.16"></a-cylinder>
-        </a-entity>
-        <a-torus id="k-gold-ring" position="0 .38 0" rotation="90 0 0" radius=".82" radius-tubular=".018" scale=".01 .01 .01" material="color:#f4d58b;emissive:#d7b66d;emissiveIntensity:.8;opacity:.85;transparent:true"></a-torus>
-      </a-entity>
+      <a-entity id="exp-assemble" position="0 0 0" visible="true"></a-entity>
     </a-marker>
     <a-entity id="arCamera" camera>
       <a-entity id="boot3d" position="0 0 -1.45" visible="false">
@@ -317,24 +259,25 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
 <div id="hud"><div class="hudRow"><div><div class="micro">KEY LENS / SYSTEM STATUS</div><div id="status">READY</div></div><div id="pill" class="pill">TARGET FOUND</div></div><div id="mission">SCANNER READY</div></div>
 <div id="guide"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div class="scan"></div></div>
 <div id="bottom"><div id="message">카메라 연결을 준비하고 있습니다.</div><div id="sub">잠시 후 KEY LENS를 시작할 수 있습니다.</div></div>
-<div id="operator"><div class="micro">SYSTEM CONTROLLER</div><button data-op="rotate">PLAY AR01 ROTATE</button><button data-op="analyze">PLAY AR02 ANALYZE</button><button data-op="activate">PLAY AR03 FORMATION</button><button data-op="decrypt">PLAY AR04 DECRYPT</button><button data-op="assemble">PLAY AR05 FINAL</button><button id="operator-reset">RESET ALL</button></div>
+<div id="operator"><div class="micro">SYSTEM CONTROLLER</div><button data-op="rotate">PLAY AR01 ROTATE</button><button data-op="analyze">PLAY AR02 ANALYZE</button><button data-op="activate">PLAY AR03 ACTIVATE</button><button data-op="decrypt">PLAY AR04 DECRYPT</button><button data-op="assemble">PLAY AR05 ASSEMBLE</button><button id="operator-reset">RESET ALL</button></div>
 <script>
 const EXPERIENCE = {
   rotate:{name:"AR01 / ROTATE",title:"PERSPECTIVE SHIFT",msg:"보이는 정보만으로 판단하지 마십시오."},
   analyze:{name:"AR02 / ANALYZE",title:"CONNECTION DETECTED",msg:"조건을 분리하지 말고 관계를 연결하십시오."},
-  activate:{name:"AR03 / FORMATION",title:"FORMATION ANALYSIS",msg:"네 개의 장면이 기록되었습니다."},
-  decrypt:{name:"AR04 / DECRYPT",title:"DECRYPTION READY",msg:"5개의 MUSIC DATA가 확보되었습니다."},
-  assemble:{name:"AR05 / FINAL",title:"FINAL ACCESS",msg:"최종 접근 신호가 확인되었습니다."}
+  activate:{name:"AR03 / ACTIVATE",title:"FIELD DIRECTIVE",msg:"잠겨 있던 수행 지시를 활성화합니다."},
+  decrypt:{name:"AR04 / DECRYPT",title:"MUSIC DATA RULE",msg:"5개의 MUSIC DATA가 확보되었습니다."},
+  assemble:{name:"AR05 / ASSEMBLE",title:"FINAL ACCESS AUTHORIZED",msg:"최종 접근 신호가 확인되었습니다."}
 };
 const RESULT = {
   rotate:{status:"PERSPECTIVE SHIFT",msg:"보이는 정보만으로 판단하지 마십시오.",sub:"관점을 바꾸어 정보의 구조를 다시 확인하십시오."},
   analyze:{status:"CONNECTION DETECTED",msg:"조건을 분리하지 말고 관계를 연결하십시오.",sub:"흩어진 정보 사이의 연결을 팀과 공유하십시오."},
-  activate:{status:"FORMATION ANALYSIS",msg:"모양이 아닌, 각 장면을 완성한 구성에 주목하십시오.",sub:"HEART · MIRROR · LINK · WAVE / 네 개의 KEY로 ACCESS CODE를 완성하십시오."},
-  decrypt:{status:"DECRYPTION READY",msg:"정답은 노래 안에만 있지 않습니다.",sub:"각 기록에 남은 이름과 그 구조를 다시 확인하십시오."},
-  assemble:{status:"MISSION COMPLETE",msg:"모든 단서가 연결되었습니다.",sub:"THE KEY ASSEMBLED · FINAL ACCESS AUTHORIZED"}
+  activate:{status:"FIELD DIRECTIVE ACTIVE",msg:"숨겨진 수행 지시가 활성화되었습니다.",sub:"팀원과 지시를 확인하고 현장에서 실행하십시오."},
+  decrypt:{status:"MUSIC DATA RULE",msg:"새로운 관점으로 5개의 MUSIC DATA를 확인하십시오.",sub:"RULE STRUCTURE READY · 정답은 참가자가 완성합니다."},
+  assemble:{status:"FINAL ACCESS AUTHORIZED",msg:"THE KEY SYSTEM 인증이 완료되었습니다.",sub:"THE KEY ASSEMBLED · SYSTEM UNLOCKED"}
 };
 const $=s=>document.querySelector(s);
 let scene=null, started=false, current=null, completed=new Set(), lostTimers={};
+let activeExperienceToken=null,experienceSerial=0;
 let audio=null;
 
 function tone(freq=720,dur=.07,gain=.025,type="triangle"){
@@ -360,123 +303,37 @@ function resetGroup(key){
     [...el.attributes].forEach(a=>{if(a.name.startsWith("animation__"))el.removeAttribute(a.name)});
   });
 }
-function materialize(g){
-  // Keep the marker group visible at full scale. Entrance motion is handled by child objects.
-  // This avoids browsers leaving a marker group at near-zero scale when an animation is interrupted.
-  g.setAttribute("visible",true);
-  g.setAttribute("scale","1 1 1");
-  g.object3D.visible=true;
-  g.object3D.scale.set(1,1,1);
-}
-async function runRotate(){
-  const g=$("#exp-rotate"); resetGroup("rotate"); materialize(g); await wait(600);
-  const o=$("#r-outer"),i=$("#r-inner"),p=$("#r-plate"),s=$("#r-scan");
-  o.setAttribute("rotation","90 0 0");i.setAttribute("rotation","90 0 0");p.setAttribute("rotation","0 0 0");s.setAttribute("position","0 .16 0");
-  anim(o,"spin","rotation","90 0 0","90 540 0",2300,"easeInOutSine");
-  anim(i,"spin","rotation","90 0 0","90 -720 0",2300,"easeInOutSine");
-  anim(s,"sweep","position","0 .16 0","0 .16 -.7",800,"easeInOutSine");
-  tone(630,.08);await wait(850);anim(p,"flip","rotation","0 0 0","0 180 0",2300,"easeInOutCubic");tone(850,.08);
-  await wait(2450);
-}
-async function runAnalyze(){
-  const g=$("#exp-analyze");resetGroup("analyze");materialize(g);await wait(550);
-  const halo=$("#a-halo"),core=$("#a-core");
-  if(halo){halo.setAttribute("rotation","90 0 0");anim(halo,"spin","rotation","90 0 0","90 540 0",2600,"easeInOutSine");}
-  if(core){core.setAttribute("scale",".05 .05 .05");anim(core,"pulse","scale",".05 .05 .05","1 1 1",500,"easeOutBack");}
-  const nodes=[1,2,3,4,5].map(n=>$("#a-node"+n)),bars=[1,2,3,4,5,6].map(n=>$("#a-bar"+n));
-  nodes.forEach(n=>{n.setAttribute("scale",".05 .05 .05")});
-  bars.forEach(b=>b.setAttribute("scale",".01 1 1"));
-  for(let n=0;n<nodes.length;n++){anim(nodes[n],"rise","scale",".05 .05 .05","1 1 1",360,"easeOutBack");tone(520+n*80,.04);await wait(260)}
-  for(let n=0;n<bars.length;n++){anim(bars[n],"link","scale",".01 1 1","1 1 1",300,"easeOutCubic");await wait(180)}
-  await wait(700);
-}
-async function runActivate(){
-  const g=$("#exp-activate");resetGroup("activate");materialize(g);await wait(600);
-  const outer=$("#f-outer"),inner=$("#f-inner"),core=$("#f-core");
-  const slots=[1,2,3,4].map(n=>$("#f-slot"+n));
-  outer.setAttribute("rotation","90 0 0");inner.setAttribute("rotation","90 0 0");core.setAttribute("scale",".01 .01 .01");
-  slots.forEach(s=>s.setAttribute("scale",".02 .02 .02"));
-  anim(outer,"spin","rotation","90 0 0","90 720 0",2600,"easeInOutSine");
-  anim(inner,"spin","rotation","90 0 0","90 -900 0",2600,"easeInOutSine");
-  anim(core,"rise","scale",".01 .01 .01","1 1 1",650,"easeOutBack");tone(520,.08);
-  await wait(650);
-  for(let i=0;i<slots.length;i++){
-    anim(slots[i],"open","scale",".02 .02 .02","1 1 1",420,"easeOutBack");
-    tone(610+i*90,.05);await wait(320);
-  }
-  await wait(700);tone(980,.12);navigator.vibrate?.(70);
-}
-async function runDecrypt(){
-  const g=$("#exp-decrypt");resetGroup("decrypt");materialize(g);await wait(650);
-  const l=$("#d-left"),r=$("#d-right"),core=$("#d-core"),ring=$("#d-ring");
-  const slots=[1,2,3,4,5].map(n=>$("#d-slot"+n));
-  l.setAttribute("position","-.48 .10 0");r.setAttribute("position",".48 .10 0");core.setAttribute("position","0 .06 0");core.setAttribute("scale",".01 .01 .01");
-  slots.forEach(s=>s.setAttribute("scale",".02 .02 .02"));
-  anim(l,"open","position","-.48 .10 0","-1.08 .13 0",1050,"easeInOutCubic");
-  anim(r,"open","position",".48 .10 0","1.08 .13 0",1050,"easeInOutCubic");tone(430,.08,.02,"sawtooth");
-  await wait(780);anim(core,"rise","position","0 .06 0","0 .42 0",850,"easeOutCubic");anim(core,"grow","scale",".01 .01 .01","1 1 1",850,"easeOutBack");
-  anim(ring,"spin","rotation","90 0 0","90 540 0",1600,"easeInOutSine");tone(760,.09);await wait(900);
-  for(let i=0;i<slots.length;i++){
-    anim(slots[i],"data","scale",".02 .02 .02","1 1 1",300,"easeOutBack");tone(650+i*70,.04);await wait(220);
-  }
-  await wait(700);
-}
-async function runAssemble(){
-  const g=$("#exp-assemble");resetGroup("assemble");materialize(g);
-  setHud("FINAL ACCESS DETECTED","최종 접근 신호가 확인되었습니다.","THE KEY SYSTEM / FINAL SEQUENCE");
-  tone(420,.12,.018,"sine");
-  await wait(1800);
+// Runtime handlers are installed by the true 3D engine after camera/tracking initialization.
+const RUN={};
 
-  setHud("ACCESS VERIFYING...","확보된 기록을 확인하고 있습니다.","01 · 02 · 03 · 04 · 05");
-  const fs=[1,2,3,4,5].map(n=>$("#k-f"+n)),final=$("#k-final"),ring=$("#k-gold-ring");
-  const starts=["-1.6 .8 -.8","1.55 .75 -.75","-1.55 .68 .9","1.6 .78 .88","0 1.2 1.6"];
-  const ends=["-.58 .24 -.42",".58 .24 -.42","-.58 .24 .42",".58 .24 .42","0 .22 .68"];
-  fs.forEach((f,i)=>{f.setAttribute("position",starts[i]);f.setAttribute("rotation","0 "+(i*63)+" 0")});
-  final.setAttribute("scale",".01 .01 .01");ring.setAttribute("scale",".01 .01 .01");
-  await wait(1500);
-
-  // Five fragments arrive sequentially so the finale reads clearly in real space.
-  for(let i=0;i<fs.length;i++){
-    const f=fs[i];
-    anim(f,"fly","position",starts[i],ends[i],1050,"easeInOutCubic");
-    anim(f,"turn","rotation","0 "+(i*63)+" 0","0 0 0",1050,"easeInOutCubic");
-    tone(560+i*90,.07,.022);
-    await wait(650);
-  }
-  await wait(900);
-
-  setHud("THE KEY ASSEMBLED","모든 조각이 하나로 연결되었습니다.","FINAL ACCESS SEQUENCE");
-  anim(final,"reveal","scale",".01 .01 .01","1 1 1",900,"easeOutBack");
-  tone(960,.16,.035);navigator.vibrate?.([50,45,100]);
-  await wait(1400);
-
-  setHud("FINAL ACCESS AUTHORIZED","모든 단서가 연결되었습니다.","THE KEY ASSEMBLED");
-  anim(ring,"burst","scale",".01 .01 .01","1.55 1.55 1.55",1100,"easeOutCubic");
-  tone(1280,.18,.04);
-  await wait(1100);
-  anim(ring,"settle","scale","1.55 1.55 1.55","1 1 1",650,"easeInOutSine");
-  await wait(1400);
-
-  setHud("MISSION COMPLETE","모든 단서가 연결되었습니다.","THE KEY ASSEMBLED · FINAL ACCESS AUTHORIZED");
-  // Hold the completed state long enough for photos/video while the target remains visible.
-  await wait(8500);
-}
-const RUN={rotate:runRotate,analyze:runAnalyze,activate:runActivate,decrypt:runDecrypt,assemble:runAssemble};
-
-async function runExperience(key){
-  if(current)return;
-  if(completed.has(key))return;
-  current=key;$("#guide").style.display="none";$("#pill").style.display="block";
+async function runExperience(key,source="marker"){
+  if(current)return false;
+  if(completed.has(key))return false;
+  const token={id:++experienceSerial,key,source,cancelled:false};
+  activeExperienceToken=token;current=key;$("#guide").style.display="none";$("#pill").style.display="block";
   const e=EXPERIENCE[key];$("#mission").textContent=e.name+" // "+e.title;setHud("ACCESS GRANTED",e.msg,"SPATIAL SYSTEM LAYER ACTIVE");
   tone(750,.07);navigator.vibrate?.(40);
-  try{await RUN[key]();completed.add(key);const r=RESULT[key];setHud(r.status,r.msg,r.sub);tone(1120,.12,.035);navigator.vibrate?.([45,35,85])}
-  finally{current=null}
+  try{
+    const ok=await RUN[key](token);
+    if(token.cancelled||ok===false)return false;
+    completed.add(key);const r=RESULT[key];setHud(r.status,r.msg,r.sub);tone(1120,.12,.035);navigator.vibrate?.([45,35,85]);return true;
+  }finally{
+    if(activeExperienceToken===token){activeExperienceToken=null;current=null}
+  }
+}
+function cancelExperience(key=null){
+  const token=activeExperienceToken;
+  if(!token||key&&token.key!==key)return;
+  token.cancelled=true;
+  window.__KEY_LENS_FX__?.cancel?.(token);
+  if(activeExperienceToken===token){activeExperienceToken=null;current=null}
 }
 function markerFound(key){
   clearTimeout(lostTimers[key]);
   if(current && current!==key)return;
   const g=$("#exp-"+key);
   if(g){g.setAttribute("visible",true);g.setAttribute("scale","1 1 1");g.object3D.visible=true;g.object3D.scale.set(1,1,1);}
+  window.__KEY_LENS_FX__?.setVisible?.(key,true);
   if(!completed.has(key))runExperience(key);
   else{
     $("#pill").style.display="block";$("#guide").style.display="none";
@@ -488,13 +345,16 @@ function markerFound(key){
 function markerLost(key){
   clearTimeout(lostTimers[key]);
   lostTimers[key]=setTimeout(()=>{
-    if(current===key)return;
+    if(current===key)cancelExperience(key);
+    window.__KEY_LENS_FX__?.setVisible?.(key,false);
     resetGroup(key);$("#pill").style.display="none";$("#guide").style.display="block";$("#mission").textContent="SCANNER READY";
     setHud("SCANNING...","안내된 미션 이미지를 화면 중앙에 맞춰주세요.","미션 이미지를 화면 중앙에 맞춰주세요.");
   },1200)
 }
 
 scene=$("#arScene");
+const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
+const viewportGuard=window.__KEY_LENS_VIEWPORT__;
 let cameraReady=false, renderReady=false, startRequested=false, scannerStarted=false;
 let fitTimer=null;
 
@@ -511,6 +371,14 @@ function applyCameraFit(){
   const video=getARVideo(),canvas=getARCanvas();
   if(!video || !video.videoWidth || !video.videoHeight)return false;
   const r=containRect(video.videoWidth,video.videoHeight);
+  if(isSamsung){
+    const root=document.documentElement;
+    root.style.setProperty("--kl-camera-width",r.width+"px");
+    root.style.setProperty("--kl-camera-height",r.height+"px");
+    root.style.setProperty("--kl-camera-left",r.left+"px");
+    root.style.setProperty("--kl-camera-top",r.top+"px");
+    root.classList.add("key-lens-samsung-camera");
+  }
   [video,canvas].forEach((el,index)=>{
     if(!el)return;
     Object.assign(el.style,{
@@ -529,6 +397,12 @@ function applyCameraFit(){
 }
 function stabilizeFit(){
   clearInterval(fitTimer);
+  if(isSamsung){
+    let n=0;
+    if(applyCameraFit())return;
+    fitTimer=setInterval(()=>{if(applyCameraFit()||++n>28)clearInterval(fitTimer)},250);
+    return;
+  }
   let n=0;
   fitTimer=setInterval(()=>{applyCameraFit();if(++n>28)clearInterval(fitTimer)},250);
 }
@@ -536,6 +410,11 @@ function verifyRenderer(){
   if(!scene || !scene.renderer || !scene.camera)return false;
   const canvas=getARCanvas();
   if(!canvas || canvas.width<2 || canvas.height<2)return false;
+  if(!canvas.__keyLensContextGuard){
+    canvas.__keyLensContextGuard=true;
+    canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();document.documentElement.classList.remove("key-lens-webgl-visible")},{passive:false});
+    canvas.addEventListener("webglcontextrestored",()=>{if(scannerStarted)document.documentElement.classList.add("key-lens-webgl-visible")});
+  }
   renderReady=true;
   updateReadyState();
   return true;
@@ -573,6 +452,7 @@ function enterScanner(){
   $("#hud").style.display="block";
   $("#bottom").style.display="block";
   $("#guide").style.display="block";
+  document.documentElement.classList.add("key-lens-webgl-visible");
   setHud("SCANNING...","안내된 미션 이미지를 화면 중앙에 맞춰주세요.","미션 이미지의 인식 영역을 화면 중앙에 맞추면 숨겨진 정보가 열립니다.");
   try{audio=new (window.AudioContext||window.webkitAudioContext)();audio.resume?.()}catch(_){}
   boot3D();
@@ -613,12 +493,13 @@ scene.addEventListener("loaded",()=>{setTimeout(()=>{verifyRenderer();applyCamer
   m.addEventListener("markerLost",()=>{if(scannerStarted)markerLost(key)});
 });
 
-window.addEventListener("resize",()=>setTimeout(()=>{applyCameraFit();stabilizeFit()},120));
-window.addEventListener("orientationchange",()=>setTimeout(()=>{applyCameraFit();stabilizeFit()},500));
+window.addEventListener("resize",()=>{if(!isSamsung)setTimeout(()=>{applyCameraFit();stabilizeFit()},120)});
+window.addEventListener("orientationchange",()=>setTimeout(()=>{applyCameraFit();if(!isSamsung)stabilizeFit()},500));
 let viewportRefitTimer=null;
 window.addEventListener("keylensviewportchange",()=>{
   if(!cameraReady)return;
   applyCameraFit();
+  if(isSamsung)return;
   clearTimeout(viewportRefitTimer);
   viewportRefitTimer=setTimeout(stabilizeFit,180);
 });
@@ -634,11 +515,9 @@ setTimeout(()=>{
 
 // ---------- Production spatial overlay (primary visible AR layer) ----------
 let spatialKey=null,spatialMarker=null,spatialRAF=0,spatialHideTimer=null,lastSpatialAnchor=null;
-const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
 const runtimeQS=new URLSearchParams(location.search);
 const samsungUIScale=1;
 const samsungVisualBoost=1;
-const viewportGuard=window.__KEY_LENS_VIEWPORT__;
 
 // Samsung and mismatched Android custom tabs use one Visual Viewport rectangle for both the
 // camera video and tracking canvas. The existing Chrome containRect() remains untouched at 1:1.
@@ -660,12 +539,193 @@ function samsungPortraitRect(sourceW,sourceH){
   }
   return {width,height,left,top};
 }
+
+// ---------- KEY LENS TRUE 3D FX ENGINE ----------
+// AR.js keeps ownership of recognition and pose. This lightweight Three.js layer creates the
+// visible geometry under the existing marker roots. Crisp information panels remain in DOM.
+const KEY_LENS_MISSION_DATA=Object.freeze({
+  activate:{title:"FIELD DIRECTIVE",body:"제시된 장면을 팀원과 함께 재현하고, 촬영 완료 후 인증을 요청하십시오."},
+  decrypt:{slots:["01","02","03","04","05"],rule:"MUSIC DATA RULE · INPUT READY"}
+});
+const FX_COLOR=Object.freeze({navy:0x07111b,gunmetal:0x263541,silver:0xaebdca,cyan:0x76ddea,blue:0x2488ff,gold:0xd7b66d,white:0xf4fbff});
+
+function setSpatialProgress(kind,count){
+  const selector=kind==="analyze"?".conditionRail span":kind==="decrypt"?".dataRibbon span":".fragmentRail span";
+  document.querySelectorAll("#spatialContent "+selector).forEach((el,i)=>el.classList.toggle("on",i<count));
+}
+function setDirectiveStage(stage,status,body){
+  const panel=document.querySelector("#spatialContent .directivePanel");if(!panel)return;
+  panel.dataset.stage=stage;
+  const s=panel.querySelector(".directiveState"),b=panel.querySelector(".directiveBody");
+  if(s)s.textContent=status;if(b)b.textContent=body;
+}
+function setRuleStage(active,text){
+  const panel=document.querySelector("#spatialContent .rulePanel");if(!panel)return;
+  panel.dataset.stage=active?"active":"waiting";
+  const body=panel.querySelector("small");if(body)body.textContent=text;
+}
+
+const KeyLensFX=(()=>{
+  const geometries=new Map(),sharedGeometries=new Set(),textures=new Map(),records=new Map(),tweens=[];
+  let raf=0,lastFrame=performance.now(),previewRoot=null;
+  const v3=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
+  const easeOut=t=>1-Math.pow(1-t,3);
+  const easeInOut=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const easeBack=t=>{const c=1.70158,c3=c+1;return 1+c3*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
+  function cachedGeometry(key,factory){if(!geometries.has(key)){const geometry=factory();geometries.set(key,geometry);sharedGeometries.add(geometry)}return geometries.get(key)}
+  function standard(color,emissive=0x000000,intensity=.55,opacity=1){return new THREE.MeshStandardMaterial({color,metalness:.72,roughness:.27,emissive,emissiveIntensity:intensity,transparent:opacity<1,opacity,depthWrite:opacity>=1})}
+  function basic(color,opacity=.25,additive=true){return new THREE.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:additive?THREE.AdditiveBlending:THREE.NormalBlending,side:THREE.DoubleSide})}
+  function roundedRect(ctx,x,y,w,h,r){ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,y,w,h,r);else{ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y)}ctx.closePath()}
+  function labelTexture(title,sub="",accent="#76ddea"){
+    const key=title+"|"+sub+"|"+accent;if(textures.has(key))return textures.get(key);
+    const c=document.createElement("canvas");c.width=512;c.height=144;const x=c.getContext("2d");
+    const g=x.createLinearGradient(0,0,0,144);g.addColorStop(0,"rgba(11,30,42,.96)");g.addColorStop(1,"rgba(3,9,15,.98)");
+    roundedRect(x,5,5,502,134,20);x.fillStyle=g;x.fill();x.strokeStyle=accent;x.lineWidth=3;x.stroke();
+    x.shadowColor=accent;x.shadowBlur=15;x.fillStyle="#f4fdff";x.textAlign="center";x.textBaseline="middle";x.font='800 35px "Segoe UI","Noto Sans KR",sans-serif';x.fillText(title,256,57);
+    x.shadowBlur=0;x.fillStyle="#a9d7dc";x.font='700 19px "Segoe UI","Noto Sans KR",sans-serif';if(sub)x.fillText(sub,256,103);
+    const tex=new THREE.CanvasTexture(c);if("colorSpace" in tex&&THREE.SRGBColorSpace)tex.colorSpace=THREE.SRGBColorSpace;tex.needsUpdate=true;textures.set(key,tex);return tex
+  }
+  function radialTexture(color="#76ddea"){
+    const key="radial|"+color;if(textures.has(key))return textures.get(key);
+    const c=document.createElement("canvas");c.width=c.height=128;const x=c.getContext("2d"),g=x.createRadialGradient(64,64,1,64,64,62);
+    const rgb=new THREE.Color(color),soft=`rgba(${Math.round(rgb.r*255)},${Math.round(rgb.g*255)},${Math.round(rgb.b*255)},.24)`;
+    g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(.16,color);g.addColorStop(.48,soft);g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(0,0,128,128);
+    const tex=new THREE.CanvasTexture(c);tex.needsUpdate=true;textures.set(key,tex);return tex
+  }
+  function beamTexture(color="#76ddea"){
+    const key="beam|"+color;if(textures.has(key))return textures.get(key);
+    const c=document.createElement("canvas");c.width=64;c.height=256;const x=c.getContext("2d"),gx=x.createLinearGradient(0,0,64,0),gy=x.createLinearGradient(0,0,0,256);
+    gx.addColorStop(0,"rgba(0,0,0,0)");gx.addColorStop(.5,color);gx.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=gx;x.fillRect(0,0,64,256);gy.addColorStop(0,"rgba(0,0,0,0)");gy.addColorStop(.2,"rgba(255,255,255,.9)");gy.addColorStop(1,"rgba(0,0,0,0)");x.globalCompositeOperation="destination-in";x.fillStyle=gy;x.fillRect(0,0,64,256);
+    const tex=new THREE.CanvasTexture(c);tex.needsUpdate=true;textures.set(key,tex);return tex
+  }
+  function labelSprite(title,sub="",accent="#76ddea",width=1.12){
+    const m=new THREE.SpriteMaterial({map:labelTexture(title,sub,accent),transparent:true,depthTest:false,depthWrite:false});const s=new THREE.Sprite(m);s.scale.set(width,width*.281,1);s.renderOrder=50;return s
+  }
+  function glowSprite(color=FX_COLOR.cyan,size=.58){
+    const hex="#"+new THREE.Color(color).getHexString();const m=new THREE.SpriteMaterial({map:radialTexture(hex),color,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending});const s=new THREE.Sprite(m);s.scale.set(size,size,1);return s
+  }
+  function addRingBeacons(parent,radius,color){
+    const beaconColor=color===FX_COLOR.gunmetal?FX_COLOR.silver:color;
+    const geo=cachedGeometry(`ring-beacons-${radius}`,()=>{const angles=[0,.72,2.04,3.38,5.16],positions=new Float32Array(angles.length*3);angles.forEach((a,i)=>{positions[i*3]=Math.cos(a)*radius;positions[i*3+1]=.018;positions[i*3+2]=Math.sin(a)*radius});const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(positions,3));return g});
+    const mat=new THREE.PointsMaterial({color:beaconColor,size:.045,map:radialTexture("#"+new THREE.Color(beaconColor).getHexString()),transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});const points=new THREE.Points(geo,mat);points.renderOrder=4;parent.add(points);return points
+  }
+  function addRing(parent,radius,y,tube,color,opacity=.96){
+    const holder=new THREE.Group();holder.position.y=y;parent.add(holder);
+    const geo=cachedGeometry(`torus-${radius}-${tube}`,()=>new THREE.TorusGeometry(radius,tube,8,48));
+    const mesh=new THREE.Mesh(geo,standard(color,color,.48,opacity));mesh.rotation.x=Math.PI/2;holder.add(mesh);
+    const glow=new THREE.Mesh(geo,basic(color,.13));glow.rotation.x=Math.PI/2;glow.scale.set(1.08,1.08,1.08);holder.add(glow);addRingBeacons(holder,radius,color);return holder
+  }
+  function addCore(parent,color=FX_COLOR.cyan,radius=.17,height=.16){
+    const group=new THREE.Group();parent.add(group);const geo=cachedGeometry(`core-${radius}-${height}`,()=>new THREE.CylinderGeometry(radius,radius*.92,height,24,1));
+    const mesh=new THREE.Mesh(geo,standard(FX_COLOR.gunmetal,color,.72));mesh.position.y=height/2;group.add(mesh);const glow=glowSprite(color,radius*3.2);glow.position.y=height*.75;group.add(glow);return group
+  }
+  function addBeam(parent,color=FX_COLOR.cyan,height=1.45,width=.20){
+    const group=new THREE.Group(),geo=cachedGeometry(`beam-${width}-${height}`,()=>new THREE.PlaneGeometry(width,height));parent.add(group);
+    const mat=basic(color,.62);mat.map=beamTexture("#"+new THREE.Color(color).getHexString());mat.needsUpdate=true;
+    const a=new THREE.Mesh(geo,mat),b=new THREE.Mesh(geo,mat.clone());a.position.y=b.position.y=height/2;b.rotation.y=Math.PI/2;group.add(a,b);return group
+  }
+  function addPlate(parent,title,sub,color=FX_COLOR.cyan,width=1.15){const g=new THREE.Group();parent.add(g);const box=new THREE.Mesh(cachedGeometry(`plate-${width}`,()=>new THREE.BoxGeometry(width,.07,.30)),standard(FX_COLOR.navy,color,.38,.93));g.add(box);const s=labelSprite(title,sub,"#"+new THREE.Color(color).getHexString(),width*.93);s.position.set(0,.12,.02);g.add(s);return g}
+  function addConnection(parent,a,b,color=FX_COLOR.cyan){
+    const d=b.clone().sub(a),len=d.length(),geo=cachedGeometry("connection",()=>new THREE.CylinderGeometry(.012,.012,1,6,1));const m=new THREE.Mesh(geo,basic(color,.86));m.position.copy(a).add(b).multiplyScalar(.5);m.quaternion.setFromUnitVectors(v3(0,1,0),d.clone().normalize());m.scale.set(1,.001,1);m.userData.lineLength=len;parent.add(m);return m
+  }
+  function addParticles(rec,count,color){
+    const positions=new Float32Array(count*3),velocity=Array.from({length:count},()=>v3());const geo=new THREE.BufferGeometry();geo.setAttribute("position",new THREE.BufferAttribute(positions,3).setUsage(THREE.DynamicDrawUsage));
+    const mat=new THREE.PointsMaterial({color,size:.052,map:radialTexture("#"+new THREE.Color(color).getHexString()),transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});const points=new THREE.Points(geo,mat);points.visible=false;rec.group.add(points);
+    let life=0;function burst(origin=v3(0,.25,0),power=.75){life=1;points.visible=true;mat.opacity=.92;for(let i=0;i<count;i++){positions[i*3]=origin.x;positions[i*3+1]=origin.y;positions[i*3+2]=origin.z;const a=Math.random()*Math.PI*2,s=.25+Math.random()*power;velocity[i].set(Math.cos(a)*s,.35+Math.random()*.85,Math.sin(a)*s)}geo.attributes.position.needsUpdate=true;ensureLoop()}
+    rec.tickers.push(dt=>{if(life<=0)return;life=Math.max(0,life-dt*.5);for(let i=0;i<count;i++){positions[i*3]+=velocity[i].x*dt;positions[i*3+1]+=velocity[i].y*dt;positions[i*3+2]+=velocity[i].z*dt;velocity[i].y-=.36*dt}mat.opacity=life*.85;geo.attributes.position.needsUpdate=true;if(!life)points.visible=false});return {points,burst}
+  }
+  function vectorTween(token,obj,prop,to,duration,ease=easeInOut,delay=0){const from=obj[prop].clone();return tween(token,duration,p=>obj[prop].lerpVectors(from,to,p),ease,delay)}
+  function eulerTween(token,obj,to,duration,ease=easeInOut,delay=0){const from=obj.rotation.clone();return tween(token,duration,p=>obj.rotation.set(from.x+(to.x-from.x)*p,from.y+(to.y-from.y)*p,from.z+(to.z-from.z)*p),ease,delay)}
+  function tween(token,duration,apply,ease=easeInOut,delay=0){return new Promise(resolve=>{tweens.push({token,start:performance.now()+delay,duration:Math.max(1,duration),apply,ease,resolve});ensureLoop()})}
+  function pause(token,ms){return new Promise(resolve=>setTimeout(()=>resolve(!token.cancelled),ms))}
+  function spin(rec,obj,axis,speed){rec.tickers.push(dt=>{obj.rotation[axis]+=speed*dt})}
+  function ensureLoop(){if(!raf)raf=requestAnimationFrame(loop)}
+  function loop(now){
+    raf=0;const dt=Math.min(.05,Math.max(.001,(now-lastFrame)/1000));lastFrame=now;
+    for(let i=tweens.length-1;i>=0;i--){const t=tweens[i];if(t.token.cancelled){t.resolve(false);tweens.splice(i,1);continue}if(now<t.start)continue;const p=Math.min(1,(now-t.start)/t.duration);t.apply(t.ease(p));if(p>=1){t.resolve(true);tweens.splice(i,1)}}
+    let running=tweens.length>0;records.forEach(rec=>{if(!rec.visible)return;running=running||rec.tickers.length>0;rec.tickers.forEach(fn=>fn(dt,now))});if(running)raf=requestAnimationFrame(loop)
+  }
+  function preview(){if(previewRoot&&previewRoot.parent)return previewRoot;previewRoot=new THREE.Group();previewRoot.name="KEY_LENS_OPERATOR_PREVIEW";previewRoot.position.set(0,-.48,-2.65);previewRoot.rotation.x=-.92;previewRoot.scale.set(.76,.76,.76);scene.camera.add(previewRoot);return previewRoot}
+  function disposeRecord(key){const rec=records.get(key);if(!rec)return;rec.token.cancelled=true;rec.group.traverse(obj=>{if(obj.material){const mats=Array.isArray(obj.material)?obj.material:[obj.material];mats.forEach(mat=>mat.dispose?.())}if(obj.geometry&&!sharedGeometries.has(obj.geometry))obj.geometry.dispose?.()});if(rec.group.parent)rec.group.parent.remove(rec.group);records.delete(key)}
+  function createRecord(key,token){
+    if(token.source==="operator")for(const [k,r] of [...records])if(r.source==="operator")disposeRecord(k);
+    disposeRecord(key);const parent=token.source==="operator"?preview():$("#exp-"+key)?.object3D;if(!parent)return null;
+    const group=new THREE.Group();group.name="KEY_LENS_FX_"+key.toUpperCase();parent.add(group);group.visible=true;const rec={key,token,source:token.source,parent,group,tickers:[],visible:true};records.set(key,rec);ensureLoop();return rec
+  }
+  function hideLegacy(){["rotate","analyze","activate","decrypt","assemble"].forEach(key=>document.querySelectorAll(`#exp-${key} > *`).forEach(el=>{el.setAttribute("visible","false");if(el.object3D)el.object3D.visible=false}))}
+
+  async function buildRotate(rec){
+    const {token,group}=rec;group.scale.set(.08,.08,.08);const baseGlow=glowSprite(FX_COLOR.cyan,1.65);baseGlow.position.y=.08;group.add(baseGlow);
+    const rings=[addRing(group,.82,.10,.026,FX_COLOR.cyan),addRing(group,.60,.34,.022,FX_COLOR.silver),addRing(group,.40,.62,.018,FX_COLOR.gold)];rings.forEach(r=>r.scale.set(.01,.01,.01));spin(rec,rings[0],"y",.62);spin(rec,rings[1],"y",-.88);spin(rec,rings[2],"y",1.12);
+    const core=addCore(group,FX_COLOR.cyan,.16,.20);core.scale.set(.01,.01,.01);const beam=addBeam(group,FX_COLOR.cyan,1.55,.17);beam.scale.set(1,.01,1);
+    const orbit=new THREE.Group();group.add(orbit);const digits=["9","9","8","1","1","6","0","1"];
+    const tiles=digits.map((digit,i)=>{const a=i/digits.length*Math.PI*2,r=.50+(i%3)*.11,g=new THREE.Group();g.position.set(Math.cos(a)*r,.08,Math.sin(a)*r);g.scale.set(.01,.01,.01);orbit.add(g);const accent=i%3===1?FX_COLOR.silver:FX_COLOR.cyan,box=new THREE.Mesh(cachedGeometry("number-tile",()=>new THREE.BoxGeometry(.30,.08,.20)),standard(FX_COLOR.gunmetal,accent,.45));g.add(box);const s=labelSprite(digit,"","#76ddea",.25);s.position.y=.13;g.add(s);g.userData.target=v3(Math.cos(a)*r,.24+i*.075,Math.sin(a)*r);g.userData.a=a;return g});
+    const p1=addPlate(group,"9981 + 1601","OBSERVED RULE",FX_COLOR.silver,1.15),p2=addPlate(group,"1080 + 9168 = ????","REFRAME THE VIEW",FX_COLOR.cyan,1.22);p1.position.set(0,.28,-.45);p2.position.set(0,.55,.36);p1.scale.set(.01,.01,.01);p2.scale.set(.01,.01,.01);spin(rec,orbit,"y",.32);
+    if(!await vectorTween(token,group,"scale",v3(1,1,1),520,easeBack))return false;await Promise.all(rings.map((r,i)=>vectorTween(token,r,"scale",v3(1,1,1),620,easeBack,i*100)));if(token.cancelled)return false;
+    if(!await vectorTween(token,core,"scale",v3(1,1,1),480,easeBack))return false;vectorTween(token,beam,"scale",v3(1,1,1),720,easeOut);
+    for(let i=0;i<tiles.length;i++){const t=tiles[i];vectorTween(token,t,"position",t.userData.target,560,easeBack);if(!await vectorTween(token,t,"scale",v3(1,1,1),360,easeBack))return false;tone(540+i*42,.035,.012);if(!await pause(token,90))return false}
+    await Promise.all([vectorTween(token,p1,"scale",v3(1,1,1),520,easeBack),vectorTween(token,p2,"scale",v3(1,1,1),520,easeBack,170)]);if(token.cancelled)return false;
+    const r0=orbit.rotation.clone();await tween(token,900,p=>{orbit.rotation.y=r0.y+Math.PI*1.2*p;orbit.rotation.x=Math.sin(p*Math.PI)*.28},easeInOut);return pause(token,650)
+  }
+
+  async function buildAnalyze(rec){
+    const {token,group}=rec;group.scale.set(.08,.08,.08);const ring=addRing(group,.88,.08,.025,FX_COLOR.cyan),core=addCore(group,FX_COLOR.cyan,.14,.24);ring.scale.set(.01,.01,.01);core.scale.set(.01,.01,.01);spin(rec,ring,"y",.55);
+    const nodeData=[{name:"남씨",p:v3(-.62,.08,.18),c:FX_COLOR.cyan},{name:"백씨",p:v3(0,.08,-.54),c:FX_COLOR.silver},{name:"황씨",p:v3(.62,.08,.18),c:FX_COLOR.blue}];
+    const nodes=nodeData.map((d,i)=>{const n=new THREE.Group();n.position.copy(d.p);n.scale.set(.01,.01,.01);group.add(n);const pedestal=addRing(n,.22,.04,.018,d.c);const torso=new THREE.Mesh(cachedGeometry("avatar-torso",()=>new THREE.CylinderGeometry(.10,.17,.28,12)),standard(FX_COLOR.gunmetal,d.c,.55));torso.position.y=.28;n.add(torso);const head=new THREE.Mesh(cachedGeometry("avatar-head",()=>new THREE.SphereGeometry(.09,12,8)),standard(FX_COLOR.silver,d.c,.32));head.position.y=.50;n.add(head);const tag=labelSprite(d.name,"셔츠 ? · 넥타이 ?","#"+new THREE.Color(d.c).getHexString(),.46);tag.position.y=.68;n.add(tag);spin(rec,pedestal,"y",i===1?-.8:.8);return n});
+    const links=[[nodeData[0].p,nodeData[1].p,FX_COLOR.cyan],[nodeData[1].p,nodeData[2].p,FX_COLOR.blue],[nodeData[2].p,nodeData[0].p,FX_COLOR.silver],[nodeData[0].p,v3(0,.22,.02),FX_COLOR.cyan],[nodeData[2].p,v3(0,.22,.02),FX_COLOR.blue]].map(([a,b,c])=>addConnection(group,a.clone().setY(.28),b.clone().setY(.28),c));
+    setSpatialProgress("analyze",0);if(!await vectorTween(token,group,"scale",v3(1,1,1),500,easeBack))return false;await Promise.all([vectorTween(token,ring,"scale",v3(1,1,1),620,easeBack),vectorTween(token,core,"scale",v3(1,1,1),480,easeBack,120)]);if(token.cancelled)return false;
+    setHud("RELATION SCAN","세 사람의 정보 노드를 분리하고 있습니다.","남씨 · 백씨 · 황씨");for(let i=0;i<nodes.length;i++){if(!await vectorTween(token,nodes[i],"scale",v3(1,1,1),430,easeBack))return false;tone(590+i*80,.04,.014);if(!await pause(token,180))return false}
+    setHud("CONDITION MAPPING","조건 사이의 연결을 확인하고 있습니다.","최종 정답은 참가자가 완성합니다.");for(let i=0;i<links.length;i++){const line=links[i],target=line.userData.lineLength;if(!await tween(token,360,p=>line.scale.y=.001+(target-.001)*p,easeOut))return false;if(i===1)setSpatialProgress("analyze",1);if(i===3)setSpatialProgress("analyze",2);tone(720+i*45,.03,.01);if(!await pause(token,100))return false}
+    setSpatialProgress("analyze",3);return pause(token,700)
+  }
+
+  async function buildActivate(rec){
+    const {token,group}=rec;group.scale.set(.08,.08,.08);const rings=[addRing(group,.90,.08,.035,FX_COLOR.gunmetal),addRing(group,.68,.13,.026,FX_COLOR.cyan),addRing(group,.44,.18,.020,FX_COLOR.gold)];rings.forEach(r=>r.scale.set(.01,.01,.01));spin(rec,rings[0],"y",.5);spin(rec,rings[1],"y",-.82);spin(rec,rings[2],"y",1.08);
+    const core=addCore(group,FX_COLOR.gold,.19,.25);core.scale.set(.01,.01,.01);const beam=addBeam(group,FX_COLOR.cyan,1.72,.20);beam.scale.set(1,.01,1);
+    const clampRoot=new THREE.Group();group.add(clampRoot);const clamps=[0,Math.PI/2,Math.PI,Math.PI*1.5].map((a,i)=>{const h=new THREE.Group();h.userData.a=a;h.userData.r=.45;h.position.set(Math.cos(a)*.45,.18,Math.sin(a)*.45);h.rotation.y=-a;h.scale.set(.01,.01,.01);clampRoot.add(h);const body=new THREE.Mesh(cachedGeometry("directive-clamp",()=>new THREE.BoxGeometry(.36,.11,.18)),standard(FX_COLOR.gunmetal,i%2?FX_COLOR.cyan:FX_COLOR.gold,.35));h.add(body);const strip=new THREE.Mesh(cachedGeometry("clamp-strip",()=>new THREE.BoxGeometry(.24,.018,.185)),basic(i%2?FX_COLOR.cyan:FX_COLOR.gold,.78));strip.position.y=.065;h.add(strip);return h});
+    setDirectiveStage("locked","SYSTEM LOCKED","KEY LENS 인증 신호를 기다리고 있습니다.");if(!await vectorTween(token,group,"scale",v3(1,1,1),520,easeBack))return false;await Promise.all(rings.map((r,i)=>vectorTween(token,r,"scale",v3(1,1,1),620,easeBack,i*90)));if(token.cancelled)return false;
+    setDirectiveStage("detected","KEY LENS DETECTED","DIRECTIVE CORE 인증을 진행합니다.");setHud("KEY LENS DETECTED","잠금 시스템과 연결되었습니다.","DIRECTIVE CORE AUTHENTICATING");for(let i=0;i<clamps.length;i++){if(!await vectorTween(token,clamps[i],"scale",v3(1,1,1),340,easeBack))return false;tone(500+i*70,.04,.013);if(!await pause(token,110))return false}
+    await Promise.all(clamps.map((c,i)=>tween(token,760,p=>{const r=.45+.34*p,a=c.userData.a;c.position.set(Math.cos(a)*r,.18+.07*p,Math.sin(a)*r)},easeInOut,i*55)));if(token.cancelled)return false;
+    setDirectiveStage("release","LOCK RELEASED","숨겨진 수행 지시를 불러오고 있습니다.");setHud("DIRECTIVE CORE ACTIVATION","기계식 잠금이 해제되었습니다.","FIELD LINK CONNECTED");if(!await vectorTween(token,core,"scale",v3(1,1,1),650,easeBack))return false;if(!await vectorTween(token,beam,"scale",v3(1,1,1),720,easeOut))return false;tone(980,.12,.028);navigator.vibrate?.([45,35,80]);
+    setDirectiveStage("active","FIELD DIRECTIVE ACTIVE",KEY_LENS_MISSION_DATA.activate.body);return pause(token,900)
+  }
+
+  async function buildDecrypt(rec){
+    const {token,group}=rec;group.scale.set(.08,.08,.08);const ring1=addRing(group,.92,.07,.028,FX_COLOR.cyan),ring2=addRing(group,.64,.12,.020,FX_COLOR.silver),core=addCore(group,FX_COLOR.gold,.13,.18);ring1.scale.set(.01,.01,.01);ring2.scale.set(.01,.01,.01);core.scale.set(.01,.01,.01);spin(rec,ring1,"y",.58);spin(rec,ring2,"y",-1.0);
+    const wavePts=[];for(let i=0;i<65;i++){const a=i/64*Math.PI*2;wavePts.push(v3(Math.cos(a)*.78,.22+Math.sin(i*.72)*.045,Math.sin(a)*.78))}const waveGeo=new THREE.BufferGeometry().setFromPoints(wavePts),wave=new THREE.LineLoop(waveGeo,new THREE.LineBasicMaterial({color:FX_COLOR.cyan,transparent:true,opacity:.72,blending:THREE.AdditiveBlending,depthWrite:false}));wave.scale.set(.01,.01,.01);group.add(wave);spin(rec,wave,"y",-.38);
+    const heights=[.42,.56,.72,.52,.63],xs=[-.68,-.34,0,.34,.68];const pillars=heights.map((h,i)=>{const wrap=new THREE.Group();wrap.position.set(xs[i],.13,0);wrap.scale.set(1,.01,1);group.add(wrap);const accent=i%2?FX_COLOR.blue:FX_COLOR.cyan,mesh=new THREE.Mesh(cachedGeometry(`data-pillar-${h}`,()=>new THREE.CylinderGeometry(.10,.10,h,6,1)),standard(0x16404c,accent,.68,.88));mesh.position.y=h/2;wrap.add(mesh);const cap=new THREE.Mesh(cachedGeometry("data-cap",()=>new THREE.OctahedronGeometry(.12,0)),standard(FX_COLOR.silver,accent,.58));cap.position.y=h+.10;wrap.add(cap);const tag=labelSprite("DATA "+KEY_LENS_MISSION_DATA.decrypt.slots[i],"ACQUIRED","#76ddea",.34);tag.position.y=h+.29;wrap.add(tag);return wrap});const particles=addParticles(rec,14,FX_COLOR.cyan);
+    setSpatialProgress("decrypt",0);setRuleStage(false,"5개의 MUSIC DATA를 동기화합니다.");if(!await vectorTween(token,group,"scale",v3(1,1,1),520,easeBack))return false;await Promise.all([vectorTween(token,ring1,"scale",v3(1,1,1),620,easeBack),vectorTween(token,ring2,"scale",v3(1,1,1),620,easeBack,100),vectorTween(token,core,"scale",v3(1,1,1),520,easeBack,180),vectorTween(token,wave,"scale",v3(1,1,1),720,easeOut,220)]);if(token.cancelled)return false;
+    setHud("MUSIC DATA SYNC","확보한 5개의 데이터를 불러오고 있습니다.","DATA 01 · 02 · 03 · 04 · 05");for(let i=0;i<pillars.length;i++){if(!await vectorTween(token,pillars[i],"scale",v3(1,1,1),480,easeBack))return false;setSpatialProgress("decrypt",i+1);tone(610+i*75,.045,.014);if(!await pause(token,170))return false}
+    particles.burst(v3(0,.26,0),.42);setRuleStage(true,KEY_LENS_MISSION_DATA.decrypt.rule);setHud("RULE STRUCTURE READY","새로운 관점으로 5개의 MUSIC DATA를 확인하십시오.","정답 계산은 참가자가 완성합니다.");return pause(token,850)
+  }
+
+  function fragmentGeometry(index){return cachedGeometry("fragment-"+index,()=>{const sets=[[[-.22,-.10],[.18,-.13],[.28,.08],[-.08,.18]],[[-.18,-.14],[.24,-.08],[.18,.18],[-.28,.10]],[[-.24,-.08],[.12,-.18],[.28,.02],[-.10,.19]],[[-.18,-.18],[.24,-.02],[.12,.20],[-.28,.08]],[[-.12,-.23],[.12,-.23],[.18,.20],[-.18,.20]]],s=new THREE.Shape();sets[index].forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:.075,bevelEnabled:true,bevelSize:.018,bevelThickness:.018,bevelSegments:1});g.center();return g})}
+  function keyholeGroup(parent){const g=new THREE.Group();parent.add(g);const ringGeo=cachedGeometry("final-key-ring",()=>new THREE.TorusGeometry(.24,.055,10,40)),ring=new THREE.Mesh(ringGeo,standard(FX_COLOR.gold,FX_COLOR.gold,.7));ring.position.y=.24;g.add(ring);const shape=new THREE.Shape();shape.moveTo(-.075,.12);shape.lineTo(.075,.12);shape.lineTo(.145,-.32);shape.lineTo(-.145,-.32);shape.closePath();const stemGeo=cachedGeometry("final-key-stem",()=>{const e=new THREE.ExtrudeGeometry(shape,{depth:.08,bevelEnabled:true,bevelSize:.014,bevelThickness:.014,bevelSegments:1});e.center();return e}),stem=new THREE.Mesh(stemGeo,standard(FX_COLOR.gold,FX_COLOR.gold,.62));stem.position.y=-.06;g.add(stem);const glow=glowSprite(FX_COLOR.gold,.95);glow.position.y=.10;glow.position.z=-.06;g.add(glow);return g}
+  async function buildAssemble(rec){
+    const {token,group}=rec;group.scale.set(.08,.08,.08);const rings=[addRing(group,.94,.08,.030,FX_COLOR.cyan),addRing(group,.72,.13,.022,FX_COLOR.gold)];rings.forEach(r=>r.scale.set(.01,.01,.01));spin(rec,rings[0],"y",.52);spin(rec,rings[1],"y",-.84);const beam=addBeam(group,FX_COLOR.gold,1.90,.24);beam.scale.set(1,.01,1);const keyhole=keyholeGroup(group);keyhole.position.set(0,.75,0);keyhole.scale.set(.01,.01,.01);
+    const starts=[v3(-1.35,1.28,-.65),v3(1.35,1.20,-.45),v3(-1.42,.32,.55),v3(1.42,.28,.60),v3(0,-.25,1.15)],ends=[v3(-.35,1.10,0),v3(.35,1.10,0),v3(-.43,.69,0),v3(.43,.69,0),v3(0,.32,0)];
+    const fragments=starts.map((p,i)=>{const f=new THREE.Group();f.position.copy(p);f.rotation.set((i%2?-.4:.35),i*.72,(i-2)*.18);f.scale.set(.58,.58,.58);group.add(f);const color=i===4?FX_COLOR.gold:i%2?FX_COLOR.silver:FX_COLOR.cyan,mesh=new THREE.Mesh(fragmentGeometry(i),standard(color,color,.52));f.add(mesh);const glow=new THREE.Mesh(fragmentGeometry(i),basic(color,.16));glow.scale.set(1.08,1.08,1.08);f.add(glow);return f});const goldParticles=addParticles(rec,16,FX_COLOR.gold),cyanParticles=addParticles(rec,12,FX_COLOR.cyan);
+    setSpatialProgress("assemble",0);setHud("FINAL ACCESS DETECTED","최종 접근 신호가 확인되었습니다.","FIVE FRAGMENTS · ONE KEY");if(!await vectorTween(token,group,"scale",v3(1,1,1),560,easeBack))return false;await Promise.all(rings.map((r,i)=>vectorTween(token,r,"scale",v3(1,1,1),680,easeBack,i*120)));if(token.cancelled||!await pause(token,350))return false;
+    setHud("ACCESS VERIFYING...","5개의 Fragment를 순차 결합합니다.","FRAGMENT 01 · 02 · 03 · 04 · 05");for(let i=0;i<fragments.length;i++){const f=fragments[i];await Promise.all([vectorTween(token,f,"position",ends[i],820,easeInOut),eulerTween(token,f,v3(0,0,0),820,easeInOut),vectorTween(token,f,"scale",v3(1,1,1),820,easeBack)]);if(token.cancelled)return false;setSpatialProgress("assemble",i+1);tone(560+i*95,.065,.020);if(!await pause(token,170))return false}
+    setHud("THE KEY ASSEMBLED","모든 Fragment가 하나의 상징으로 연결되었습니다.","FINAL ACCESS SEQUENCE");if(!await vectorTween(token,keyhole,"scale",v3(1,1,1),760,easeBack))return false;tone(980,.16,.035);navigator.vibrate?.([50,45,100]);if(!await pause(token,380))return false;
+    if(!await vectorTween(token,beam,"scale",v3(1,1,1),720,easeOut))return false;goldParticles.burst(v3(0,.62,0),1.0);cyanParticles.burst(v3(0,.55,0),.78);tween(token,900,p=>{const s=1+1.0*p;rings[0].scale.set(s,s,s)},easeOut);setHud("FINAL ACCESS AUTHORIZED","전체 시스템의 접근 권한이 승인되었습니다.","THE KEY ASSEMBLED · SYSTEM UNLOCKED");tone(1280,.18,.04);return pause(token,1200)
+  }
+
+  async function play(key,token){const rec=createRecord(key,token);if(!rec)return false;const builder={rotate:buildRotate,analyze:buildAnalyze,activate:buildActivate,decrypt:buildDecrypt,assemble:buildAssemble}[key];return builder?builder(rec):false}
+  function cancel(token){token.cancelled=true;const rec=records.get(token.key);if(rec&&rec.token===token){rec.visible=false;rec.group.visible=false}}
+  function setVisible(key,value){const rec=records.get(key);if(!rec)return;rec.visible=value;rec.group.visible=value;if(value)ensureLoop()}
+  function reset(key){disposeRecord(key)}function resetAll(){for(const key of [...records.keys()])disposeRecord(key)}
+  hideLegacy();
+  return {play,cancel,setVisible,reset,resetAll,hideLegacy};
+})();
+window.__KEY_LENS_FX__=KeyLensFX;
+
 function spatialMarkup(key){
-  if(key==="rotate")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="rotatePanel">PERSPECTIVE SHIFT<small>ROTATE · OBSERVE · REFRAME</small></div><div class="scanBeam"></div></div><div class="holoLabel">PERSPECTIVE SHIFT<span class="holoSub">보이는 정보만으로 판단하지 마십시오.</span></div></div>`;
-  if(key==="analyze")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="holoCore"></div><svg class="network" viewBox="0 0 100 100"><line x1="18" y1="28" x2="47" y2="18" style="--d:.25s"/><line x1="47" y1="18" x2="78" y2="30" style="--d:.45s"/><line x1="78" y1="30" x2="66" y2="72" style="--d:.65s"/><line class="gold" x1="66" y1="72" x2="28" y2="72" style="--d:.85s"/><line x1="28" y1="72" x2="18" y2="28" style="--d:1.05s"/><line x1="18" y1="28" x2="66" y2="72" style="--d:1.2s"/></svg><i class="holoNode" style="left:18%;top:28%;--d:.12s"></i><i class="holoNode" style="left:47%;top:18%;--d:.28s"></i><i class="holoNode" style="left:78%;top:30%;--d:.44s"></i><i class="holoNode gold" style="left:66%;top:72%;--d:.60s"></i><i class="holoNode" style="left:28%;top:72%;--d:.76s"></i></div><div class="holoLabel">CONNECTION DETECTED<span class="holoSub">조건을 분리하지 말고 관계를 연결하십시오.</span></div></div>`;
-  if(key==="activate")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="holoCore"></div><div class="formationGrid"><div class="formCell" style="--d:.10s">HEART</div><div class="formCell" style="--d:.24s">MIRROR</div><div class="formCell" style="--d:.38s">LINK</div><div class="formCell" style="--d:.52s">WAVE</div></div></div><div class="holoLabel">FORMATION ANALYSIS<span class="holoSub">각 장면을 완성한 구성에 주목하십시오.</span></div></div>`;
-  if(key==="decrypt")return `<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoCore"></div><div class="decryptDeck"><i class="dataSlot" data-label="01" style="--d:.15s"></i><i class="dataSlot" data-label="02" style="--d:.32s"></i><i class="dataSlot gold" data-label="03" style="--d:.49s"></i><i class="dataSlot" data-label="04" style="--d:.66s"></i><i class="dataSlot" data-label="05" style="--d:.83s"></i></div></div><div class="holoLabel">DECRYPTION READY<span class="holoSub">5개의 MUSIC DATA가 확보되었습니다.</span></div></div>`;
-  return `<div class="holo finalHolo"><div class="holoTilt"><div class="finalGlow"></div><div class="holoRing outer" style="border-color:#d7b66d;box-shadow:0 0 20px rgba(215,182,109,.6)"></div><div class="finalAssembly"><i class="finalFrag f1"></i><i class="finalFrag f2"></i><i class="finalFrag f3"></i><i class="finalFrag f4"></i><i class="finalFrag f5"></i><div class="keyholeFinal"></div><div class="sweepGold"></div></div></div><div class="holoLabel" style="border-color:rgba(215,182,109,.55);color:#fff2c9">FINAL ACCESS AUTHORIZED<span class="holoSub" style="color:#d8bf82">THE KEY ASSEMBLED · MISSION COMPLETE</span></div></div>`;
+  if(key==="rotate")return `<div class="holo hybridHolo"><div class="hybridPanel rotateReadout"><b>9981</b><b>ROTATE</b><b>1601</b></div><div class="holoLabel">PERSPECTIVE SHIFT<span class="holoSub">ROTATE · OBSERVE · REFRAME</span></div></div>`;
+  if(key==="analyze")return `<div class="holo hybridHolo"><div class="personTags"><b>남씨</b><b>백씨</b><b>황씨</b></div><div class="hybridPanel conditionRail"><span>CONDITION 01</span><span>CONDITION 02</span><span>RELATION MAP</span></div><div class="holoLabel">CONNECTION DETECTED<span class="holoSub">조건을 연결하되 정답은 직접 완성하십시오.</span></div></div>`;
+  if(key==="activate")return `<div class="holo hybridHolo"><div class="hybridPanel directivePanel" data-stage="locked"><strong class="directiveState">SYSTEM LOCKED</strong><small class="directiveBody">KEY LENS 인증 신호를 기다리고 있습니다.</small></div><div class="holoLabel">ACTIVATE · FIELD DIRECTIVE<span class="holoSub">DIRECTIVE CORE CONNECTION</span></div></div>`;
+  if(key==="decrypt")return `<div class="holo hybridHolo"><div class="hybridPanel dataRibbon"><span>DATA 01</span><span>DATA 02</span><span>DATA 03</span><span>DATA 04</span><span>DATA 05</span></div><div class="hybridPanel rulePanel" data-stage="waiting"><strong>DECRYPTION READY</strong><small>5개의 MUSIC DATA를 동기화합니다.</small></div><div class="holoLabel">MUSIC DATA RULE<span class="holoSub">DATA ACQUISITION · PATTERN ANALYSIS</span></div></div>`;
+  return `<div class="holo hybridHolo finalHolo3D"><div class="hybridPanel fragmentRail"><span>F01</span><span>F02</span><span>F03</span><span>F04</span><span>F05</span></div><div class="holoLabel" style="border-color:rgba(215,182,109,.64);color:#fff2c9">FINAL ACCESS AUTHORIZED<span class="holoSub" style="color:#d8bf82">THE KEY ASSEMBLED · SYSTEM UNLOCKED</span></div></div>`;
 }
 function showSpatial(key){
   clearTimeout(spatialHideTimer);spatialKey=key;spatialMarker=$("#m-"+key);
@@ -716,16 +776,33 @@ function spatialLoop(){
 function scheduleSpatialHide(key,delay=1300){
   clearTimeout(spatialHideTimer);spatialHideTimer=setTimeout(()=>{if(spatialKey===key && current!==key && !$("#m-"+key)?.object3D?.visible)hideSpatial(key)},delay);
 }
-async function spatialSequence(key,duration){showSpatial(key);tone(720,.07);await wait(duration)}
-RUN.rotate=()=>spatialSequence("rotate",3200);
-RUN.analyze=()=>spatialSequence("analyze",3400);
-RUN.activate=()=>spatialSequence("activate",3400);
-RUN.decrypt=()=>spatialSequence("decrypt",3600);
-RUN.assemble=async()=>{showSpatial("assemble");setHud("FINAL ACCESS DETECTED","최종 접근 신호가 확인되었습니다.","ACCESS VERIFYING...");tone(460,.10);await wait(1800);setHud("THE KEY ASSEMBLED","모든 조각이 하나로 연결되었습니다.","FINAL ACCESS SEQUENCE");tone(980,.14,.035);await wait(1600);setHud("FINAL ACCESS AUTHORIZED","모든 단서가 연결되었습니다.","THE KEY ASSEMBLED");navigator.vibrate?.([50,40,90]);tone(1280,.16,.04);await wait(3000)};
-const _runExperienceSpatial=runExperience;runExperience=async function(key){await _runExperienceSpatial(key);if(spatialKey===key&&!$("#m-"+key)?.object3D?.visible)scheduleSpatialHide(key,750)};
+function completeSpatialFallback(key){
+  if(key==="analyze")setSpatialProgress("analyze",3);
+  if(key==="activate")setDirectiveStage("active","FIELD DIRECTIVE ACTIVE",KEY_LENS_MISSION_DATA.activate.body);
+  if(key==="decrypt"){setSpatialProgress("decrypt",5);setRuleStage(true,KEY_LENS_MISSION_DATA.decrypt.rule)}
+  if(key==="assemble"){setSpatialProgress("assemble",5);const label=document.querySelector("#spatialContent .finalHolo3D .holoLabel");if(label)label.style.animationDelay="0s"}
+}
+async function spatialSequence(key,token){
+  if(token.source==="operator")lastSpatialAnchor=null;
+  showSpatial(key);tone(720,.07);
+  try{
+    const rendered=await KeyLensFX.play(key,token);
+    if(rendered!==false||token.cancelled)return rendered;
+  }catch(error){console.warn("KEY LENS 3D fallback",key,error);KeyLensFX.reset(key)}
+  if(token.cancelled)return false;
+  completeSpatialFallback(key);
+  await wait(900);
+  return !token.cancelled;
+}
+RUN.rotate=token=>spatialSequence("rotate",token);
+RUN.analyze=token=>spatialSequence("analyze",token);
+RUN.activate=token=>spatialSequence("activate",token);
+RUN.decrypt=token=>spatialSequence("decrypt",token);
+RUN.assemble=token=>spatialSequence("assemble",token);
+const _runExperienceSpatial=runExperience;runExperience=async function(key,source="marker"){const ok=await _runExperienceSpatial(key,source);if(source!=="operator"&&spatialKey===key&&!$("#m-"+key)?.object3D?.visible)scheduleSpatialHide(key,750);return ok};
 const _markerFound=markerFound;markerFound=function(key){clearTimeout(spatialHideTimer);_markerFound(key)};
 const _markerLost=markerLost;markerLost=function(key){_markerLost(key);scheduleSpatialHide(key)};
-// DOM boot hologram: verifies the visible overlay without depending on WebGL compositing.
+// DOM boot hologram: a short, readable confirmation layer above the WebGL readiness object.
 const _enterScanner=enterScanner;enterScanner=function(){const was=scannerStarted;_enterScanner();if(!was&&scannerStarted){const content=$("#spatialContent");$("#spatialLayer").classList.add("active");content.innerHTML='<div class="holo"><div class="holoTilt"><div class="holoRing outer"></div><div class="holoRing inner"></div><div class="holoCore"></div></div><div class="holoLabel">KEY LENS READY<span class="holoSub">CAMERA · TARGET ENGINE · SPATIAL LAYER</span></div></div><div class="spatialDebug" id="spatialDebug"></div>';const rect=getARCanvas()?.getBoundingClientRect();content.style.left=((rect?.left||0)+(rect?.width||innerWidth)/2)+"px";content.style.top=((rect?.top||0)+(rect?.height||innerHeight)/2)+"px";content.style.width=Math.max(250*samsungVisualBoost,Math.min(360*samsungVisualBoost,(rect?.width||innerWidth)*.68))+"px";content.style.height=content.style.width;setTimeout(()=>{if(!spatialKey)$("#spatialLayer").classList.remove("active")},1300)}};
 // Browser-normalized camera fit. Chrome keeps its proven fit; Samsung gets a deterministic
 // center-cropped 3:4 portrait window without changing page zoom or participant UI scale.
@@ -735,8 +812,8 @@ const _containRect=containRect;containRect=function(sourceW,sourceH){
 
 if(new URLSearchParams(location.search).get("operator")==="1"){
   $("#operator").style.display="block";
-  $("#operator-reset").onclick=()=>{completed.clear();current=null;["rotate","analyze","activate","decrypt","assemble"].forEach(resetGroup);setHud("OPERATOR RESET","모든 미션 재생 상태를 초기화했습니다.","타깃을 다시 비추면 재생됩니다.")};
-  document.querySelectorAll("[data-op]").forEach(b=>b.onclick=()=>{const k=b.dataset.op;completed.delete(k);resetGroup(k);runExperience(k)});
+  $("#operator-reset").onclick=()=>{cancelExperience();KeyLensFX.resetAll();hideSpatial();completed.clear();current=null;["rotate","analyze","activate","decrypt","assemble"].forEach(resetGroup);$("#pill").style.display="none";$("#guide").style.display="block";$("#mission").textContent="SCANNER READY";setHud("OPERATOR RESET","모든 미션 재생 상태를 초기화했습니다.","타깃 또는 AR 버튼을 다시 선택하십시오.")};
+  document.querySelectorAll("[data-op]").forEach(b=>b.onclick=()=>{const k=b.dataset.op;cancelExperience();completed.delete(k);KeyLensFX.reset(k);resetGroup(k);runExperience(k,"operator")});
 }
 
 </script>
