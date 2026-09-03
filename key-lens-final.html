@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14.1-BOOT-TEST01">
+<meta name="key-lens-build" content="FINAL-STABLE-SAMSUNG-V14.2-UI-TEST02">
 <style>
 
 :root{
@@ -111,9 +111,9 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 .spatialDebug{display:none;position:absolute;left:50%;top:-16px;transform:translateX(-50%);font:8px ui-monospace,monospace;color:#76ddea;background:#031018aa;padding:3px 6px;border-radius:5px;white-space:nowrap}
 
 </style>
-<!-- CHANGE 01: keep the AR engines in order, but do not let either download block the first HTML paint. -->
-<script defer src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
-<script defer src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
+<!-- CHANGE 01 RESULT: FAIL. The deferred-engine boot test did not change Samsung Internet. Rolled back. -->
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
 <div id="sceneMount">
@@ -234,7 +234,6 @@ border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
 <div id="bottom"><div id="message">카메라 연결을 준비하고 있습니다.</div><div id="sub">잠시 후 KEY LENS를 시작할 수 있습니다.</div></div>
 <div id="operator"><div class="micro">SYSTEM CONTROLLER</div><button data-op="rotate">PLAY AR01 ROTATE</button><button data-op="analyze">PLAY AR02 ANALYZE</button><button data-op="activate">PLAY AR03 FORMATION</button><button data-op="decrypt">PLAY AR04 DECRYPT</button><button data-op="assemble">PLAY AR05 FINAL</button><button id="operator-reset">RESET ALL</button></div>
 <script>
-window.addEventListener("DOMContentLoaded",()=>{
 const EXPERIENCE = {
   rotate:{name:"AR01 / ROTATE",title:"PERSPECTIVE SHIFT",msg:"보이는 정보만으로 판단하지 마십시오."},
   analyze:{name:"AR02 / ANALYZE",title:"CONNECTION DETECTED",msg:"조건을 분리하지 말고 관계를 연결하십시오."},
@@ -545,10 +544,58 @@ setTimeout(()=>{
 let spatialKey=null,spatialMarker=null,spatialRAF=0,spatialHideTimer=null,lastSpatialAnchor=null;
 const isSamsung=/SamsungBrowser/i.test(navigator.userAgent);
 const runtimeQS=new URLSearchParams(location.search);
-// Samsung must use the same participant UI scale as Chrome.
-// Do not enlarge the page/HUD/hologram to compensate for Samsung's camera aspect.
-const samsungUIScale=1;
-const samsungVisualBoost=1;
+// CHANGE 02 — Samsung physical UI normalization (TEST02)
+// Problem: the intro can be outside the visible area and scanner UI is rendered extremely small.
+// Cause: Samsung Internet or an Android custom tab can expose a desktop-sized CSS layout
+// viewport on a portrait phone while V14 fixes the participant UI scale at 1.
+// Change: derive one bounded physical UI scale from layout/screen/visualViewport ratios and
+// apply it only to participant overlays; keep the intro inside the visible viewport.
+// Preserved: V14 camera/projection rectangle, AR scene, marker mappings and experience logic.
+// Verification: syntax/diff/formula checks PASS; Samsung hardware result NOT TESTED.
+const portrait=innerHeight>innerWidth;
+const screenShort=Math.max(320,Math.min(Number(screen.width)||innerWidth,Number(screen.height)||innerHeight));
+const vvScale=(window.visualViewport&&Number(window.visualViewport.scale))||1;
+const samsungLayoutRatio=portrait?Math.max(1,innerWidth/screenShort):1;
+const visualScaleRatio=portrait&&vvScale>0&&vvScale<1?1/vvScale:1;
+const needsPhysicalUI=portrait&&(isSamsung||samsungLayoutRatio>=1.35||visualScaleRatio>=1.35);
+const samsungUIScale=needsPhysicalUI?Math.min(4.2,Math.max(1,samsungLayoutRatio,visualScaleRatio)):1;
+const samsungVisualBoost=samsungUIScale;
+
+function installPhysicalUIScale(){
+  if(samsungUIScale<=1.05)return;
+  const s=samsungUIScale;
+  const px=n=>Math.round(n*s*10)/10;
+  const st=document.createElement("style");
+  st.id="samsung-physical-ui-scale";
+  st.textContent=`
+    #intro{padding:${px(22)}px}
+    .introCard{width:calc(100% - ${px(44)}px);max-width:${px(520)}px;padding:${px(27)}px ${px(22)}px;border-radius:${px(22)}px}
+    .brand{font-size:${px(10)}px}h1{font-size:${px(38)}px;margin:${px(8)}px 0}.lead{font-size:${px(14)}px}
+    #readyLine{font-size:${px(11)}px;margin-top:${px(12)}px}.activate{font-size:${px(16)}px;margin-top:${px(22)}px;padding:${px(16)}px;border-radius:${px(14)}px}
+    #hud{left:${px(10)}px;right:${px(10)}px;padding:${px(11)}px ${px(13)}px;border-radius:${px(14)}px}
+    .micro{font-size:${px(9)}px}#status{font-size:${px(19)}px;margin-top:${px(2)}px}
+    .pill{font-size:${px(10)}px;padding:${px(6)}px ${px(9)}px}#mission{font-size:${px(10)}px;margin-top:${px(6)}px}
+    #bottom{left:${px(10)}px;right:${px(10)}px;padding:${px(12)}px ${px(13)}px;border-radius:${px(14)}px}
+    #message{font-size:${px(14)}px}#sub{font-size:${px(11)}px;margin-top:${px(4)}px}
+    #guide{width:min(86vw,${px(520)}px)}.corner{width:${px(42)}px;height:${px(42)}px}
+    .holoLabel{font-size:${px(12)}px;padding:${px(8)}px ${px(13)}px}.holoSub{font-size:${px(8)}px;margin-top:${px(3)}px}
+    .rotatePanel{font-size:${px(16)}px;border-radius:${px(12)}px}.rotatePanel small{font-size:${px(9)}px}
+    .formCell{font-size:${px(11)}px;border-radius:${px(10)}px}.decryptDeck{border-radius:${px(14)}px}.dataSlot{border-radius:${px(6)}px}
+    .spatialDebug{font-size:${px(8)}px;padding:${px(3)}px ${px(6)}px}
+  `;
+  document.head.appendChild(st);
+  document.documentElement.dataset.keyLensUiScale=s.toFixed(2);
+}
+function placeIntroInVisualViewport(){
+  if(samsungUIScale<=1.05||!window.visualViewport)return;
+  const vv=window.visualViewport,intro=document.querySelector("#intro");
+  if(!intro)return;
+  Object.assign(intro.style,{left:vv.offsetLeft+"px",top:vv.offsetTop+"px",right:"auto",bottom:"auto",width:vv.width+"px",height:vv.height+"px"});
+}
+installPhysicalUIScale();
+placeIntroInVisualViewport();
+window.visualViewport?.addEventListener("resize",placeIntroInVisualViewport);
+window.visualViewport?.addEventListener("scroll",placeIntroInVisualViewport);
 
 // Samsung often supplies a wider landscape camera stream in portrait mode.
 // We normalize ONLY the camera/projection rectangle to the same 3:4 portrait window used by Chrome.
@@ -654,8 +701,6 @@ if(new URLSearchParams(location.search).get("operator")==="1"){
   $("#operator-reset").onclick=()=>{completed.clear();current=null;["rotate","analyze","activate","decrypt","assemble"].forEach(resetGroup);setHud("OPERATOR RESET","모든 미션 재생 상태를 초기화했습니다.","타깃을 다시 비추면 재생됩니다.")};
   document.querySelectorAll("[data-op]").forEach(b=>b.onclick=()=>{const k=b.dataset.op;completed.delete(k);resetGroup(k);runExperience(k)});
 }
-
-});
 
 </script>
 </body></html>
