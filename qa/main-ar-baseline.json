@@ -1,0 +1,12 @@
+{
+  "sourceBuild": "FINAL-PRODUCTION-V23.2-NFT-3D-ANCHOR",
+  "sourceCommit": "cccecf3b9210a2d7cde8a3e79ad02355b3d7b4b9",
+  "builders": {
+    "buildRotate": "ba26fb52f9f4fb425c6dc28944f41fb8829e4d05f196ec693ecd5f792b6effd2",
+    "buildAnalyze": "cd25b72aa2e3488c64c0761588b378333efada99c584c8861d4f2f782ecc5bbf",
+    "buildActivate": "067982b9b47e5da93e897f7115a7633d6e1ea843dd6c0d4dda3e87f9d93c402f",
+    "buildDecrypt": "ef278584220bc5ce5aa09852e695dcf3997c872797f12e357da2093a11ac0091",
+    "buildAssemble": "c0dd2345a114abf9cfaf2f97d9462b7574ed7da6faa2d72f19a2a857d020f7f9"
+  },
+  "mainTargets": ["rotate", "analyze", "activate", "decrypt", "assemble"]
+}

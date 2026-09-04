@@ -1,32 +1,56 @@
-# THE KEY AR — Technical Spike 0
+# THE KEY SYSTEM / KEY LENS
 
-모바일 브라우저에서 평면 이미지 타깃을 인식하고 타깃 위에 `742` 보안 오버레이를 표시하는 WebAR 기술 검증 프로젝트입니다.
+Production WebAR scanner for THE KEY SYSTEM. The deployed participant entry is
+[`key-lens-final.html`](./key-lens-final.html); GitHub Pages serves it at
+`https://ljk2692-svg.github.io/the-key-ar/key-lens-final.html`.
 
-## 공개 실행 주소
+## Runtime architecture
 
-GitHub Pages 활성화 후:
+- MAIN EXPERIENCE: five existing AR.js NFT targets route to AR01 ROTATE, AR02
+  ANALYZE, AR03 ACTIVATE, AR04 DECRYPT, and AR05 ASSEMBLE.
+- HINT PROTOCOL: lightweight AR.js pattern nodes route through the data-driven
+  registry in `hint-registry.js` and the reusable Three.js engine in
+  `hint-engine.js`.
+- Tracking load: the five NFT workers remain unchanged. Only confirmed HINT
+  nodes are mounted; scaffold nodes are not loaded by the participant runtime.
+- Presentation: Three.js geometry provides the spatial hologram while the
+  companion DOM layer keeps short Korean copy readable on portrait phones.
+- Deployment: `key-lens-final.html` embeds the HINT CSS, Registry snapshot,
+  engine, and four active patterns so Production can be updated atomically with
+  one file. The separate modules remain the maintainable source of truth.
 
-- AR 실행: `https://ljk2692-svg.github.io/the-key-ar/`
-- 테스트 타깃: `https://ljk2692-svg.github.io/the-key-ar/target.html`
+The default V24 pilot mounts four confirmed nodes: `H-R2M02`, `H-R3GUIDE`,
+`H-R3M07`, and `H-R3M08`. Ten additional Registry entries and their generated
+assets are scaffolded until their source mission content is confirmed.
 
-## 사용 기술
+## Internal configuration
 
-- A-Frame 1.5.0
-- MindAR Image Tracking 1.2.5
-- HTML / CSS / JavaScript
-- GitHub Pages 정적 HTTPS 호스팅
+These query parameters are for operations and QA, not participant selection:
 
-Spike 0에서는 카메라와 이미지 추적 자체를 빠르게 검증하기 위해 MindAR 공식 테스트 카드와 공식 `.mind` 파일을 사용합니다. 이 단계가 성공하면 실제 THE KEY 전용 이미지 타깃으로 교체합니다.
+- `?operator=1` — MAIN and HINT scene controls plus diagnostics
+- `?diag=1` — tracker/HINT diagnostics
+- `?round=1`, `?round=2`, `?round=3`, or `?round=ALL` — mounted HINT group
+- `?audience=SCHOOL` or `?audience=CORPORATE` — copy variant
+- `?eventMode=FAST_120`, `STANDARD_150`, or `STRATEGY_180` — HINT 2 timing
 
-## 모바일 테스트
+## Node generation and verification
 
-1. AR 실행 주소를 Android Chrome 또는 iPhone Safari에서 직접 엽니다.
-2. `AR 테스트 시작`을 누르고 카메라 권한을 허용합니다.
-3. 테스트 타깃 주소를 PC나 다른 기기에 띄웁니다.
-4. 휴대전화로 타깃을 비추면 보안 프레임과 `742`가 나타납니다.
+```bash
+python3 scripts/generate-hint-nodes.py
+node scripts/build-standalone.mjs
+node scripts/verify-key-lens.mjs
+node scripts/test-hint-runtime.mjs
+```
 
-## 주의
+The generator creates `.patt`, print PNG, SVG, and marker-only PNG assets from
+each Registry ID and seed. `qa/content-master.json` is the answer-free public
+QA index. The canonical answer master is retained outside this public
+repository and must never be loaded by participant HTML or JavaScript.
 
-- 다운로드한 HTML을 `content://` 또는 `file://`로 열면 카메라가 실행되지 않습니다.
-- 카카오톡·인스타그램 내부 브라우저보다 Chrome 또는 Safari 직접 실행을 권장합니다.
-- 이 단계에는 로그인, 팀 코드, 데이터베이스, 관리자 기능이 포함되지 않습니다.
+## Production constraints
+
+- Keep the A-Frame/AR.js camera and Samsung viewport paths intact.
+- Do not replace the five NFT target datasets in `target-nft/`.
+- Do not expose canonical answers in participant code or HINT copy.
+- A successful Operator test does not replace printed-node tracking tests on
+  Samsung Internet and Android Chrome.

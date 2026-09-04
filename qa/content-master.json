@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "purpose": "공개 저장소용 CONTENT MASTER 검수 인덱스. 실제 정답은 비공개 운영 원본에만 둔다.",
+  "confidentialAnswerStorage": "PRIVATE_OPERATIONS_MASTER",
+  "missions": [
+    {
+      "missionId": "R1-Q02",
+      "canonicalAnswerRef": "PRIVATE:R1-Q02",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "KNOWN_CORRECTION"
+    },
+    {
+      "missionId": "R2-M01",
+      "canonicalAnswerRef": "PRIVATE:R2-M01",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "PASS_REFERENCE"
+    },
+    {
+      "missionId": "R2-M03",
+      "canonicalAnswerRef": "PRIVATE:R2-M03",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "PASS_REFERENCE"
+    },
+    {
+      "missionId": "R3-M07",
+      "canonicalAnswerRef": "PRIVATE:R3-M07",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "HINT_1_MUST_KEEP_SLOTS_EMPTY"
+    },
+    {
+      "missionId": "R3-M08",
+      "canonicalAnswerRef": "PRIVATE:R3-M08",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "FIELD_REHEARSAL_REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "OBJECT_PLACEMENT_PENDING_EVENT_REHEARSAL"
+    }
+  ]
+}
