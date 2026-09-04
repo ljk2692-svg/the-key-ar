@@ -1,0 +1,93 @@
+{
+  "version": "KEY-LENS-NFT-TARGETS-V1",
+  "generated_at": "2026-09-04",
+  "generator": {
+    "repository": "https://github.com/Carnaux/NFT-Marker-Creator",
+    "commit": "44c4cdff3f3a184f61d52235fafed0098faf6478",
+    "level": 3,
+    "max_dpi": 28
+  },
+  "runtime": {
+    "upstream": "AR-js-org/AR.js 3.4.8 aframe-ar-nft.js",
+    "upstream_sha256": "a5536018932307a7b8e4fd21e774c48f8d1f3ca3371b12cc07f12b7e7f0acb18",
+    "local_file": "../vendor/aframe-ar-nft-3.4.8-keylens.js",
+    "local_sha256": "a69d328502e0213b8822a287bdb33d10138945c0558e1e6b3636ecebe9095d2d",
+    "patch": "Keep each NFT worker's visibility state on its own marker control instead of the shared ARController.showObject flag"
+  },
+  "source_preparation": {
+    "method": "Remove the unused alpha channel from fully opaque PNG files before generation",
+    "rgb_absolute_error_pixels": 0
+  },
+  "targets": [
+    {
+      "target": "01",
+      "route": "AR01 / ROTATE",
+      "source_name": "ar01.png",
+      "source_dimensions": "1672x941",
+      "source_sha256": "97fe4f74d72de3923fc7971a5b9486f4bb8a24ce4af71763bad2f9b6503228a2",
+      "descriptor_reference": {"width": 650, "height": 366, "dpi": 28},
+      "dataset_prefix": "key-lens-target-01",
+      "descriptors": {
+        "fset": "28d51b5b99c865ccab1e3754e02fb81bfbb78668615bf5ccb33ff921c1e1cd6b",
+        "fset3": "498946810a4174a629bed7b6c9a786715aea6eeb55267678bda2fbe569df1479",
+        "iset": "5f6c32f7a01aefebd3c723439974387c3a27e82d839d11fcefbe83fc3371c5ca"
+      }
+    },
+    {
+      "target": "02",
+      "route": "AR02 / ANALYZE",
+      "source_name": "ar02.png",
+      "source_dimensions": "1672x941",
+      "source_sha256": "e4104a6015f628bb4265a5859a2ca167abf2c8b56c9bb1ae91161dedd01eea95",
+      "descriptor_reference": {"width": 650, "height": 366, "dpi": 28},
+      "dataset_prefix": "key-lens-target-02",
+      "descriptors": {
+        "fset": "1eaf9229f982409a4ed4d151d4341bde878febc5f4964e41368029a6692968db",
+        "fset3": "a329bc45c1a514d0e95d5aba0674e5186151a9673244ea6f55be94565bb234c2",
+        "iset": "d1fd802496e1e803a1a4db7fc570da0cca8c8abc4cf6a151b4913aa26c545bc1"
+      }
+    },
+    {
+      "target": "03",
+      "route": "AR03 / ACTIVATE",
+      "source_name": "ar03.png",
+      "source_dimensions": "1672x941",
+      "source_sha256": "d4e426d4ac7a20f333357b38fcacf4f63bd81512ddfe66a684e22dc8c698ac7a",
+      "descriptor_reference": {"width": 650, "height": 366, "dpi": 28},
+      "dataset_prefix": "key-lens-target-03",
+      "descriptors": {
+        "fset": "749babb236438b622de12b24334f9931e5de13632395a8f18b288b9967b2ee59",
+        "fset3": "b057f42d4249b1bfb7f1169523351834efc6991255bb35f4653472c214d49fcc",
+        "iset": "321371541ea4732cdd6d5fadae1093bd9c751a6135a2452506dee585af381f2a"
+      }
+    },
+    {
+      "target": "04",
+      "route": "AR04 / DECRYPT",
+      "source_name": "ar4.png",
+      "source_dimensions": "2048x1143",
+      "source_sha256": "d91958e92e938f29d02bfae6b5b619ef083210b6554edbc8ab64abebc5163f28",
+      "descriptor_reference": {"width": 796, "height": 445, "dpi": 28},
+      "dataset_prefix": "key-lens-target-04",
+      "descriptors": {
+        "fset": "013833a27b5b1979e397c487a9dfbdde15d6115bce5397914098c83430d0a36b",
+        "fset3": "9d8b0b9591abf387820644163d113c2c78d7964055ad8f6584eb7dc75348daf6",
+        "iset": "d82ca6ea5bbf8a0789f01d724b422f2b25b012b602bd2d8e8fa26d03623f7dfd"
+      }
+    },
+    {
+      "target": "05",
+      "route": "AR05 / ASSEMBLE",
+      "source_name": "ar5.png",
+      "source_dimensions": "1491x1055",
+      "source_sha256": "a6aa23f3d604f9d2f011e473a58e16952b1d6cba1341789c28c5c565a0312afc",
+      "descriptor_reference": {"width": 580, "height": 410, "dpi": 28},
+      "dataset_prefix": "key-lens-target-05",
+      "descriptors": {
+        "fset": "24a18b6b2339c83f911bd268e60878a20b86a5fafa08c8b92364c8d00bcc24e6",
+        "fset3": "364d17d7cf64c995f41ac23d3cab200701571aa87593172389f9e6621b20ced0",
+        "iset": "fca0d051a3a11d2b630f58ec510e21652e3ec57c0fcc87fa18b916af09e8020e"
+      }
+    }
+  ]
+}
