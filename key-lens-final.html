@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-PRODUCTION-V20-MISSION-DECODE-LOGIC">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V21-VISUAL-HINT-BALANCE">
 <style>
 
 :root{
@@ -153,12 +153,14 @@ transform:perspective(620px) rotateX(58deg) rotateZ(-4deg) scale(1.06)}
 .directivePanel[data-stage="active"] .directiveState{color:#f0cf83!important}
 .poseRail{position:absolute;z-index:4;left:3%;right:3%;top:3%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .poseRail span{padding:6px 1px;border:1px solid rgba(118,221,234,.25);border-radius:6px;background:rgba(4,14,22,.92);font:800 8px ui-monospace,monospace;color:#78979f;text-align:center}
-.poseRail span:after{content:"COUNT";display:block;margin-top:2px;font-size:6px;color:#607982}.poseRail span.on{color:#fff;border-color:rgba(118,221,234,.82);box-shadow:0 0 10px rgba(118,221,234,.36)}.poseRail span.on:after{color:#d5fbff}
+.poseRail span:after{content:"VALUE —";display:block;margin-top:2px;font-size:6px;color:#607982}.poseRail span.on{color:#fff;border-color:rgba(118,221,234,.82);box-shadow:0 0 10px rgba(118,221,234,.36)}.poseRail span.on:after{color:#d5fbff}
 .dataRibbon{top:5%;display:flex;justify-content:center;gap:5px;padding:8px;width:94%}
 .dataRibbon span{flex:1;padding:5px 1px;border:1px solid rgba(118,221,234,.27);border-radius:5px;font:800 7px ui-monospace,monospace;color:#c9f7fb;background:rgba(5,18,28,.84)}
 .dataRibbon span.on{color:#fff;border-color:rgba(118,221,234,.82);box-shadow:0 0 10px rgba(118,221,234,.38)}
 .rulePanel{top:auto;bottom:13%;border-color:rgba(215,182,109,.38)}
-.rulePanel em{display:block;margin-top:4px;font:800 7px ui-monospace,monospace;color:#f0cf83;letter-spacing:.09em;font-style:normal}.rulePanel[data-stage="source"] strong,.rulePanel[data-stage="count"] strong,.rulePanel[data-stage="order"] strong,.rulePanel[data-stage="active"] strong{color:#f0cf83}.rulePanel[data-stage="active"]{border-color:rgba(215,182,109,.82);box-shadow:0 12px 34px rgba(0,0,0,.52),0 0 24px rgba(215,182,109,.22)}
+.rulePanel em{display:block;margin-top:4px;font:800 7px ui-monospace,monospace;color:#f0cf83;letter-spacing:.09em;font-style:normal}.rulePanel[data-stage="owner"] strong,.rulePanel[data-stage="name"] strong,.rulePanel[data-stage="cells"] strong,.rulePanel[data-stage="value"] strong,.rulePanel[data-stage="active"] strong{color:#f0cf83}.rulePanel[data-stage="active"]{border-color:rgba(215,182,109,.82);box-shadow:0 12px 34px rgba(0,0,0,.52),0 0 24px rgba(215,182,109,.22)}
+@keyframes secondaryHintIn{0%{max-height:0;margin-top:0;opacity:0;transform:translateY(4px)}100%{max-height:20px;margin-top:5px;opacity:1;transform:translateY(0)}}
+.secondaryHint{display:block;max-height:0;overflow:hidden;margin-top:0;opacity:0;font:750 8px/1.4 "Segoe UI","Noto Sans KR",sans-serif;letter-spacing:.04em;color:#f0cf83;animation:secondaryHintIn .42s 8s ease-out forwards}
 .fragmentRail{top:3%;display:flex;justify-content:center;gap:5px;width:94%;padding:7px}
 .fragmentRail span{width:16%;padding:5px 1px;border:1px solid rgba(215,182,109,.25);border-radius:5px;font:800 7px ui-monospace,monospace;color:#b8aa86;background:rgba(18,14,7,.78)}
 .fragmentRail span.on{color:#fff3c9;border-color:rgba(240,212,136,.82);box-shadow:0 0 11px rgba(215,182,109,.42)}
@@ -283,8 +285,8 @@ const EXPERIENCE = {
 const RESULT = {
   rotate:{status:"PERSPECTIVE SHIFT",msg:"숫자를 다른 방향에서 다시 읽으십시오.",sub:"ROTATE · OBSERVE · REFRAME · 최종 계산은 직접 완성하십시오."},
   analyze:{status:"INFERENCE START POINT",msg:"황씨부터 분석하십시오.",sub:"황씨의 셔츠와 넥타이 후보를 먼저 좁혀보십시오."},
-  activate:{status:"POSE COUNT RULE",msg:"각 포즈에 참여한 인원을 확인하십시오.",sub:"POSE 01 → 02 → 03 → 04 · 인원 수를 순서대로 연결하십시오."},
-  decrypt:{status:"MUSIC DATA RULE",msg:"가수 또는 그룹명의 글자 수를 세십시오.",sub:"DATA 01 → 02 → 03 → 04 → 05 · 숫자를 순서대로 연결하십시오."},
+  activate:{status:"4 SCENES · 4 VALUES",msg:"각 장면에는 하나의 값이 남아 있습니다.",sub:"01 → 02 → 03 → 04"},
+  decrypt:{status:"5 TRACKS · 5 VALUES",msg:"곡 안에 답이 있는 것은 아닙니다.",sub:"그 곡의 ‘주인’을 확인하십시오. · 01 → 02 → 03 → 04 → 05"},
   assemble:{status:"FINAL ACCESS AUTHORIZED",msg:"THE KEY SYSTEM 인증이 완료되었습니다.",sub:"THE KEY ASSEMBLED · SYSTEM UNLOCKED"}
 };
 const $=s=>document.querySelector(s);
@@ -583,17 +585,16 @@ const KEY_LENS_MISSION_DATA=Object.freeze({
   },
   activate:{
     poses:["POSE 01","POSE 02","POSE 03","POSE 04"],
-    count:"각 포즈에 참여한 인원을 확인하십시오.",
-    order:"포즈 1부터 포즈 4까지 순서대로 인원 수를 기록하십시오.",
-    connect:"4개의 숫자를 순서대로 연결하십시오."
+    primary:"각 장면에는 하나의 값이 남아 있습니다.",
+    order:"01 → 02 → 03 → 04",
+    secondary:"장면의 규모를 숫자로 바꾸십시오."
   },
   decrypt:{
     slots:["01","02","03","04","05"],
-    recall:"5곡을 다시 떠올리십시오.",
-    source:"곡 제목이 아니라 가수 또는 그룹명을 확인하십시오.",
-    count:"가수 또는 그룹명의 글자 수를 세십시오.",
+    primary:"곡 안에 답이 있는 것은 아닙니다.",
+    owner:"그 곡의 ‘주인’을 확인하십시오.",
     order:"01 → 02 → 03 → 04 → 05",
-    connect:"5개의 숫자를 순서대로 연결하십시오."
+    secondary:"이름의 길이를 숫자로 바꾸십시오."
   }
 });
 const FX_COLOR=Object.freeze({navy:0x07111b,gunmetal:0x263541,silver:0xaebdca,cyan:0x76ddea,blue:0x2488ff,gold:0xd7b66d,white:0xf4fbff});
@@ -745,26 +746,41 @@ const KeyLensFX=(()=>{
   async function buildActivate(rec){
     const {token,group}=rec;group.scale.set(.08,.08,.08);const rings=[addRing(group,.90,.08,.035,FX_COLOR.gunmetal),addRing(group,.68,.13,.026,FX_COLOR.cyan),addRing(group,.44,.18,.020,FX_COLOR.gold)];rings.forEach(r=>r.scale.set(.01,.01,.01));spin(rec,rings[0],"y",.5);spin(rec,rings[1],"y",-.82);spin(rec,rings[2],"y",1.08);
     const core=addCore(group,FX_COLOR.gold,.19,.25);core.scale.set(.01,.01,.01);const beam=addBeam(group,FX_COLOR.cyan,1.72,.20);beam.scale.set(1,.01,1);
-    const clampRoot=new THREE.Group();group.add(clampRoot);const clamps=[0,Math.PI/2,Math.PI,Math.PI*1.5].map((a,i)=>{const h=new THREE.Group();h.userData.a=a;h.userData.r=.45;h.position.set(Math.cos(a)*.45,.18,Math.sin(a)*.45);h.rotation.y=-a;h.scale.set(.01,.01,.01);clampRoot.add(h);const body=new THREE.Mesh(cachedGeometry("directive-clamp",()=>new THREE.BoxGeometry(.36,.11,.18)),standard(FX_COLOR.gunmetal,i%2?FX_COLOR.cyan:FX_COLOR.gold,.35));h.add(body);const strip=new THREE.Mesh(cachedGeometry("clamp-strip",()=>new THREE.BoxGeometry(.24,.018,.185)),basic(i%2?FX_COLOR.cyan:FX_COLOR.gold,.78));strip.position.y=.065;h.add(strip);const tag=labelSprite(KEY_LENS_MISSION_DATA.activate.poses[i],"COUNT","#"+new THREE.Color(i%2?FX_COLOR.cyan:FX_COLOR.gold).getHexString(),.31);tag.position.set(0,.23,.01);h.add(tag);return h});
+    const clampRoot=new THREE.Group();group.add(clampRoot);const clamps=[0,Math.PI/2,Math.PI,Math.PI*1.5].map((a,i)=>{
+      const h=new THREE.Group(),accent=i%2?FX_COLOR.cyan:FX_COLOR.gold;h.userData.a=a;h.userData.r=.45;h.position.set(Math.cos(a)*.45,.18,Math.sin(a)*.45);h.rotation.y=-a;h.scale.set(.01,.01,.01);clampRoot.add(h);
+      const body=new THREE.Mesh(cachedGeometry("directive-clamp",()=>new THREE.BoxGeometry(.36,.11,.18)),standard(FX_COLOR.gunmetal,accent,.35));h.add(body);const strip=new THREE.Mesh(cachedGeometry("clamp-strip",()=>new THREE.BoxGeometry(.24,.018,.185)),basic(accent,.78));strip.position.y=.065;h.add(strip);
+      const pulse=glowSprite(accent,.22);pulse.position.set(0,.14,.07);pulse.material.opacity=.08;h.add(pulse);rec.tickers.push((dt,now)=>{const q=.5+.5*Math.sin(now*.004+i*1.4),s=.20+.035*q;pulse.material.opacity=.06+.09*q;pulse.scale.set(s,s,1)});
+      const figures=[-.07,0,.07].map((x,j)=>{const person=new THREE.Group(),mat=standard(FX_COLOR.gunmetal,accent,.06,.22);person.position.set(x,.12,.10);person.scale.set(.72,.72,.72);h.add(person);const torso=new THREE.Mesh(cachedGeometry("scene-human-body",()=>new THREE.BoxGeometry(.034,.064,.022)),mat);torso.position.y=.026;person.add(torso);const head=new THREE.Mesh(cachedGeometry("scene-human-head",()=>new THREE.SphereGeometry(.022,6,4)),mat);head.position.y=.075;person.add(head);person.userData.material=mat;person.userData.phase=j;return person});
+      const tag=labelSprite(KEY_LENS_MISSION_DATA.activate.poses[i],"SCENE","#"+new THREE.Color(accent).getHexString(),.31);tag.position.set(0,.28,.01);h.add(tag);const slot=labelSprite("VALUE —","","#"+new THREE.Color(accent).getHexString(),.22);slot.position.set(0,.43,.01);h.add(slot);h.userData.figures=figures;return h
+    });
     setDirectiveStage("locked","SYSTEM LOCKED","완료한 단체사진 미션의 기록을 연결합니다.",0);setHud("MISSION RECORD SCAN","완료한 단체사진 미션을 불러옵니다.","POSE 01 · 02 · 03 · 04");if(!await vectorTween(token,group,"scale",v3(1,1,1),520,easeBack))return false;await Promise.all(rings.map((r,i)=>vectorTween(token,r,"scale",v3(1,1,1),620,easeBack,i*90)));if(token.cancelled)return false;
-    setDirectiveStage("detected","KEY LENS DETECTED","단체사진 미션의 4개 포즈 기록이 확인되었습니다.",0);setHud("MISSION RECORD DETECTED","4개의 포즈를 순서대로 복원합니다.","POSE 01 → POSE 04");for(let i=0;i<clamps.length;i++){if(!await vectorTween(token,clamps[i],"scale",v3(1,1,1),340,easeBack))return false;setSpatialProgress("activate",i+1);tone(500+i*70,.04,.013);if(!await pause(token,150))return false}
+    setDirectiveStage("detected","KEY LENS DETECTED","단체사진 미션의 4개 포즈 기록이 확인되었습니다.",0);setHud("MISSION RECORD DETECTED","4개의 장면을 순서대로 복원합니다.","POSE 01 → POSE 04");for(let i=0;i<clamps.length;i++){const clamp=clamps[i];if(!await vectorTween(token,clamp,"scale",v3(1,1,1),340,easeBack))return false;setSpatialProgress("activate",i+1);for(const person of clamp.userData.figures){const mat=person.userData.material;if(!await tween(token,115,p=>{const s=.72*(.80+.20*p);person.scale.set(s,s,s);mat.opacity=.22+.70*p;mat.emissiveIntensity=.06+.72*p},easeOut))return false}tone(500+i*70,.04,.013);if(!await pause(token,90))return false}
     await Promise.all(clamps.map((c,i)=>tween(token,760,p=>{const r=.45+.34*p,a=c.userData.a;c.position.set(Math.cos(a)*r,.18+.07*p,Math.sin(a)*r)},easeInOut,i*55)));if(token.cancelled)return false;
-    setDirectiveStage("release","LOCK RELEASED","포즈별 참여 인원 해독 규칙을 불러옵니다.",4);setHud("DIRECTIVE CORE ACTIVATION","기계식 잠금이 해제되었습니다.","POSE COUNT RULE LOADING");if(!await vectorTween(token,core,"scale",v3(1,1,1),650,easeBack))return false;if(!await vectorTween(token,beam,"scale",v3(1,1,1),720,easeOut))return false;tone(980,.12,.028);navigator.vibrate?.([45,35,80]);
-    setDirectiveStage("count","COUNT PARTICIPANTS",KEY_LENS_MISSION_DATA.activate.count,4);setHud("COUNT PARTICIPANTS",KEY_LENS_MISSION_DATA.activate.count,"각 포즈마다 참여한 사람 수를 확인하십시오.");if(!await pause(token,900))return false;
-    setDirectiveStage("order","READ IN ORDER","POSE 01 → 02 → 03 → 04",4);setHud("READ IN ORDER",KEY_LENS_MISSION_DATA.activate.order,"POSE 01 → 02 → 03 → 04");if(!await pause(token,900))return false;
-    setDirectiveStage("active","CONNECT FOUR DIGITS",KEY_LENS_MISSION_DATA.activate.connect,4);setHud("POSE COUNT RULE",KEY_LENS_MISSION_DATA.activate.connect,"인원 수를 포즈 순서대로 연결하십시오.");return pause(token,1200)
+    setDirectiveStage("release","LOCK RELEASED","4개 장면의 값 슬롯이 열렸습니다.",4);setHud("DIRECTIVE CORE ACTIVATION","기계식 잠금이 해제되었습니다.","SCENE VALUE MAP");if(!await vectorTween(token,core,"scale",v3(1,1,1),650,easeBack))return false;if(!await vectorTween(token,beam,"scale",v3(1,1,1),720,easeOut))return false;tone(980,.12,.028);navigator.vibrate?.([45,35,80]);
+    setDirectiveStage("values","4 SCENES · 4 VALUES",KEY_LENS_MISSION_DATA.activate.primary,4);setHud("4 SCENES · 4 VALUES",KEY_LENS_MISSION_DATA.activate.primary,KEY_LENS_MISSION_DATA.activate.order);if(!await pause(token,950))return false;
+    setDirectiveStage("order","SEQUENCE",KEY_LENS_MISSION_DATA.activate.order,4);setHud("SEQUENCE",KEY_LENS_MISSION_DATA.activate.primary,KEY_LENS_MISSION_DATA.activate.order);if(!await pause(token,900))return false;
+    setDirectiveStage("active","4 SCENES · 4 VALUES",KEY_LENS_MISSION_DATA.activate.primary,4);setHud("4 SCENES · 4 VALUES",KEY_LENS_MISSION_DATA.activate.primary,KEY_LENS_MISSION_DATA.activate.order);return pause(token,1200)
   }
 
   async function buildDecrypt(rec){
     const {token,group}=rec;group.scale.set(.08,.08,.08);const ring1=addRing(group,.92,.07,.028,FX_COLOR.cyan),ring2=addRing(group,.64,.12,.020,FX_COLOR.silver),core=addCore(group,FX_COLOR.gold,.13,.18);ring1.scale.set(.01,.01,.01);ring2.scale.set(.01,.01,.01);core.scale.set(.01,.01,.01);spin(rec,ring1,"y",.58);spin(rec,ring2,"y",-1.0);
     const wavePts=[];for(let i=0;i<65;i++){const a=i/64*Math.PI*2;wavePts.push(v3(Math.cos(a)*.78,.22+Math.sin(i*.72)*.045,Math.sin(a)*.78))}const waveGeo=new THREE.BufferGeometry().setFromPoints(wavePts),wave=new THREE.LineLoop(waveGeo,new THREE.LineBasicMaterial({color:FX_COLOR.cyan,transparent:true,opacity:.72,blending:THREE.AdditiveBlending,depthWrite:false}));wave.scale.set(.01,.01,.01);group.add(wave);spin(rec,wave,"y",-.38);
     const heights=[.42,.56,.72,.52,.63],xs=[-.68,-.34,0,.34,.68];const pillars=heights.map((h,i)=>{const wrap=new THREE.Group();wrap.position.set(xs[i],.13,0);wrap.scale.set(1,.01,1);group.add(wrap);const accent=i%2?FX_COLOR.blue:FX_COLOR.cyan,mesh=new THREE.Mesh(cachedGeometry(`data-pillar-${h}`,()=>new THREE.CylinderGeometry(.10,.10,h,6,1)),standard(0x16404c,accent,.68,.88));mesh.position.y=h/2;wrap.add(mesh);const cap=new THREE.Mesh(cachedGeometry("data-cap",()=>new THREE.OctahedronGeometry(.12,0)),standard(FX_COLOR.silver,accent,.58));cap.position.y=h+.10;wrap.add(cap);const tag=labelSprite("MUSIC "+KEY_LENS_MISSION_DATA.decrypt.slots[i],"DATA","#76ddea",.34);tag.position.y=h+.29;wrap.add(tag);return wrap});const particles=addParticles(rec,14,FX_COLOR.cyan);
-    setSpatialProgress("decrypt",0);setRuleStage("recall","MUSIC DATA 01—05",KEY_LENS_MISSION_DATA.decrypt.recall);if(!await vectorTween(token,group,"scale",v3(1,1,1),520,easeBack))return false;await Promise.all([vectorTween(token,ring1,"scale",v3(1,1,1),620,easeBack),vectorTween(token,ring2,"scale",v3(1,1,1),620,easeBack,100),vectorTween(token,core,"scale",v3(1,1,1),520,easeBack,180),vectorTween(token,wave,"scale",v3(1,1,1),720,easeOut,220)]);if(token.cancelled)return false;
-    setHud("MUSIC DATA SYNC",KEY_LENS_MISSION_DATA.decrypt.recall,"MUSIC DATA 01 · 02 · 03 · 04 · 05");for(let i=0;i<pillars.length;i++){if(!await vectorTween(token,pillars[i],"scale",v3(1,1,1),480,easeBack))return false;setSpatialProgress("decrypt",i+1);tone(610+i*75,.045,.014);if(!await pause(token,170))return false}
-    setRuleStage("source","ARTIST / GROUP",KEY_LENS_MISSION_DATA.decrypt.source);setHud("SOURCE FIELD",KEY_LENS_MISSION_DATA.decrypt.source,"SONG TITLE ≠ COUNT SOURCE");if(!await pause(token,900))return false;
-    setRuleStage("count","COUNT LETTERS",KEY_LENS_MISSION_DATA.decrypt.count);setHud("COUNT LETTERS",KEY_LENS_MISSION_DATA.decrypt.count,"ARTIST / GROUP NAME");if(!await pause(token,900))return false;
-    setRuleStage("order","READ IN ORDER","01부터 05까지 순서대로 읽으십시오.",KEY_LENS_MISSION_DATA.decrypt.order);setHud("READ IN ORDER","MUSIC DATA 01부터 05까지 순서대로 읽으십시오.",KEY_LENS_MISSION_DATA.decrypt.order);if(!await pause(token,850))return false;
-    particles.burst(v3(0,.26,0),.42);setRuleStage("active","CONNECT FIVE DIGITS",KEY_LENS_MISSION_DATA.decrypt.connect,KEY_LENS_MISSION_DATA.decrypt.order);setHud("MUSIC DATA RULE",KEY_LENS_MISSION_DATA.decrypt.connect,KEY_LENS_MISSION_DATA.decrypt.order);return pause(token,1200)
+    const transformRoot=new THREE.Group();transformRoot.position.set(0,.28,.48);group.add(transformRoot);
+    const note=new THREE.Group();note.position.x=-.70;note.scale.set(.01,.01,.01);transformRoot.add(note);const noteMat=standard(FX_COLOR.gunmetal,FX_COLOR.cyan,.76);const noteHead=new THREE.Mesh(cachedGeometry("decrypt-note-head",()=>new THREE.SphereGeometry(.045,8,6)),noteMat);noteHead.position.set(-.025,0,0);note.add(noteHead);const noteStem=new THREE.Mesh(cachedGeometry("decrypt-note-stem",()=>new THREE.CylinderGeometry(.012,.012,.18,6,1)),noteMat);noteStem.position.set(.018,.09,0);note.add(noteStem);const noteFlag=new THREE.Mesh(cachedGeometry("decrypt-note-flag",()=>new THREE.BoxGeometry(.085,.018,.022)),noteMat);noteFlag.position.set(-.016,.175,0);note.add(noteFlag);
+    const mic=new THREE.Group();mic.position.x=-.36;mic.rotation.z=-.24;mic.scale.set(.01,.01,.01);transformRoot.add(mic);const micMat=standard(FX_COLOR.silver,FX_COLOR.blue,.62);const micHead=new THREE.Mesh(cachedGeometry("decrypt-mic-head",()=>new THREE.SphereGeometry(.052,8,6)),micMat);micHead.position.y=.10;mic.add(micHead);const micHandle=new THREE.Mesh(cachedGeometry("decrypt-mic-handle",()=>new THREE.CylinderGeometry(.022,.017,.16,7,1)),micMat);micHandle.position.y=0;mic.add(micHandle);
+    const namePlate=new THREE.Group();namePlate.position.x=-.01;namePlate.scale.set(.01,.01,.01);transformRoot.add(namePlate);const nameBody=new THREE.Mesh(cachedGeometry("decrypt-name-plate",()=>new THREE.BoxGeometry(.28,.055,.13)),standard(FX_COLOR.navy,FX_COLOR.cyan,.42,.94));namePlate.add(nameBody);const nameTag=labelSprite("NAME","","#76ddea",.25);nameTag.position.set(0,.085,.01);namePlate.add(nameTag);
+    const cellGroup=new THREE.Group();cellGroup.position.x=.37;transformRoot.add(cellGroup);const cells=[-.09,-.03,.03,.09].map((x,i)=>{const cell=new THREE.Mesh(cachedGeometry("decrypt-character-cell",()=>new THREE.BoxGeometry(.05,.052,.09)),standard(FX_COLOR.gunmetal,i%2?FX_COLOR.blue:FX_COLOR.cyan,.54,.92));cell.position.x=x;cell.scale.set(.01,.01,.01);cellGroup.add(cell);return cell});
+    const valueSlot=new THREE.Group();valueSlot.position.x=.72;valueSlot.scale.set(.01,.01,.01);transformRoot.add(valueSlot);const valueTag=labelSprite("VALUE ?","","#d7b66d",.28);valueSlot.add(valueTag);
+    const chainX=[-.53,-.185,.18,.55],connectors=chainX.map((x,i)=>{const line=new THREE.Mesh(cachedGeometry("decrypt-transform-link",()=>new THREE.BoxGeometry(.12,.012,.012)),basic(i===3?FX_COLOR.gold:FX_COLOR.cyan,.62));line.position.x=x;line.scale.set(.01,1,1);transformRoot.add(line);return line});
+    setSpatialProgress("decrypt",0);setRuleStage("tracks","5 TRACKS · 5 VALUES",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.order);if(!await vectorTween(token,group,"scale",v3(1,1,1),520,easeBack))return false;await Promise.all([vectorTween(token,ring1,"scale",v3(1,1,1),620,easeBack),vectorTween(token,ring2,"scale",v3(1,1,1),620,easeBack,100),vectorTween(token,core,"scale",v3(1,1,1),520,easeBack,180),vectorTween(token,wave,"scale",v3(1,1,1),720,easeOut,220)]);if(token.cancelled)return false;
+    setHud("MUSIC DATA SYNC",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.order);for(let i=0;i<pillars.length;i++){if(!await vectorTween(token,pillars[i],"scale",v3(1,1,1),480,easeBack))return false;setSpatialProgress("decrypt",i+1);tone(610+i*75,.045,.014);if(!await pause(token,170))return false}
+    setRuleStage("source","TRACE THE SOURCE",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.order);setHud("TRACE THE SOURCE",KEY_LENS_MISSION_DATA.decrypt.primary,"MUSIC → ?");if(!await vectorTween(token,note,"scale",v3(1,1,1),420,easeBack))return false;if(!await vectorTween(token,connectors[0],"scale",v3(1,1,1),280,easeOut))return false;
+    setRuleStage("owner","OWNER SIGNAL",KEY_LENS_MISSION_DATA.decrypt.owner,KEY_LENS_MISSION_DATA.decrypt.order);setHud("OWNER SIGNAL",KEY_LENS_MISSION_DATA.decrypt.owner,"TRACK → OWNER");if(!await vectorTween(token,mic,"scale",v3(1,1,1),430,easeBack))return false;if(!await vectorTween(token,connectors[1],"scale",v3(1,1,1),280,easeOut))return false;
+    setRuleStage("name","NAME PLATE",KEY_LENS_MISSION_DATA.decrypt.owner,KEY_LENS_MISSION_DATA.decrypt.order);setHud("NAME FIELD",KEY_LENS_MISSION_DATA.decrypt.owner,"OWNER → NAME");if(!await vectorTween(token,namePlate,"scale",v3(1,1,1),430,easeBack))return false;if(!await vectorTween(token,connectors[2],"scale",v3(1,1,1),280,easeOut))return false;
+    setRuleStage("cells","NAME PATTERN",KEY_LENS_MISSION_DATA.decrypt.owner,KEY_LENS_MISSION_DATA.decrypt.order);setHud("NAME PATTERN",KEY_LENS_MISSION_DATA.decrypt.owner,"NAME → [■][■][■][■]");for(let i=0;i<cells.length;i++){if(!await vectorTween(token,cells[i],"scale",v3(1,1,1),170,easeBack))return false;tone(760+i*55,.035,.011)}if(!await vectorTween(token,connectors[3],"scale",v3(1,1,1),280,easeOut))return false;
+    setRuleStage("value","VALUE SLOT",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.order);setHud("VALUE SLOT",KEY_LENS_MISSION_DATA.decrypt.owner,"NAME → [■][■][■][■] → VALUE ?");if(!await vectorTween(token,valueSlot,"scale",v3(1,1,1),470,easeBack))return false;
+    particles.burst(v3(0,.26,0),.42);setRuleStage("active","5 TRACKS · 5 VALUES",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.order);setHud("5 TRACKS · 5 VALUES",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.owner+" · "+KEY_LENS_MISSION_DATA.decrypt.order);return pause(token,1200)
   }
 
   function fragmentGeometry(index){return cachedGeometry("fragment-"+index,()=>{const sets=[[[-.22,-.10],[.18,-.13],[.28,.08],[-.08,.18]],[[-.18,-.14],[.24,-.08],[.18,.18],[-.28,.10]],[[-.24,-.08],[.12,-.18],[.28,.02],[-.10,.19]],[[-.18,-.18],[.24,-.02],[.12,.20],[-.28,.08]],[[-.12,-.23],[.12,-.23],[.18,.20],[-.18,.20]]],s=new THREE.Shape();sets[index].forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:.075,bevelEnabled:true,bevelSize:.018,bevelThickness:.018,bevelSegments:1});g.center();return g})}
@@ -791,8 +807,8 @@ window.__KEY_LENS_FX__=KeyLensFX;
 function spatialMarkup(key){
   if(key==="rotate")return `<div class="holo hybridHolo"><div class="hybridPanel rotateReadout"><b>9981</b><b>ROTATE</b><b>1601</b></div><div class="hybridPanel rotateRulePanel"><strong>CHANGE THE VIEW</strong><small>숫자를 다른 방향에서 다시 읽으십시오.</small></div><div class="holoLabel">PERSPECTIVE SHIFT<span class="holoSub">ROTATE · OBSERVE · REFRAME</span></div></div>`;
   if(key==="analyze")return `<div class="holo hybridHolo"><div class="logicGrid" data-stage="scan"><div class="logicCard"><b>남씨</b><span>남색 셔츠 X</span><span>남색 넥타이 X</span></div><div class="logicCard"><b>백씨</b><span>백색 셔츠 X</span><span>백색 넥타이 X</span></div><div class="logicCard"><b>황씨</b><span>황색 셔츠 X</span><span>황색 넥타이 X</span></div></div><div class="hybridPanel logicPanel" data-stage="scan"><strong class="logicState">RELATION SCAN</strong><small class="logicBody">세 사람의 정보 노드를 불러옵니다.</small></div><div class="hybridPanel conditionRail"><span>후보 제거</span><span>조건 01</span><span>조건 02</span><span>황씨 우선</span></div><div class="holoLabel">CONNECTION DETECTED<span class="holoSub">후보를 지우고 실제 관계를 연결하십시오.</span></div></div>`;
-  if(key==="activate")return `<div class="holo hybridHolo"><div class="poseRail"><span>POSE 01</span><span>POSE 02</span><span>POSE 03</span><span>POSE 04</span></div><div class="hybridPanel directivePanel" data-stage="locked"><strong class="directiveState">SYSTEM LOCKED</strong><small class="directiveBody">완료한 단체사진 미션의 기록을 연결합니다.</small></div><div class="holoLabel">ACTIVATE · POSE DECODER<span class="holoSub">FIELD DIRECTIVE · COUNT PARTICIPANTS</span></div></div>`;
-  if(key==="decrypt")return `<div class="holo hybridHolo"><div class="hybridPanel dataRibbon"><span>DATA 01</span><span>DATA 02</span><span>DATA 03</span><span>DATA 04</span><span>DATA 05</span></div><div class="hybridPanel rulePanel" data-stage="recall"><strong class="ruleState">MUSIC DATA 01—05</strong><small class="ruleBody">5곡을 다시 떠올리십시오.</small><em class="ruleOrder"></em></div><div class="holoLabel">MUSIC DATA RULE<span class="holoSub">ARTIST / GROUP · COUNT LETTERS</span></div></div>`;
+  if(key==="activate")return `<div class="holo hybridHolo"><div class="poseRail"><span>POSE 01</span><span>POSE 02</span><span>POSE 03</span><span>POSE 04</span></div><div class="hybridPanel directivePanel" data-stage="locked"><strong class="directiveState">SYSTEM LOCKED</strong><small class="directiveBody">완료한 단체사진 미션의 기록을 연결합니다.</small><span class="secondaryHint">${KEY_LENS_MISSION_DATA.activate.secondary}</span></div><div class="holoLabel">ACTIVATE · POSE DECODER<span class="holoSub">4 SCENES · 4 VALUES</span></div></div>`;
+  if(key==="decrypt")return `<div class="holo hybridHolo"><div class="hybridPanel dataRibbon"><span>TRACK 01</span><span>TRACK 02</span><span>TRACK 03</span><span>TRACK 04</span><span>TRACK 05</span></div><div class="hybridPanel rulePanel" data-stage="tracks"><strong class="ruleState">5 TRACKS · 5 VALUES</strong><small class="ruleBody">${KEY_LENS_MISSION_DATA.decrypt.primary}</small><em class="ruleOrder">${KEY_LENS_MISSION_DATA.decrypt.order}</em><span class="secondaryHint">${KEY_LENS_MISSION_DATA.decrypt.secondary}</span></div><div class="holoLabel">MUSIC DATA RULE<span class="holoSub">그 곡의 ‘주인’을 확인하십시오.</span></div></div>`;
   return `<div class="holo hybridHolo finalHolo3D"><div class="hybridPanel fragmentRail"><span>F01</span><span>F02</span><span>F03</span><span>F04</span><span>F05</span></div><div class="holoLabel" style="border-color:rgba(215,182,109,.64);color:#fff2c9">FINAL ACCESS AUTHORIZED<span class="holoSub" style="color:#d8bf82">THE KEY ASSEMBLED · SYSTEM UNLOCKED</span></div></div>`;
 }
 function showSpatial(key){
@@ -846,8 +862,8 @@ function scheduleSpatialHide(key,delay=1300){
 }
 function completeSpatialFallback(key){
   if(key==="analyze")setAnalyzeStage("focus","START WITH 황씨",KEY_LENS_MISSION_DATA.analyze.focus,4);
-  if(key==="activate")setDirectiveStage("active","CONNECT FOUR DIGITS",KEY_LENS_MISSION_DATA.activate.connect,4);
-  if(key==="decrypt"){setSpatialProgress("decrypt",5);setRuleStage("active","CONNECT FIVE DIGITS",KEY_LENS_MISSION_DATA.decrypt.connect,KEY_LENS_MISSION_DATA.decrypt.order)}
+  if(key==="activate")setDirectiveStage("active","4 SCENES · 4 VALUES",KEY_LENS_MISSION_DATA.activate.primary,4);
+  if(key==="decrypt"){setSpatialProgress("decrypt",5);setRuleStage("active","5 TRACKS · 5 VALUES",KEY_LENS_MISSION_DATA.decrypt.primary,KEY_LENS_MISSION_DATA.decrypt.order)}
   if(key==="assemble"){setSpatialProgress("assemble",5);const label=document.querySelector("#spatialContent .finalHolo3D .holoLabel");if(label)label.style.animationDelay="0s"}
 }
 async function spatialSequence(key,token){
