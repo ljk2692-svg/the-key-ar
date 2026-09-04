@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-PRODUCTION-V22-PROGRESSIVE-HINTS">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V23-NFT-IMAGE-TARGETS">
 <style>
 
 :root{
@@ -76,6 +76,8 @@ padding:12px 13px;border-radius:14px;border:1px solid var(--line);background:var
 #operator{position:fixed;z-index:980;right:10px;top:130px;width:170px;display:none;padding:10px;border:1px solid var(--line);
 border-radius:12px;background:rgba(4,8,14,.96)}#operator button{width:100%;margin:3px 0;padding:8px;border:1px solid rgba(255,255,255,.12);
 border-radius:8px;background:#111c29;color:white;font-size:10px;text-align:left}
+.trackerDiag{margin-top:8px;padding-top:8px;border-top:1px solid rgba(118,221,234,.18);white-space:pre-line;
+font:700 8px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:#a9d7dc;overflow-wrap:anywhere}
 
 
 #readyLine{margin-top:12px;font-size:11px;color:var(--muted);line-height:1.5}
@@ -229,8 +231,15 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
   setTimeout(sync,1000);
 })();
 </script>
+<script>
+window.__KEY_LENS_NFT_LOAD_COUNT__=0;
+window.addEventListener("arjs-nft-loaded",()=>{
+  window.__KEY_LENS_NFT_LOAD_COUNT__+=1;
+  window.dispatchEvent(new CustomEvent("keylensnftprogress",{detail:{count:window.__KEY_LENS_NFT_LOAD_COUNT__}}));
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
-<script src="https://raw.githack.com/AR-js-org/AR.js/3.4.8/aframe/build/aframe-ar.js"></script>
+<script src="./vendor/aframe-ar-nft-3.4.8-keylens.js"></script>
 <div id="sceneMount">
   <a-scene id="arScene" embedded vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false"
     loading-screen="enabled:false" renderer="antialias:true;alpha:true;logarithmicDepthBuffer:true;precision:medium;sortObjects:true"
@@ -239,25 +248,35 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
     <a-entity light="type:directional;intensity:1.35;color:#ffffff" position="1 4 2"></a-entity>
     <a-entity light="type:directional;intensity:.7;color:#76ddea" position="-3 2 1"></a-entity>
 
-    <a-marker id="m-rotate" type="pattern" url="./access-node-01.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-rotate" position="0 0 0" visible="true"></a-entity>
-    </a-marker>
+    <a-nft id="m-rotate" type="nft" url="./target-nft/key-lens-target-01" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+      <a-entity class="nft-stage" position="294.821 0 -166.029" scale="120 120 120">
+        <a-entity id="exp-rotate" position="0 0 0" visible="true"></a-entity>
+      </a-entity>
+    </a-nft>
 
-    <a-marker id="m-analyze" type="pattern" url="./access-node-02.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-analyze" position="0 0 0" visible="true"></a-entity>
-    </a-marker>
+    <a-nft id="m-analyze" type="nft" url="./target-nft/key-lens-target-02" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+      <a-entity class="nft-stage" position="294.821 0 -166.029" scale="120 120 120">
+        <a-entity id="exp-analyze" position="0 0 0" visible="true"></a-entity>
+      </a-entity>
+    </a-nft>
 
-    <a-marker id="m-activate" type="pattern" url="./access-node-03.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-activate" position="0 0 0" visible="true"></a-entity>
-    </a-marker>
+    <a-nft id="m-activate" type="nft" url="./target-nft/key-lens-target-03" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+      <a-entity class="nft-stage" position="294.821 0 -166.029" scale="120 120 120">
+        <a-entity id="exp-activate" position="0 0 0" visible="true"></a-entity>
+      </a-entity>
+    </a-nft>
 
-    <a-marker id="m-decrypt" type="pattern" url="./access-node-04.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-decrypt" position="0 0 0" visible="true"></a-entity>
-    </a-marker>
+    <a-nft id="m-decrypt" type="nft" url="./target-nft/key-lens-target-04" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+      <a-entity class="nft-stage" position="361.043 0 -201.839" scale="120 120 120">
+        <a-entity id="exp-decrypt" position="0 0 0" visible="true"></a-entity>
+      </a-entity>
+    </a-nft>
 
-    <a-marker id="m-assemble" type="pattern" url="./access-node-05.patt" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
-      <a-entity id="exp-assemble" position="0 0 0" visible="true"></a-entity>
-    </a-marker>
+    <a-nft id="m-assemble" type="nft" url="./target-nft/key-lens-target-05" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+      <a-entity class="nft-stage" position="263.071 0 -185.964" scale="120 120 120">
+        <a-entity id="exp-assemble" position="0 0 0" visible="true"></a-entity>
+      </a-entity>
+    </a-nft>
     <a-entity id="arCamera" camera>
       <a-entity id="boot3d" position="0 0 -1.45" visible="false">
         <a-torus id="bootRing1" radius=".34" radius-tubular=".035"
@@ -275,7 +294,7 @@ single presentation rectangle without guessing a 2x/3x page scale. Chrome's norm
 <div id="hud"><div class="hudRow"><div><div class="micro">KEY LENS / SYSTEM STATUS</div><div id="status">READY</div></div><div id="pill" class="pill">TARGET FOUND</div></div><div id="mission">SCANNER READY</div></div>
 <div id="guide"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div class="scan"></div></div>
 <div id="bottom"><div id="message">카메라 연결을 준비하고 있습니다.</div><div id="sub">잠시 후 KEY LENS를 시작할 수 있습니다.</div></div>
-<div id="operator"><div class="micro">SYSTEM CONTROLLER</div><button data-op="rotate">PLAY AR01 ROTATE</button><button data-op="analyze">PLAY AR02 ANALYZE</button><button data-op="activate">PLAY AR03 ACTIVATE</button><button data-op="decrypt">PLAY AR04 DECRYPT</button><button data-op="assemble">PLAY AR05 ASSEMBLE</button><button id="operator-reset">RESET ALL</button></div>
+<div id="operator"><div class="micro">SYSTEM CONTROLLER</div><button data-op="rotate">PLAY AR01 ROTATE</button><button data-op="analyze">PLAY AR02 ANALYZE</button><button data-op="activate">PLAY AR03 ACTIVATE</button><button data-op="decrypt">PLAY AR04 DECRYPT</button><button data-op="assemble">PLAY AR05 ASSEMBLE</button><button id="operator-reset">RESET ALL</button><div id="trackerDiag" class="trackerDiag">TRACKER INITIALIZING</div></div>
 <script>
 const EXPERIENCE = {
   rotate:{name:"AR01 / ROTATE",title:"PERSPECTIVE SHIFT",msg:"보이는 정보만으로 판단하지 마십시오."},
@@ -292,9 +311,70 @@ const RESULT = {
   assemble:{status:"FINAL ACCESS AUTHORIZED",msg:"THE KEY SYSTEM 인증이 완료되었습니다.",sub:"THE KEY ASSEMBLED · SYSTEM UNLOCKED"}
 };
 const $=s=>document.querySelector(s);
-let scene=null, started=false, current=null, completed=new Set(), lostTimers={};
+let scene=null, started=false, current=null, completed=new Set(), lostTimers={},detectedTargets=new Set();
 let activeExperienceToken=null,experienceSerial=0;
 let audio=null;
+
+const NFT_TARGETS=Object.freeze([
+  {id:"01",key:"rotate",route:"AR01",url:"./target-nft/key-lens-target-01",widthMm:589.643,heightMm:332.057},
+  {id:"02",key:"analyze",route:"AR02",url:"./target-nft/key-lens-target-02",widthMm:589.643,heightMm:332.057},
+  {id:"03",key:"activate",route:"AR03",url:"./target-nft/key-lens-target-03",widthMm:589.643,heightMm:332.057},
+  {id:"04",key:"decrypt",route:"AR04",url:"./target-nft/key-lens-target-04",widthMm:722.086,heightMm:403.679},
+  {id:"05",key:"assemble",route:"AR05",url:"./target-nft/key-lens-target-05",widthMm:526.143,heightMm:371.929}
+]);
+const nftExtensions=Object.freeze([".iset",".fset",".fset3"]);
+const trackerState={
+  assets:Object.fromEntries(NFT_TARGETS.map(target=>[target.key,"CHECKING"])),
+  assetsReady:false,assetError:false,workersLoaded:Math.min(NFT_TARGETS.length,Number(window.__KEY_LENS_NFT_LOAD_COUNT__)||0),
+  lastDetected:"NONE"
+};
+window.__KEY_LENS_TRACKING__=trackerState;
+
+function trackingReady(){return trackerState.assetsReady&&!trackerState.assetError&&trackerState.workersLoaded>=NFT_TARGETS.length}
+function renderTrackerDiagnostics(){
+  const diag=$("#trackerDiag");if(!diag)return;
+  const initialized=trackingReady();
+  diag.textContent=[
+    initialized?"TRACKER INITIALIZED":"TRACKER INITIALIZING",
+    ...NFT_TARGETS.map(target=>`NFT ${target.id} ${trackerState.assets[target.key]}`),
+    `ACTIVE TARGETS: ${NFT_TARGETS.length}`,
+    `TRACKER WORKERS: ${trackerState.workersLoaded}/${NFT_TARGETS.length}`,
+    `LAST DETECTED: ${trackerState.lastDetected}`
+  ].join("\n");
+}
+function recordTrackingEvent(key,eventName){
+  const target=NFT_TARGETS.find(item=>item.key===key);if(!target)return;
+  trackerState.lastDetected=eventName==="FOUND"?`TARGET ${target.id} FOUND → ROUTE ${target.route}`:`TARGET ${target.id} LOST`;
+  renderTrackerDiagnostics();
+}
+async function verifyNftAssets(){
+  await Promise.all(NFT_TARGETS.map(async target=>{
+    try{
+      for(const extension of nftExtensions){
+        const response=await fetch(new URL(target.url+extension,document.baseURI),{cache:"force-cache"});
+        if(!response.ok)throw new Error(`${extension} HTTP ${response.status}`);
+        const bytes=await response.arrayBuffer();
+        if(!bytes.byteLength)throw new Error(`${extension} EMPTY`);
+      }
+      trackerState.assets[target.key]="LOADED";
+    }catch(error){
+      trackerState.assets[target.key]="LOAD ERROR";
+      trackerState.assetError=true;
+      console.error(`KEY LENS NFT ${target.id} LOAD ERROR`,error);
+    }
+    renderTrackerDiagnostics();
+  }));
+  trackerState.assetsReady=NFT_TARGETS.every(target=>trackerState.assets[target.key]==="LOADED");
+  renderTrackerDiagnostics();
+  updateReadyState();
+}
+window.addEventListener("keylensnftprogress",event=>{
+  trackerState.workersLoaded=Math.min(NFT_TARGETS.length,Number(event.detail?.count)||0);
+  renderTrackerDiagnostics();
+  updateReadyState();
+});
+renderTrackerDiagnostics();
+void verifyNftAssets();
 
 function tone(freq=720,dur=.07,gain=.025,type="triangle"){
   try{
@@ -452,17 +532,28 @@ function verifyRenderer(){
 }
 function updateReadyState(){
   const el=$("#readyLine");
-  if(cameraReady && renderReady){
-    el.textContent="CAMERA READY · 3D ENGINE READY";
+  renderTrackerDiagnostics();
+  if(trackerState.assetError){
+    el.textContent="TARGET DATA 연결에 실패했습니다. DIAGNOSTIC MODE에서 파일 상태를 확인해 주세요.";
+    el.className="warn";
+    $("#activate").disabled=true;
+  }else if(cameraReady && renderReady && trackingReady()){
+    el.textContent="CAMERA READY · 3D ENGINE READY · 5 TARGETS READY";
     el.className="ok";
     $("#activate").disabled=false;
     if(startRequested)enterScanner();
+  }else if(cameraReady && renderReady){
+    el.textContent=`CAMERA READY · TARGET ENGINE ${trackerState.workersLoaded}/${NFT_TARGETS.length} 준비 중`;
+    el.className="warn";
+    $("#activate").disabled=true;
   }else if(cameraReady){
     el.textContent="CAMERA READY · 3D ENGINE 준비 중";
     el.className="warn";
+    $("#activate").disabled=true;
   }else{
     el.textContent="카메라 사용을 허용해 주세요.";
     el.className="";
+    $("#activate").disabled=true;
   }
 }
 function boot3D(){
@@ -476,7 +567,7 @@ function boot3D(){
   setTimeout(()=>{anim(g,"bootOut","scale","1 1 1",".01 .01 .01",260,"easeInCubic");setTimeout(()=>g.setAttribute("visible","false"),280)},1050);
 }
 function enterScanner(){
-  if(scannerStarted || !cameraReady || !renderReady)return;
+  if(scannerStarted || !cameraReady || !renderReady || !trackingReady())return;
   scannerStarted=true;
   $("#intro").style.display="none";
   $("#loader").style.display="none";
@@ -487,16 +578,18 @@ function enterScanner(){
   setHud("SCANNING...","안내된 미션 이미지를 화면 중앙에 맞춰주세요.","미션 이미지의 인식 영역을 화면 중앙에 맞추면 숨겨진 정보가 열립니다.");
   try{audio=new (window.AudioContext||window.webkitAudioContext)();audio.resume?.()}catch(_){}
   boot3D();
+  const alreadyVisible=[...detectedTargets][0];
+  if(alreadyVisible)setTimeout(()=>markerFound(alreadyVisible),0);
 }
 function requestStart(){
   startRequested=true;
   const v=getARVideo(); if(v?.paused)v.play().catch(()=>{});
-  if(cameraReady && renderReady)enterScanner();
+  if(cameraReady && renderReady && trackingReady())enterScanner();
   else{
     $("#activate").disabled=true;
-    $("#readyLine").textContent="CAMERA + 3D ENGINE 연결을 완료하는 중입니다.";
+    $("#readyLine").textContent="CAMERA + 3D ENGINE + TARGET DATA 연결을 완료하는 중입니다.";
     $("#readyLine").className="warn";
-    setTimeout(()=>{$("#activate").disabled=false;updateReadyState()},1800);
+    setTimeout(updateReadyState,1800);
   }
 }
 
@@ -515,13 +608,15 @@ scene.addEventListener("loaded",()=>{setTimeout(()=>{verifyRenderer();applyCamer
 ["rotate","analyze","activate","decrypt","assemble"].forEach(key=>{
   const m=$("#m-"+key);
   m.addEventListener("markerFound",()=>{
+    detectedTargets.add(key);
+    recordTrackingEvent(key,"FOUND");
     if(!scannerStarted)return;
     m.object3D.visible=true;
     const g=$("#exp-"+key);
     if(g){g.object3D.visible=true;g.object3D.scale.set(1,1,1);g.setAttribute("visible","true")}
     markerFound(key);
   });
-  m.addEventListener("markerLost",()=>{if(scannerStarted)markerLost(key)});
+  m.addEventListener("markerLost",()=>{detectedTargets.delete(key);recordTrackingEvent(key,"LOST");if(scannerStarted)markerLost(key)});
 });
 
 let lastLayoutViewport=innerWidth+"x"+innerHeight;
@@ -855,9 +950,13 @@ function updateSpatialAnchor(){
     spatialMarker.object3D.updateMatrixWorld(true);scene.camera.updateMatrixWorld(true);
     if(spatialMarker.object3D.visible){
       const M=spatialMarker.object3D.matrixWorld;
-      const c=projectWorld(new THREE.Vector3(0,0,0).applyMatrix4(M),rect);
-      const l=projectWorld(new THREE.Vector3(-.5,0,0).applyMatrix4(M),rect);
-      const r=projectWorld(new THREE.Vector3(.5,0,0).applyMatrix4(M),rect);
+      const target=NFT_TARGETS.find(item=>item.key===spatialKey);
+      const center=target?new THREE.Vector3(target.widthMm/2,0,-target.heightMm/2):new THREE.Vector3(0,0,0);
+      const left=target?new THREE.Vector3(0,0,-target.heightMm/2):new THREE.Vector3(-.5,0,0);
+      const right=target?new THREE.Vector3(target.widthMm,0,-target.heightMm/2):new THREE.Vector3(.5,0,0);
+      const c=projectWorld(center.applyMatrix4(M),rect);
+      const l=projectWorld(left.applyMatrix4(M),rect);
+      const r=projectWorld(right.applyMatrix4(M),rect);
       if(c&&l&&r){
         let markerPx=Math.hypot(r.x-l.x,r.y-l.y);
         const boost=samsungVisualBoost;
