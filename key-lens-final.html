@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#060a11">
 <title>THE KEY / KEY LENS</title>
-<meta name="key-lens-build" content="FINAL-PRODUCTION-V23-NFT-IMAGE-TARGETS">
+<meta name="key-lens-build" content="FINAL-PRODUCTION-V23.1-NFT-PATH-HOTFIX">
 <style>
 
 :root{
@@ -248,31 +248,31 @@ window.addEventListener("arjs-nft-loaded",()=>{
     <a-entity light="type:directional;intensity:1.35;color:#ffffff" position="1 4 2"></a-entity>
     <a-entity light="type:directional;intensity:.7;color:#76ddea" position="-3 2 1"></a-entity>
 
-    <a-nft id="m-rotate" type="nft" url="./target-nft/key-lens-target-01" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+    <a-nft id="m-rotate" type="nft" url="https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-01" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
       <a-entity class="nft-stage" position="294.821 0 -166.029" scale="120 120 120">
         <a-entity id="exp-rotate" position="0 0 0" visible="true"></a-entity>
       </a-entity>
     </a-nft>
 
-    <a-nft id="m-analyze" type="nft" url="./target-nft/key-lens-target-02" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+    <a-nft id="m-analyze" type="nft" url="https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-02" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
       <a-entity class="nft-stage" position="294.821 0 -166.029" scale="120 120 120">
         <a-entity id="exp-analyze" position="0 0 0" visible="true"></a-entity>
       </a-entity>
     </a-nft>
 
-    <a-nft id="m-activate" type="nft" url="./target-nft/key-lens-target-03" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+    <a-nft id="m-activate" type="nft" url="https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-03" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
       <a-entity class="nft-stage" position="294.821 0 -166.029" scale="120 120 120">
         <a-entity id="exp-activate" position="0 0 0" visible="true"></a-entity>
       </a-entity>
     </a-nft>
 
-    <a-nft id="m-decrypt" type="nft" url="./target-nft/key-lens-target-04" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+    <a-nft id="m-decrypt" type="nft" url="https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-04" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
       <a-entity class="nft-stage" position="361.043 0 -201.839" scale="120 120 120">
         <a-entity id="exp-decrypt" position="0 0 0" visible="true"></a-entity>
       </a-entity>
     </a-nft>
 
-    <a-nft id="m-assemble" type="nft" url="./target-nft/key-lens-target-05" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
+    <a-nft id="m-assemble" type="nft" url="https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-05" emitevents="true" smooth="true" smooth-count="6" smooth-tolerance=".01" smooth-threshold="2">
       <a-entity class="nft-stage" position="263.071 0 -185.964" scale="120 120 120">
         <a-entity id="exp-assemble" position="0 0 0" visible="true"></a-entity>
       </a-entity>
@@ -316,11 +316,11 @@ let activeExperienceToken=null,experienceSerial=0;
 let audio=null;
 
 const NFT_TARGETS=Object.freeze([
-  {id:"01",key:"rotate",route:"AR01",url:"./target-nft/key-lens-target-01",widthMm:589.643,heightMm:332.057},
-  {id:"02",key:"analyze",route:"AR02",url:"./target-nft/key-lens-target-02",widthMm:589.643,heightMm:332.057},
-  {id:"03",key:"activate",route:"AR03",url:"./target-nft/key-lens-target-03",widthMm:589.643,heightMm:332.057},
-  {id:"04",key:"decrypt",route:"AR04",url:"./target-nft/key-lens-target-04",widthMm:722.086,heightMm:403.679},
-  {id:"05",key:"assemble",route:"AR05",url:"./target-nft/key-lens-target-05",widthMm:526.143,heightMm:371.929}
+  {id:"01",key:"rotate",route:"AR01",url:"https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-01",widthMm:589.643,heightMm:332.057},
+  {id:"02",key:"analyze",route:"AR02",url:"https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-02",widthMm:589.643,heightMm:332.057},
+  {id:"03",key:"activate",route:"AR03",url:"https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-03",widthMm:589.643,heightMm:332.057},
+  {id:"04",key:"decrypt",route:"AR04",url:"https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-04",widthMm:722.086,heightMm:403.679},
+  {id:"05",key:"assemble",route:"AR05",url:"https://ljk2692-svg.github.io/the-key-ar/target-nft/key-lens-target-05",widthMm:526.143,heightMm:371.929}
 ]);
 const nftExtensions=Object.freeze([".iset",".fset",".fset3"]);
 const trackerState={
