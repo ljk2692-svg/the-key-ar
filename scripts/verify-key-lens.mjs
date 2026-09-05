@@ -118,6 +118,7 @@ check("HINT marker route",engine.includes('marker.addEventListener("markerFound"
 check("NODE master active/pending distinction",nodeMaster.includes(`PRODUCTION ACTIVE · <span class="count">${completeNodes.length}</span>`)&&nodeMaster.includes("TRACKING OFF")&&nodeMaster.includes("?node=H-R3M07"));
 check("NODE master scan enlargement",nodeMaster.includes('body.singleMode #singleView{display:grid}')&&nodeMaster.includes('id="singleImage"'));
 check("static marker tracking QA",completeNodes.every(node=>markerTrackingQA.includes(`"${node.id}"`))&&markerTrackingQA.includes("sourceType:image")&&markerTrackingQA.includes('id===sourceId?"PASS":"FAIL"'));
+check("static marker QA dependencies local",markerTrackingQA.includes('../vendor/aframe-1.6.0.min.js')&&exists("vendor/aframe-1.6.0.min.js"));
 check("Operator HINT route",html.includes('id="hintOperator"')&&engine.includes("data-hint-test")&&engine.includes('run(button.dataset.hintTest,"operator",1)'));
 check("Diagnostic fields",["CAMERA:","TRACKER:","MAIN TARGETS:","HINT NODES:","ACTIVE GROUP:","LAST TARGET:","ROUTE:","FPS:","ACTIVE OBJECTS:","NODE LOAD ERROR:"].every(label=>engine.includes(label)));
 check("HINT cleanup lifecycle",["function cancel(","function resetAll(","HintFX.dispose","rec.timers.forEach(clearTimeout)","rec.root.parent?.remove"].every(fragment=>engine.includes(fragment)));

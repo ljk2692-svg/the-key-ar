@@ -18,5 +18,14 @@ does not see its own target can therefore hide a different worker's detected
 target. The local patch stores that boolean on each marker control instead.
 No camera, pose, descriptor loading, A-Frame, or rendering behavior is changed.
 
+`aframe-1.6.0.min.js` is the unmodified official A-Frame 1.6.0 distribution.
+It is vendored for the static-image tracking QA harness so that the test does
+not depend on a third-party CDN.
+
+- Upstream project: https://github.com/aframevr/aframe
+- Upstream tag: v1.6.0
+- Upstream blob SHA: `3e94914016733f223f23b1f4e84a2b171433d846`
+- License: MIT
+
 This corresponds to the upstream multi-NFT issue:
 https://github.com/AR-js-org/AR.js/issues/132
