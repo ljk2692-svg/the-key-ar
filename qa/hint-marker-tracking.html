@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>KEY LENS · HINT Marker Tracking QA</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050912;color:#f4fbff;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+#qa{position:fixed;z-index:100;left:12px;right:12px;top:12px;padding:14px;border:1px solid #25444f;border-radius:12px;background:rgba(5,9,18,.92)}
+#qaState{color:#76ddea;font-weight:900}#qaDetail{margin-top:6px;color:#96b1b9;font-size:12px}.pass{color:#7ff0c2!important}.fail{color:#ff8585!important}
+a-scene{position:fixed!important;inset:0!important}.a-enter-vr,.a-enter-ar{display:none!important}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+<script src="../vendor/aframe-ar-nft-3.4.8-keylens.js"></script>
+</head>
+<body>
+<div id="qa"><div>STATIC IMAGE → AR.js PATTERN → ROUTE</div><div id="qaState">BOOTING</div><div id="qaDetail"></div></div>
+<script>
+(()=>{
+  "use strict";
+  const ids=Object.freeze(["H-R2M02","H-R3GUIDE","H-R3M07","H-R3M08"]);
+  const requested=new URLSearchParams(location.search).get("node");
+  const sourceId=ids.includes(requested)?requested:ids[0];
+  const state={sourceId,foundId:null,result:"BOOTING",events:[]};
+  window.__KEY_LENS_MARKER_QA=state;
+  const status=document.querySelector("#qaState");
+  const detail=document.querySelector("#qaDetail");
+  const render=()=>{
+    status.textContent=`${state.result} · SOURCE ${sourceId}${state.foundId?` · FOUND ${state.foundId}`:""}`;
+    status.className=state.result==="PASS"?"pass":state.result==="FAIL"?"fail":"";
+    detail.textContent=state.events.join(" | ");
+  };
+  const scene=document.createElement("a-scene");
+  scene.id="qaScene";
+  scene.setAttribute("embedded","");
+  scene.setAttribute("vr-mode-ui","enabled:false");
+  scene.setAttribute("renderer","alpha:true;antialias:false;precision:mediump");
+  scene.setAttribute("arjs",`trackingMethod:best;sourceType:image;sourceUrl:../hint-nodes/${sourceId}.png;sourceWidth:1000;sourceHeight:1200;displayWidth:500;displayHeight:600;debugUIEnabled:false;patternRatio:0.5;maxDetectionRate:60;canvasWidth:640;canvasHeight:480;`);
+  ids.forEach(id=>{
+    const marker=document.createElement("a-marker");
+    marker.id=`qa-${id}`;
+    marker.setAttribute("type","pattern");
+    marker.setAttribute("url",`../hint-nodes/${id}.patt`);
+    marker.setAttribute("size","1");
+    marker.setAttribute("emitevents","true");
+    marker.addEventListener("markerFound",()=>{
+      state.events.push(`FOUND:${id}`);state.foundId=id;state.result=id===sourceId?"PASS":"FAIL";render();
+    });
+    marker.addEventListener("markerLost",()=>{state.events.push(`LOST:${id}`);render()});
+    scene.appendChild(marker);
+  });
+  const camera=document.createElement("a-entity");camera.setAttribute("camera","");scene.appendChild(camera);
+  scene.addEventListener("renderstart",()=>{state.events.push("RENDER_READY");state.result="TRACKING";render()});
+  window.addEventListener("arjs-video-loaded",()=>{state.events.push("SOURCE_READY");render()},{once:true});
+  document.body.appendChild(scene);render();
+  setTimeout(()=>{if(!state.foundId){state.result="FAIL";state.events.push("NO_MATCH_TIMEOUT");render()}},10000);
+})();
+</script>
+</body>
+</html>

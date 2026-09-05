@@ -31,10 +31,16 @@ CELL = INNER_SIZE / GRID
 
 def registry_nodes(path: Path) -> list[dict[str, object]]:
     text = path.read_text(encoding="utf-8")
-    pairs = re.findall(r'id:"(H-[A-Z0-9]+)"[^\n]*?nodeSeed:(\d+)', text)
+    pairs = re.findall(
+        r'"(H-[A-Z0-9]+)":(complete|scaffold)\(\{\s*id:"\1"[^\n]*?nodeSeed:(\d+)',
+        text,
+    )
     if not pairs:
         raise SystemExit(f"No HINT nodes found in {path}")
-    nodes = [{"id": node_id, "seed": int(seed)} for node_id, seed in pairs]
+    nodes = [
+        {"id": node_id, "seed": int(seed), "tracking": "ACTIVE" if kind == "complete" else "OFF"}
+        for node_id, kind, seed in pairs
+    ]
     if len({node["id"] for node in nodes}) != len(nodes):
         raise SystemExit("Duplicate HINT node IDs in registry")
     return nodes
@@ -210,11 +216,37 @@ def min_rotational_distance(patterns: dict[str, list[list[int]]]) -> float:
 
 
 def contact_sheet(nodes: list[dict[str, object]], out: Path) -> None:
-    cards = "\n".join(
-        f'<article><img src="{node["id"]}.png" alt="{node["id"]}"><code>{node["id"]}</code></article>'
-        for node in nodes
+    active = [node for node in nodes if node["tracking"] == "ACTIVE"]
+    pending = [node for node in nodes if node["tracking"] != "ACTIVE"]
+    active_cards = "\n".join(
+        f'''<article class="nodeCard activeCard" data-node-id="{node["id"]}">
+<a href="?node={node["id"]}" aria-label="{node["id"]} 크게 열기"><span class="badge ready">SCAN READY</span><img src="{node["id"]}.png" alt="{node["id"]}"><span class="cardAction">크게 열어 스캔</span></a></article>'''
+        for node in active
     )
-    page = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>THE KEY HINT NODES</title><style>body{{margin:0;background:#050912;color:#f4fbff;font-family:Arial,sans-serif}}header{{padding:28px;color:#d7b66d;letter-spacing:.12em}}main{{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;padding:0 24px 36px}}article{{padding:12px;border:1px solid #25444f;background:#07111b}}img{{display:block;width:100%;height:auto}}code{{display:block;padding-top:9px;color:#76ddea;text-align:center}}</style></head><body><header>THE KEY SYSTEM / HINT NODE MASTER</header><main>{cards}</main></body></html>'''
+    pending_cards = "\n".join(
+        f'''<article class="nodeCard pendingCard" data-node-id="{node["id"]}"><span class="badge pending">TRACKING OFF</span><img src="{node["id"]}.png" alt="{node["id"]}"><span class="cardAction">문제 콘텐츠 확정 대기</span></article>'''
+        for node in pending
+    )
+    active_ids = json.dumps([node["id"] for node in active], ensure_ascii=False)
+    page = f'''<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050912"><title>THE KEY HINT NODES</title>
+<style>
+:root{{--bg:#050912;--panel:#07111b;--line:#25444f;--cyan:#76ddea;--gold:#d7b66d;--text:#f4fbff;--muted:#96b1b9}}
+*{{box-sizing:border-box}}html,body{{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}}
+header{{max-width:1120px;margin:auto;padding:28px 24px 20px}}.eyebrow{{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.16em}}h1{{margin:8px 0 6px;font-size:clamp(24px,4vw,40px)}}p{{margin:0;color:var(--muted);line-height:1.55}}main{{max-width:1120px;margin:auto;padding:0 24px 48px}}section{{margin-top:20px}}h2{{font-size:14px;letter-spacing:.13em;color:var(--cyan);margin:0 0 12px}}.count{{color:var(--gold)}}
+.grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}.pendingGrid{{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}}.nodeCard{{position:relative;padding:12px;border:1px solid var(--line);background:var(--panel);overflow:hidden}}.nodeCard a{{display:block;color:inherit;text-decoration:none}}.nodeCard img{{display:block;width:100%;height:auto}}.badge{{position:absolute;z-index:2;top:20px;right:20px;padding:6px 8px;border-radius:999px;background:rgba(5,9,18,.9);font:800 10px/1 ui-monospace,monospace;letter-spacing:.08em}}.badge.ready{{border:1px solid rgba(118,221,234,.6);color:var(--cyan)}}.badge.pending{{border:1px solid rgba(150,177,185,.35);color:var(--muted)}}.cardAction{{display:block;padding:11px 4px 2px;text-align:center;color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.05em}}.activeCard a:focus-visible{{outline:2px solid var(--cyan);outline-offset:4px}}.activeCard:hover{{border-color:var(--cyan)}}.pendingCard{{opacity:.42;filter:saturate(.45)}}.pendingCard .cardAction{{color:var(--muted)}}
+#singleView{{display:none;min-height:100vh;padding:12px 18px 28px;place-items:center}}.singleWrap{{width:100%;display:grid;place-items:center;gap:10px}}.singleTop{{width:min(90vw,calc(72vh),720px);display:flex;justify-content:space-between;align-items:center;gap:12px}}.back{{color:var(--cyan);text-decoration:none;font-size:13px;font-weight:800}}.singleStatus{{color:var(--gold);font:800 11px/1 ui-monospace,monospace;letter-spacing:.1em}}#singleImage{{display:block;width:min(90vw,calc(72vh),720px);height:auto;box-shadow:0 24px 80px rgba(0,0,0,.5)}}.singleNote{{color:var(--muted);font-size:12px;text-align:center}}body.singleMode>header,body.singleMode>main{{display:none}}body.singleMode #singleView{{display:grid}}
+@media(max-width:720px){{.grid{{grid-template-columns:1fr}}header{{padding:22px 16px 14px}}main{{padding:0 16px 32px}}.pendingGrid{{grid-template-columns:repeat(2,minmax(0,1fr))}}.badge{{top:16px;right:16px}}}}
+</style></head><body>
+<header><div class="eyebrow">THE KEY SYSTEM / HINT NODE MASTER</div><h1>HINT NODE 스캔 보드</h1><p>SCAN READY 카드를 눌러 한 장만 크게 연 뒤 KEY LENS로 비추십시오.</p></header>
+<main>
+<section><h2>PRODUCTION ACTIVE · <span class="count">{len(active)}</span></h2><div class="grid">{active_cards}</div></section>
+<section><h2>CONTENT PENDING · <span class="count">{len(pending)}</span></h2><p>아래 노드는 Registry와 자산만 준비되었으며 Production 추적은 꺼져 있습니다.</p><div class="grid pendingGrid">{pending_cards}</div></section>
+</main>
+<div id="singleView" aria-live="polite"><div class="singleWrap"><div class="singleTop"><a class="back" href="./">← 전체 보기</a><span class="singleStatus">SCAN READY</span></div><img id="singleImage" alt=""><div class="singleNote">화면 밝기를 높이고 카드 전체가 카메라에 보이게 하십시오.</div></div></div>
+<script>
+(()=>{{const activeIds=new Set({active_ids});const id=new URLSearchParams(location.search).get("node");if(!activeIds.has(id))return;document.body.classList.add("singleMode");const image=document.querySelector("#singleImage");image.src=`${{id}}.png`;image.alt=id;document.title=`${{id}} · THE KEY HINT NODE`;}})();
+</script></body></html>'''
     (out / "index.html").write_text(page, encoding="utf-8")
 
 
@@ -242,6 +274,7 @@ def main() -> None:
         "patternRatio": PATTERN_RATIO,
         "grid": GRID,
         "nodeCount": len(nodes),
+        "activeNodeCount": sum(node["tracking"] == "ACTIVE" for node in nodes),
         "minimumRotationalHammingDistance": round(distance, 4),
         "nodes": nodes,
     }

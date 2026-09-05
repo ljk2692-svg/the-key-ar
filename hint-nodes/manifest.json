@@ -4,63 +4,78 @@
   "patternRatio": 0.5,
   "grid": 16,
   "nodeCount": 14,
+  "activeNodeCount": 4,
   "minimumRotationalHammingDistance": 0.2227,
   "nodes": [
     {
       "id": "H-R1Q01",
-      "seed": 101
+      "seed": 101,
+      "tracking": "OFF"
     },
     {
       "id": "H-R1Q03",
-      "seed": 103
+      "seed": 103,
+      "tracking": "OFF"
     },
     {
       "id": "H-R1Q05",
-      "seed": 105
+      "seed": 105,
+      "tracking": "OFF"
     },
     {
       "id": "H-R1Q06",
-      "seed": 106
+      "seed": 106,
+      "tracking": "OFF"
     },
     {
       "id": "H-R2M02",
-      "seed": 202
+      "seed": 202,
+      "tracking": "ACTIVE"
     },
     {
       "id": "H-R3GUIDE",
-      "seed": 300
+      "seed": 300,
+      "tracking": "ACTIVE"
     },
     {
       "id": "H-R3M01",
-      "seed": 301
+      "seed": 301,
+      "tracking": "OFF"
     },
     {
       "id": "H-R3M02",
-      "seed": 302
+      "seed": 302,
+      "tracking": "OFF"
     },
     {
       "id": "H-R3M03",
-      "seed": 303
+      "seed": 303,
+      "tracking": "OFF"
     },
     {
       "id": "H-R3M04",
-      "seed": 304
+      "seed": 304,
+      "tracking": "OFF"
     },
     {
       "id": "H-R3M05",
-      "seed": 305
+      "seed": 305,
+      "tracking": "OFF"
     },
     {
       "id": "H-R3M06",
-      "seed": 306
+      "seed": 306,
+      "tracking": "OFF"
     },
     {
       "id": "H-R3M07",
-      "seed": 307
+      "seed": 307,
+      "tracking": "ACTIVE"
     },
     {
       "id": "H-R3M08",
-      "seed": 308
+      "seed": 308,
+      "tracking": "ACTIVE"
     }
   ]
 }

@@ -15,6 +15,8 @@ const css=read("hint-protocol.css");
 const baseline=JSON.parse(read("qa/main-ar-baseline.json"));
 const contentMaster=JSON.parse(read("qa/content-master.json"));
 const manifest=JSON.parse(read("hint-nodes/manifest.json"));
+const nodeMaster=read("hint-nodes/index.html");
+const markerTrackingQA=read("qa/hint-marker-tracking.html");
 const privateMasterPath=process.env.KEY_LENS_PRIVATE_MASTER||path.resolve(root,"../THE-KEY-CONTENT-MASTER-PRIVATE.json");
 const privateMaster=fs.existsSync(privateMasterPath)?JSON.parse(fs.readFileSync(privateMasterPath,"utf8")):null;
 const results=[];
@@ -104,6 +106,7 @@ check("round group inventory",roundCounts[1]===0&&roundCounts[2]===1&&roundCount
 check("event-mode level timing",config.eventModes.FAST_120.level2DelayMs<config.eventModes.STANDARD_150.level2DelayMs&&config.eventModes.STANDARD_150.level2DelayMs<config.eventModes.STRATEGY_180.level2DelayMs);
 
 check("NODE manifest alignment",manifest.nodeCount===registryIds.length&&equalArrays(manifest.nodes.map(node=>node.id),registryIds),`${manifest.nodeCount}/${registryIds.length}`);
+check("NODE manifest active count",manifest.activeNodeCount===completeNodes.length,`${manifest.activeNodeCount}/${completeNodes.length}`);
 check("NODE rotational separation",manifest.minimumRotationalHammingDistance>=.20,String(manifest.minimumRotationalHammingDistance));
 for(const id of registryIds){
   check(`${id} assets`,["patt","png","svg","marker.png"].every(extension=>exists(`hint-nodes/${id}.${extension}`)));
@@ -112,6 +115,9 @@ for(const id of registryIds){
 }
 
 check("HINT marker route",engine.includes('marker.addEventListener("markerFound"')&&engine.includes('run(node.id,"marker",1)'));
+check("NODE master active/pending distinction",nodeMaster.includes(`PRODUCTION ACTIVE · <span class="count">${completeNodes.length}</span>`)&&nodeMaster.includes("TRACKING OFF")&&nodeMaster.includes("?node=H-R3M07"));
+check("NODE master scan enlargement",nodeMaster.includes('body.singleMode #singleView{display:grid}')&&nodeMaster.includes('id="singleImage"'));
+check("static marker tracking QA",completeNodes.every(node=>markerTrackingQA.includes(`"${node.id}"`))&&markerTrackingQA.includes("sourceType:image")&&markerTrackingQA.includes('id===sourceId?"PASS":"FAIL"'));
 check("Operator HINT route",html.includes('id="hintOperator"')&&engine.includes("data-hint-test")&&engine.includes('run(button.dataset.hintTest,"operator",1)'));
 check("Diagnostic fields",["CAMERA:","TRACKER:","MAIN TARGETS:","HINT NODES:","ACTIVE GROUP:","LAST TARGET:","ROUTE:","FPS:","ACTIVE OBJECTS:","NODE LOAD ERROR:"].every(label=>engine.includes(label)));
 check("HINT cleanup lifecycle",["function cancel(","function resetAll(","HintFX.dispose","rec.timers.forEach(clearTimeout)","rec.root.parent?.remove"].every(fragment=>engine.includes(fragment)));
