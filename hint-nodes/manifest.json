@@ -7,7 +7,7 @@
   "moduleScale": 2,
   "recognitionRevision": "ROBUST-V2",
   "nodeCount": 14,
-  "activeNodeCount": 8,
+  "activeNodeCount": 14,
   "minimumRotationalHammingDistance": 0.3281,
   "nodes": [
     {
@@ -19,19 +19,19 @@
     {
       "id": "H-R1Q03",
       "seed": 103,
-      "tracking": "OFF",
+      "tracking": "ACTIVE",
       "patternSalt": 0
     },
     {
       "id": "H-R1Q05",
       "seed": 105,
-      "tracking": "OFF",
+      "tracking": "ACTIVE",
       "patternSalt": 2
     },
     {
       "id": "H-R1Q06",
       "seed": 106,
-      "tracking": "OFF",
+      "tracking": "ACTIVE",
       "patternSalt": 0
     },
     {
@@ -55,19 +55,19 @@
     {
       "id": "H-R3M02",
       "seed": 302,
-      "tracking": "OFF",
+      "tracking": "ACTIVE",
       "patternSalt": 17
     },
     {
       "id": "H-R3M03",
       "seed": 303,
-      "tracking": "OFF",
+      "tracking": "ACTIVE",
       "patternSalt": 21
     },
     {
       "id": "H-R3M04",
       "seed": 304,
-      "tracking": "OFF",
+      "tracking": "ACTIVE",
       "patternSalt": 38
     },
     {

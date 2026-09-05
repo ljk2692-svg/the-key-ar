@@ -102,9 +102,12 @@ check("scaffold tracking disabled",Object.values(registry).filter(node=>node.imp
 check("mounted-node budget",completeNodes.length<=config.tracking.maxMountedNodes,`${completeNodes.length}/${config.tracking.maxMountedNodes}`);
 check("round tracking filter",engine.includes('roundParam==="ALL"||String(node.round)===roundParam'));
 const roundCounts=Object.fromEntries([1,2,3].map(round=>[round,completeNodes.filter(node=>node.round===round).length]));
-check("round group inventory",roundCounts[1]===1&&roundCounts[2]===1&&roundCounts[3]===6,`R1:${roundCounts[1]} R2:${roundCounts[2]} R3:${roundCounts[3]}`);
+check("round group inventory",roundCounts[1]===4&&roundCounts[2]===1&&roundCounts[3]===9,`R1:${roundCounts[1]} R2:${roundCounts[2]} R3:${roundCounts[3]}`);
 const sourcePendingIds=Object.values(registry).filter(node=>node.contentStatus==="MISSION_SOURCE_REQUIRED").map(node=>node.id);
-check("NEEDS SOURCE inventory",equalArrays(sourcePendingIds,["H-R1Q03","H-R1Q05","H-R1Q06","H-R3M02","H-R3M03","H-R3M04"]),`${sourcePendingIds.length} nodes`);
+check("all HINT mission sources confirmed",sourcePendingIds.length===0,`${completeNodes.length}/${registryIds.length} nodes`);
+const sourceResolvedVariants={"H-R1Q03":"CODE_MAPPING","H-R1Q05":"TWO_STAGE","H-R1Q06":"TRIPLE_DECODE","H-R3M02":"FRAGMENT_FILTER","H-R3M03":"GESTURE_VERIFY","H-R3M04":"ROTATE_CLUE"};
+check("source-resolved visual variants",Object.entries(sourceResolvedVariants).every(([id,variant])=>registry[id]?.visual?.variant===variant&&engine.includes(`===\"${variant}\"`)),`${Object.keys(sourceResolvedVariants).length}/6`);
+check("source-resolved readable rails",["mapping","twoStage","tripleDecode","fragmentFilter","gestureVerify","rotateClue"].every(className=>engine.includes(`hintVisualRail ${className}`)&&css.includes(`.hintVisualRail.${className}`)),"6/6");
 check("event-mode level timing",config.eventModes.FAST_120.level2DelayMs<config.eventModes.STANDARD_150.level2DelayMs&&config.eventModes.STANDARD_150.level2DelayMs<config.eventModes.STRATEGY_180.level2DelayMs);
 
 check("NODE manifest alignment",manifest.nodeCount===registryIds.length&&equalArrays(manifest.nodes.map(node=>node.id),registryIds),`${manifest.nodeCount}/${registryIds.length}`);
@@ -118,7 +121,7 @@ for(const id of registryIds){
 }
 
 check("HINT marker route",engine.includes('marker.addEventListener("markerFound"')&&engine.includes('run(node.id,"marker",1)'));
-check("NODE master active/pending distinction",nodeMaster.includes(`PRODUCTION ACTIVE · <span class="count">${completeNodes.length}</span>`)&&nodeMaster.includes("TRACKING OFF")&&nodeMaster.includes("?node=H-R3M07"));
+check("NODE master all active",nodeMaster.includes(`PRODUCTION ACTIVE · <span class="count">${completeNodes.length}</span>`)&&nodeMaster.includes('CONTENT PENDING · <span class="count">0</span>')&&nodeMaster.includes("ALL CONTENT CONFIRMED")&&nodeMaster.includes("?node=H-R3M07"));
 check("NODE master scan enlargement",nodeMaster.includes('body.singleMode #singleView{display:grid}')&&nodeMaster.includes('id="singleImage"'));
 check("static marker tracking QA",completeNodes.every(node=>markerTrackingQA.includes(`"${node.id}"`))&&markerTrackingQA.includes("sourceType:image")&&markerTrackingQA.includes('id===sourceId?"PASS":"FAIL"'));
 check("static marker QA dependencies local",markerTrackingQA.includes('../vendor/aframe-1.6.0.min.js')&&exists("vendor/aframe-1.6.0.min.js"));
@@ -148,6 +151,7 @@ if(privateMaster){
   skip("private Content Master available");skip("Content Master ID alignment");
 }
 check("Content Master participant isolation",contentMaster.missions.every(item=>item.arDirectAnswerExposure===false&&item.canonicalAnswerPresentInRepository===false&&!Object.hasOwn(item,"canonicalAnswer")));
+check("Content Master HINT sources resolved",contentMaster.missions.filter(item=>sourceResolvedVariants[item.hintNodeId]).every(item=>item.qa==="HINT_CONFIRMED"&&item.printCheck==="REQUIRED"&&item.staffGuideCheck==="REQUIRED"));
 const textExtensions=new Set([".css",".html",".js",".json",".md",".mjs",".txt"]);
 const repositoryText=[];
 function collectRepositoryText(directory){
@@ -163,7 +167,7 @@ if(privateMaster)repositoryText.push(JSON.stringify(privateMaster));
 const obsoleteR1Q02Value=["97","19"].join("");
 check("obsolete R1-Q02 value absent",!repositoryText.join("\n").includes(obsoleteR1Q02Value));
 
-check("V24.3 build label",html.includes('FINAL-PRODUCTION-V24.3-HINT-CONTENT-WAVE-1')&&config.version==="24.3.0");
+check("V24.4 build label",html.includes('FINAL-PRODUCTION-V24.4-HINT-CONTENT-COMPLETE')&&config.version==="24.4.0");
 check("standalone HINT CSS",html.includes('data-key-lens-hint-bundle="css"')&&!html.includes('href="./hint-protocol.css"'));
 const registryBundleIndex=html.indexOf('data-key-lens-hint-bundle="registry"'),patternsBundleIndex=html.indexOf('data-key-lens-hint-bundle="patterns"'),engineBundleIndex=html.indexOf('data-key-lens-hint-bundle="engine"');
 check("standalone HINT script order",registryBundleIndex>0&&registryBundleIndex<patternsBundleIndex&&patternsBundleIndex<engineBundleIndex&&!html.includes('src="./hint-engine.js"'));

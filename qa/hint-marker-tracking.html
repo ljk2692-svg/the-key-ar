@@ -19,7 +19,7 @@ a-scene{position:fixed!important;inset:0!important}.a-enter-vr,.a-enter-ar{displ
 <script>
 (()=>{
   "use strict";
-  const ids=Object.freeze(["H-R1Q01","H-R2M02","H-R3GUIDE","H-R3M01","H-R3M05","H-R3M06","H-R3M07","H-R3M08"]);
+  const ids=Object.freeze(["H-R1Q01","H-R1Q03","H-R1Q05","H-R1Q06","H-R2M02","H-R3GUIDE","H-R3M01","H-R3M02","H-R3M03","H-R3M04","H-R3M05","H-R3M06","H-R3M07","H-R3M08"]);
   const requested=new URLSearchParams(location.search).get("node");
   const sourceId=ids.includes(requested)?requested:ids[0];
   const state={sourceId,foundId:null,result:"BOOTING",events:[]};

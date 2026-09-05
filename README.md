@@ -16,13 +16,14 @@ Production WebAR scanner for THE KEY SYSTEM. The deployed participant entry is
 - Presentation: Three.js geometry provides the spatial hologram while the
   companion DOM layer keeps short Korean copy readable on portrait phones.
 - Deployment: `key-lens-final.html` embeds the HINT CSS, Registry snapshot,
-  engine, and eight active patterns so Production can be updated atomically with
+  engine, and fourteen active patterns so Production can be updated atomically with
   one file. The separate modules remain the maintainable source of truth.
 
-V24.3 mounts eight confirmed nodes: `H-R1Q01`, `H-R2M02`, `H-R3GUIDE`,
-`H-R3M01`, `H-R3M05`, `H-R3M06`, `H-R3M07`, and `H-R3M08`. Six additional
-Registry entries and their generated assets remain disabled until the exact
-source layouts, options, or mission images are supplied.
+V24.4 mounts all fourteen confirmed nodes: four ROUND 1 nodes, one ROUND 2
+node, and the ROUND 3 guide plus all eight ROUND 3 mission nodes. Every node is
+Registry-routed and has a source-grounded HINT 1/HINT 2 copy pair. The default
+`ALL` group mounts fourteen lightweight pattern markers; event links may use
+the round filter to mount only the current round's 4, 1, or 9 nodes.
 
 ## Internal configuration
 
@@ -38,6 +39,7 @@ These query parameters are for operations and QA, not participant selection:
 
 ```bash
 python3 scripts/generate-hint-nodes.py
+python3 scripts/verify-hint-node-pairing.py
 node scripts/build-standalone.mjs
 node scripts/verify-key-lens.mjs
 node scripts/test-hint-runtime.mjs

@@ -27,30 +27,30 @@
       "hintNodeId": "H-R1Q03",
       "canonicalAnswerRef": "PRIVATE:R1-Q03",
       "canonicalAnswerPresentInRepository": false,
-      "printCheck": "NEEDS_SOURCE",
-      "staffGuideCheck": "NEEDS_SOURCE",
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
-      "qa": "NEEDS_SOURCE"
+      "qa": "HINT_CONFIRMED"
     },
     {
       "missionId": "R1-Q05",
       "hintNodeId": "H-R1Q05",
       "canonicalAnswerRef": "PRIVATE:R1-Q05",
       "canonicalAnswerPresentInRepository": false,
-      "printCheck": "NEEDS_SOURCE",
-      "staffGuideCheck": "NEEDS_SOURCE",
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
-      "qa": "NEEDS_SOURCE"
+      "qa": "HINT_CONFIRMED"
     },
     {
       "missionId": "R1-Q06",
       "hintNodeId": "H-R1Q06",
       "canonicalAnswerRef": "PRIVATE:R1-Q06",
       "canonicalAnswerPresentInRepository": false,
-      "printCheck": "NEEDS_SOURCE",
-      "staffGuideCheck": "NEEDS_SOURCE",
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
-      "qa": "NEEDS_SOURCE"
+      "qa": "HINT_CONFIRMED"
     },
     {
       "missionId": "R2-M01",
@@ -85,30 +85,30 @@
       "hintNodeId": "H-R3M02",
       "canonicalAnswerRef": "PRIVATE:R3-M02",
       "canonicalAnswerPresentInRepository": false,
-      "printCheck": "NEEDS_SOURCE",
-      "staffGuideCheck": "NEEDS_SOURCE",
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
-      "qa": "NEEDS_SOURCE"
+      "qa": "HINT_CONFIRMED"
     },
     {
       "missionId": "R3-M03",
       "hintNodeId": "H-R3M03",
       "canonicalAnswerRef": "PRIVATE:R3-M03",
       "canonicalAnswerPresentInRepository": false,
-      "printCheck": "NEEDS_SOURCE",
-      "staffGuideCheck": "NEEDS_SOURCE",
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
-      "qa": "NEEDS_SOURCE"
+      "qa": "HINT_CONFIRMED"
     },
     {
       "missionId": "R3-M04",
       "hintNodeId": "H-R3M04",
       "canonicalAnswerRef": "PRIVATE:R3-M04",
       "canonicalAnswerPresentInRepository": false,
-      "printCheck": "NEEDS_SOURCE",
-      "staffGuideCheck": "NEEDS_SOURCE",
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
-      "qa": "NEEDS_SOURCE"
+      "qa": "HINT_CONFIRMED"
     },
     {
       "missionId": "R3-M05",

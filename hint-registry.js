@@ -17,7 +17,7 @@
   ]);
 
   const CONFIG=Object.freeze({
-    version:"24.3.0",
+    version:"24.4.0",
     defaultAudience:"SCHOOL",
     defaultEventMode:"STANDARD_150",
     defaultRound:"ALL",
@@ -75,9 +75,39 @@
       ),
       visual:Object.freeze({variant:"WORD_GROUPS",groups:2,itemsPerGroup:4})
     }),
-    "H-R1Q03":scaffold({id:"H-R1Q03",round:1,mission:"Q03",visualPreset:"ORDER",nodeSeed:103,title:"ORDER TRACE"}),
-    "H-R1Q05":scaffold({id:"H-R1Q05",round:1,mission:"Q05",visualPreset:"DECODE",nodeSeed:105,title:"DECODE TRACE"}),
-    "H-R1Q06":scaffold({id:"H-R1Q06",round:1,mission:"Q06",visualPreset:"COMBINE",nodeSeed:106,title:"COMBINE TRACE"}),
+    "H-R1Q03":complete({
+      id:"H-R1Q03",round:1,mission:"Q03",visualPreset:"ORDER",nodeSeed:103,title:"CODE MAPPING",
+      systemLabel:"HINT PROTOCOL · MAPPING",accent:"CYAN",
+      copy:copy(
+        {line1:"기호와 문자의 위치를 비교해보세요.",line2:"같은 순서의 대응 관계에 주목하십시오."},
+        {line1:"각 기호를 하나씩 대응되는 문자로 바꾼 뒤",line2:"처음 제시된 순서를 다시 확인하세요."},
+        {line1:"기호와 문자 배열의 위치 관계를 추적하십시오.",line2:"동일한 순서 기준을 적용하십시오."},
+        {line1:"각 기호를 대응 문자로 변환한 뒤",line2:"원래 배열 순서를 유지하십시오."}
+      ),
+      visual:Object.freeze({variant:"CODE_MAPPING",sourceSlots:4,alphabetSlots:9})
+    }),
+    "H-R1Q05":complete({
+      id:"H-R1Q05",round:1,mission:"Q05",visualPreset:"DECODE",nodeSeed:105,title:"DUAL STAGE DECODE",
+      systemLabel:"HINT PROTOCOL · TWO STAGE",accent:"CYAN",
+      copy:copy(
+        {line1:"두 부분을 먼저 따로 해결해보세요.",line2:"서로 다른 규칙을 한 번에 섞지 마십시오."},
+        {line1:"각 부분에서 얻은 결과를 따로 기록한 뒤",line2:"문제에 제시된 순서대로 연결하세요."},
+        {line1:"두 데이터 영역을 독립적으로 해석하십시오.",line2:"각 영역에는 별도의 규칙이 있습니다."},
+        {line1:"두 결과를 분리해 기록한 뒤",line2:"지정된 순서대로 결합하십시오."}
+      ),
+      visual:Object.freeze({variant:"TWO_STAGE",stages:2,outputSlots:4})
+    }),
+    "H-R1Q06":complete({
+      id:"H-R1Q06",round:1,mission:"Q06",visualPreset:"COMBINE",nodeSeed:106,title:"TRIPLE DECODE",
+      systemLabel:"HINT PROTOCOL · THREE STAGE",accent:"CYAN",
+      copy:copy(
+        {line1:"세 문제를 한 번에 풀려고 하지 마세요.",line2:"각 영역의 규칙을 따로 확인하십시오."},
+        {line1:"각 소문제의 결과를 따로 기록한 뒤",line2:"왼쪽부터 제시된 순서로 연결하세요."},
+        {line1:"세 데이터 영역을 독립적으로 분석하십시오.",line2:"규칙을 서로 섞지 마십시오."},
+        {line1:"각 결과를 분리해 기록한 뒤",line2:"왼쪽에서 오른쪽 순서로 결합하십시오."}
+      ),
+      visual:Object.freeze({variant:"TRIPLE_DECODE",stages:3,outputSlots:4})
+    }),
 
     "H-R2M02":complete({
       id:"H-R2M02",round:2,mission:"M02",visualPreset:"MOTION_GUIDE",nodeSeed:202,title:"COORDINATION LINK",
@@ -114,9 +144,39 @@
       ),
       visual:Object.freeze({frames:4,converge:true})
     }),
-    "H-R3M02":scaffold({id:"H-R3M02",round:3,mission:"M02",visualPreset:"COMPARE",nodeSeed:302,title:"FILTER TRACE"}),
-    "H-R3M03":scaffold({id:"H-R3M03",round:3,mission:"M03",visualPreset:"COMPARE",nodeSeed:303,title:"GESTURE TRACE"}),
-    "H-R3M04":scaffold({id:"H-R3M04",round:3,mission:"M04",visualPreset:"RELATION",nodeSeed:304,title:"RELATION TRACE"}),
+    "H-R3M02":complete({
+      id:"H-R3M02",round:3,mission:"M02",visualPreset:"COMPARE",nodeSeed:302,title:"FRAGMENT FILTER",
+      systemLabel:"HINT PROTOCOL · FRAGMENT",accent:"CYAN",
+      copy:copy(
+        {line1:"분절된 문자를 순서대로 이어 읽어보세요.",line2:"먼저 하나의 단어를 완성하십시오."},
+        {line1:"완성된 단어의 뜻과",line2:"보기의 범주를 하나씩 비교하세요."},
+        {line1:"분리된 문자 조각을 원래 순서로 결합하십시오.",line2:"먼저 하나의 의미를 복원하십시오."},
+        {line1:"복원된 단어와",line2:"각 범주의 의미를 대조하십시오."}
+      ),
+      visual:Object.freeze({variant:"FRAGMENT_FILTER",fragments:8,categories:4})
+    }),
+    "H-R3M03":complete({
+      id:"H-R3M03",round:3,mission:"M03",visualPreset:"COMPARE",nodeSeed:303,title:"GESTURE VERIFY",
+      systemLabel:"HINT PROTOCOL · VISUAL VERIFY",accent:"CYAN",
+      copy:copy(
+        {line1:"모든 손을 같은 기준으로 비교하세요.",line2:"하나씩 차분히 검증하십시오."},
+        {line1:"손가락 수뿐 아니라",line2:"방향과 모양까지 함께 비교해보세요."},
+        {line1:"모든 제스처에 동일한 검증 기준을 적용하십시오.",line2:"개별 인상에 의존하지 마십시오."},
+        {line1:"수량·방향·형태를 함께 비교하십시오.",line2:"세 기준을 끝까지 유지하십시오."}
+      ),
+      visual:Object.freeze({variant:"GESTURE_VERIFY",items:5,criteria:3})
+    }),
+    "H-R3M04":complete({
+      id:"H-R3M04",round:3,mission:"M04",visualPreset:"RELATION",nodeSeed:304,title:"CODE ROTATION",
+      systemLabel:"HINT PROTOCOL · ROTATE CLUE",accent:"GOLD",
+      copy:copy(
+        {line1:"보이는 방향이 전부는 아닙니다.",line2:"남겨진 기호의 관점을 바꿔보세요."},
+        {line1:"이미지 또는 기호를 90도 돌려",line2:"다시 확인해보세요."},
+        {line1:"현재 방향만으로 결론 내리지 마십시오.",line2:"기호의 관점을 전환하십시오."},
+        {line1:"전체 기호 배열을 90도 회전해",line2:"새로운 의미를 확인하십시오."}
+      ),
+      visual:Object.freeze({variant:"ROTATE_CLUE",clues:5,rotationDegrees:90,options:5})
+    }),
     "H-R3M05":complete({
       id:"H-R3M05",round:3,mission:"M05",visualPreset:"COMBINE",nodeSeed:305,title:"DUAL FRAGMENT",
       systemLabel:"HINT PROTOCOL · COMBINE",accent:"CYAN",

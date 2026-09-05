@@ -114,8 +114,8 @@ await Promise.resolve();await Promise.resolve();
 
 const api=sandbox.__KEY_LENS_HINT_PROTOCOL__;
 assert.ok(api,"public HINT protocol API exists");
-const activeIds=["H-R1Q01","H-R2M02","H-R3GUIDE","H-R3M01","H-R3M05","H-R3M06","H-R3M07","H-R3M08"];
-const pendingIds=["H-R1Q03","H-R1Q05","H-R1Q06","H-R3M02","H-R3M03","H-R3M04"];
+const activeIds=["H-R1Q01","H-R1Q03","H-R1Q05","H-R1Q06","H-R2M02","H-R3GUIDE","H-R3M01","H-R3M02","H-R3M03","H-R3M04","H-R3M05","H-R3M06","H-R3M07","H-R3M08"];
+const pendingIds=[];
 assert.equal(elements.hintMarkerRoot.children.length,activeIds.length,"only confirmed nodes are mounted");
 assert.deepEqual(elements.hintMarkerRoot.children.map(marker=>marker.dataset.hintId),activeIds);
 assert.equal(api.state.totalNodes,14);assert.equal(api.state.mountedNodes,activeIds.length);
@@ -136,10 +136,12 @@ const m08=elements.hintMarkerRoot.children.find(marker=>marker.dataset.hintId===
 m08.dispatchEvent({type:"markerFound"});flushFrames(6,160);assert.match(api.state.route,/R3M08/);assert.ok(api.state.activeObjects>=20);
 api.resetAll();assert.equal(api.state.activeObjects,0);assert.equal(api.state.level,0);assert.equal(elements.arScene.camera.children.length,0);
 const objectBudgets={};
+const sourceRailClasses={"H-R1Q03":"mapping","H-R1Q05":"twoStage","H-R1Q06":"tripleDecode","H-R3M02":"fragmentFilter","H-R3M03":"gestureVerify","H-R3M04":"rotateClue"};
 for(const id of activeIds){
   assert.equal(api.run(id,"operator"),true);flushFrames(4,160);objectBudgets[id]=api.state.activeObjects;
   assert.ok(api.state.activeObjects>=18,`${id} renders a layered premium scene`);
   assert.ok(api.state.activeObjects<=48,`${id} stays inside the 48-object mobile budget`);
+  if(sourceRailClasses[id])assert.match(elements.hintSpatialContent.innerHTML,new RegExp(`hintVisualRail ${sourceRailClasses[id]}`),`${id} renders its source-specific readable rail`);
   const hasLevel2=Boolean(api.registry[id].copy?.SCHOOL?.level2);
   assert.equal(api.setLevel(2,"test"),hasLevel2,`${id} level 2 policy matches Registry`);
   api.resetAll();
@@ -162,6 +164,6 @@ console.log("PASS  H-R3M07 repeated FOUND/LOST · 5 cycles · 0 leaked roots");
 console.log("PASS  H-R3M08 route and 3D object budget");
 console.log(`PASS  confirmed preset object budgets · ${Object.entries(objectBudgets).map(([id,count])=>`${id}:${count}`).join(" · ")}`);
 console.log(`PASS  all active routes repeated · ${activeIds.length*3} cycles · 0 leaked roots`);
-console.log(`PASS  NEEDS SOURCE scaffold blocked · ${pendingIds.length}/14`);
+console.log("PASS  all mission sources resolved · 14/14");
 console.log("PASS  MAIN EXPERIENCE priority preserved");
 console.log("\nRUNTIME PASS: HINT lifecycle simulation completed");
