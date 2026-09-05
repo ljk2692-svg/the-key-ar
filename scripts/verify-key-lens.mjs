@@ -107,7 +107,8 @@ check("event-mode level timing",config.eventModes.FAST_120.level2DelayMs<config.
 
 check("NODE manifest alignment",manifest.nodeCount===registryIds.length&&equalArrays(manifest.nodes.map(node=>node.id),registryIds),`${manifest.nodeCount}/${registryIds.length}`);
 check("NODE manifest active count",manifest.activeNodeCount===completeNodes.length,`${manifest.activeNodeCount}/${completeNodes.length}`);
-check("NODE rotational separation",manifest.minimumRotationalHammingDistance>=.20,String(manifest.minimumRotationalHammingDistance));
+check("NODE robust module grid",manifest.recognitionRevision==="ROBUST-V2"&&manifest.grid===16&&manifest.logicalGrid===8&&manifest.moduleScale===2);
+check("NODE rotational separation",manifest.minimumRotationalHammingDistance>=.32,String(manifest.minimumRotationalHammingDistance));
 for(const id of registryIds){
   check(`${id} assets`,["patt","png","svg","marker.png"].every(extension=>exists(`hint-nodes/${id}.${extension}`)));
   const values=read(`hint-nodes/${id}.patt`).trim().split(/\s+/).map(Number);
@@ -148,7 +149,7 @@ if(privateMaster){
 }
 check("Content Master participant isolation",contentMaster.missions.every(item=>item.arDirectAnswerExposure===false&&item.canonicalAnswerPresentInRepository===false&&!Object.hasOwn(item,"canonicalAnswer")));
 
-check("V24 build label",html.includes('FINAL-PRODUCTION-V24-HINT-PROTOCOL-PILOT'));
+check("V24.2 build label",html.includes('FINAL-PRODUCTION-V24.2-HINT-NODE-ROBUST-V2')&&config.version==="24.2.0");
 check("standalone HINT CSS",html.includes('data-key-lens-hint-bundle="css"')&&!html.includes('href="./hint-protocol.css"'));
 const registryBundleIndex=html.indexOf('data-key-lens-hint-bundle="registry"'),patternsBundleIndex=html.indexOf('data-key-lens-hint-bundle="patterns"'),engineBundleIndex=html.indexOf('data-key-lens-hint-bundle="engine"');
 check("standalone HINT script order",registryBundleIndex>0&&registryBundleIndex<patternsBundleIndex&&patternsBundleIndex<engineBundleIndex&&!html.includes('src="./hint-engine.js"'));

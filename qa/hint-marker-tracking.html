@@ -36,12 +36,12 @@ a-scene{position:fixed!important;inset:0!important}.a-enter-vr,.a-enter-ar{displ
   scene.setAttribute("embedded","");
   scene.setAttribute("vr-mode-ui","enabled:false");
   scene.setAttribute("renderer","alpha:true;antialias:false;precision:mediump");
-  scene.setAttribute("arjs",`trackingMethod:best;sourceType:image;sourceUrl:../hint-nodes/${sourceId}.png;sourceWidth:1000;sourceHeight:1200;displayWidth:500;displayHeight:600;debugUIEnabled:false;patternRatio:0.5;maxDetectionRate:60;canvasWidth:640;canvasHeight:480;`);
+  scene.setAttribute("arjs",`trackingMethod:best;sourceType:image;sourceUrl:../hint-nodes/${sourceId}.png?rv=2;sourceWidth:1000;sourceHeight:1200;displayWidth:500;displayHeight:600;debugUIEnabled:false;patternRatio:0.5;maxDetectionRate:60;canvasWidth:640;canvasHeight:480;`);
   ids.forEach(id=>{
     const marker=document.createElement("a-marker");
     marker.id=`qa-${id}`;
     marker.setAttribute("type","pattern");
-    marker.setAttribute("url",`../hint-nodes/${id}.patt`);
+    marker.setAttribute("url",`../hint-nodes/${id}.patt?rv=2`);
     marker.setAttribute("size","1");
     marker.setAttribute("emitevents","true");
     marker.addEventListener("markerFound",()=>{

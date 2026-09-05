@@ -3,6 +3,8 @@
 
 The generated recognition square is deliberately monochrome and asymmetric.
 Brand copy and color sit outside the marker boundary so tracking remains stable.
+Logical 8x8 modules are expanded to ARToolKit's 16x16 pattern grid so each
+feature survives small printing and the 320x240 mobile tracking canvas.
 """
 
 from __future__ import annotations
@@ -20,6 +22,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 GRID = 16
+LOGICAL_GRID = 8
+MODULE_SCALE = GRID // LOGICAL_GRID
+MIN_PATTERN_DISTANCE = 0.32
+MIN_BLACK_RATIO = 0.38
+MAX_BLACK_RATIO = 0.58
+MAX_PATTERN_ATTEMPTS = 10_000
+PATTERN_REVISION = "robust-v2"
 CARD_W, CARD_H = 1000, 1200
 MARKER_SIZE = 720
 MARKER_X, MARKER_Y = 140, 196
@@ -46,76 +55,73 @@ def registry_nodes(path: Path) -> list[dict[str, object]]:
     return nodes
 
 
-def make_pattern(node_id: str, seed: int) -> list[list[int]]:
-    digest = hashlib.sha256(f"THE-KEY:{node_id}:{seed}".encode()).digest()
+def make_pattern(node_id: str, seed: int, salt: int) -> list[list[int]]:
+    digest = hashlib.sha256(f"THE-KEY-ROBUST-V2:{node_id}:{seed}:{salt}".encode()).digest()
     rng = random.Random(int.from_bytes(digest[:8], "big"))
-    grid = [[255 for _ in range(GRID)] for _ in range(GRID)]
-
-    # Give every node a dense, seed-specific local texture before drawing the
-    # shared KEY SYSTEM core.  A sparse common motif looked branded, but made
-    # two rotated nodes too similar for a comfortable tracking margin.
-    protected_core = {
-        (y, x)
-        for y in range(3, 14)
-        for x in range(5, 11)
-    }
-    for y in range(1, GRID - 1):
-        for x in range(1, GRID - 1):
-            if (y, x) not in protected_core and rng.random() < .34:
-                grid[y][x] = 0
-
-    # Central key/core silhouette. It is intentionally off-centre to preserve orientation.
-    for y, x in [(4, 7), (4, 8), (5, 6), (5, 9), (6, 6), (6, 9), (7, 7),
-                 (7, 8), (8, 7), (8, 8), (9, 7), (9, 8), (10, 7), (11, 7),
-                 (12, 7), (12, 8)]:
-        grid[y][x] = 0
-
-    # Seeded circuit rails and corner signatures; no three nodes share the same layout.
-    for band in range(6):
-        x = 1 + rng.randrange(14)
-        y = 1 + rng.randrange(14)
-        horizontal = bool(rng.getrandbits(1))
-        length = 2 + rng.randrange(5)
-        for step in range(length):
-            xx = min(14, x + step) if horizontal else x
-            yy = y if horizontal else min(14, y + step)
-            grid[yy][xx] = 0
-        hook_x = min(14, x + length - 1) if horizontal else max(1, x - 1)
-        hook_y = max(1, y - 1) if horizontal else min(14, y + length - 1)
-        grid[hook_y][hook_x] = 0
-
-    signatures = [
-        [(1, 1), (1, 2), (2, 1), (3, 1)],
-        [(1, 13), (1, 14), (2, 14), (3, 14), (3, 13)],
-        [(13, 1), (14, 1), (14, 2), (13, 3)],
-        [(14, 14), (14, 13), (13, 14), (12, 14), (12, 12)],
+    logical = [
+        [0 if rng.random() < .43 else 255 for _ in range(LOGICAL_GRID)]
+        for _ in range(LOGICAL_GRID)
     ]
-    chosen = rng.sample(range(4), 2)
-    for idx in chosen:
-        for y, x in signatures[idx]:
-            grid[y][x] = 0
 
-    # Add isolated beacons and ensure useful high-frequency contrast.
-    for _ in range(16):
-        x, y = rng.randrange(1, 15), rng.randrange(1, 15)
-        if 5 <= x <= 10 and 3 <= y <= 13:
-            continue
-        grid[y][x] = 0 if rng.random() < 0.72 else 255
+    # A restrained, off-centre KEY SYSTEM core keeps the family resemblance
+    # without making separate nodes too similar.
+    for y, x in [(2, 3), (2, 4), (3, 2), (3, 5), (4, 3), (4, 4), (5, 3), (6, 3)]:
+        logical[y][x] = 0
 
-    # Encode four seed bits as an asymmetric right-side rail.
-    for bit in range(4):
-        y = 3 + bit * 3
-        if seed & (1 << bit):
-            grid[y][13] = grid[y][14] = 0
-            grid[y + 1][14] = 0
-        else:
-            grid[y][11] = grid[y][12] = 0
-            grid[y + 1][11] = 0
-    return grid
+    # Fixed asymmetric anchors make 90-degree rotations unambiguous.
+    for y, x in [(0, 0), (0, 1), (1, 0)]:
+        logical[y][x] = 0
+    for y, x in [(0, 6), (0, 7), (1, 7), (6, 6), (6, 7), (7, 6), (7, 7)]:
+        logical[y][x] = 255
+
+    return [
+        [logical[y // MODULE_SCALE][x // MODULE_SCALE] for x in range(GRID)]
+        for y in range(GRID)
+    ]
 
 
 def rotate(grid: list[list[int]]) -> list[list[int]]:
     return [list(row) for row in zip(*grid[::-1])]
+
+
+def pattern_distance(a: list[list[int]], b: list[list[int]]) -> float:
+    return sum(a[y][x] != b[y][x] for y in range(GRID) for x in range(GRID)) / (GRID * GRID)
+
+
+def pattern_margin(candidate: list[list[int]], existing: dict[str, list[list[int]]]) -> float:
+    distances: list[float] = []
+    rotated = candidate
+    for _ in range(3):
+        rotated = rotate(rotated)
+        distances.append(pattern_distance(candidate, rotated))
+    for other in existing.values():
+        rotated = other
+        for _ in range(4):
+            distances.append(pattern_distance(candidate, rotated))
+            rotated = rotate(rotated)
+    return min(distances)
+
+
+def make_patterns(nodes: list[dict[str, object]]) -> dict[str, list[list[int]]]:
+    patterns: dict[str, list[list[int]]] = {}
+    for node in nodes:
+        node_id, seed = str(node["id"]), int(node["seed"])
+        best: tuple[float, int, list[list[int]]] | None = None
+        for salt in range(MAX_PATTERN_ATTEMPTS):
+            candidate = make_pattern(node_id, seed, salt)
+            black_ratio = sum(value == 0 for row in candidate for value in row) / (GRID * GRID)
+            if not MIN_BLACK_RATIO <= black_ratio <= MAX_BLACK_RATIO:
+                continue
+            margin = pattern_margin(candidate, patterns)
+            if best is None or margin > best[0]:
+                best = (margin, salt, candidate)
+            if margin >= MIN_PATTERN_DISTANCE:
+                break
+        if best is None or best[0] < MIN_PATTERN_DISTANCE:
+            raise SystemExit(f"Could not generate robust pattern for {node_id}; best={best}")
+        node["patternSalt"] = best[1]
+        patterns[node_id] = best[2]
+    return patterns
 
 
 def patt_text(grid: list[list[int]]) -> str:
@@ -206,11 +212,14 @@ def min_rotational_distance(patterns: dict[str, list[list[int]]]) -> float:
     minimum = 1.0
     values = list(patterns.items())
     for i, (_, a) in enumerate(values):
+        rotated_a = a
+        for _ in range(3):
+            rotated_a = rotate(rotated_a)
+            minimum = min(minimum, pattern_distance(a, rotated_a))
         for _, b0 in values[i + 1:]:
             b = b0
             for _ in range(4):
-                different = sum(a[y][x] != b[y][x] for y in range(GRID) for x in range(GRID)) / (GRID * GRID)
-                minimum = min(minimum, different)
+                minimum = min(minimum, pattern_distance(a, b))
                 b = rotate(b)
     return minimum
 
@@ -220,11 +229,11 @@ def contact_sheet(nodes: list[dict[str, object]], out: Path) -> None:
     pending = [node for node in nodes if node["tracking"] != "ACTIVE"]
     active_cards = "\n".join(
         f'''<article class="nodeCard activeCard" data-node-id="{node["id"]}">
-<a href="?node={node["id"]}" aria-label="{node["id"]} 크게 열기"><span class="badge ready">SCAN READY</span><img src="{node["id"]}.png" alt="{node["id"]}"><span class="cardAction">크게 열어 스캔</span></a></article>'''
+<a href="?node={node["id"]}" aria-label="{node["id"]} 크게 열기"><span class="badge ready">SCAN READY</span><img src="{node["id"]}.png?v={PATTERN_REVISION}" alt="{node["id"]}"><span class="cardAction">크게 열어 스캔</span></a></article>'''
         for node in active
     )
     pending_cards = "\n".join(
-        f'''<article class="nodeCard pendingCard" data-node-id="{node["id"]}"><span class="badge pending">TRACKING OFF</span><img src="{node["id"]}.png" alt="{node["id"]}"><span class="cardAction">문제 콘텐츠 확정 대기</span></article>'''
+        f'''<article class="nodeCard pendingCard" data-node-id="{node["id"]}"><span class="badge pending">TRACKING OFF</span><img src="{node["id"]}.png?v={PATTERN_REVISION}" alt="{node["id"]}"><span class="cardAction">문제 콘텐츠 확정 대기</span></article>'''
         for node in pending
     )
     active_ids = json.dumps([node["id"] for node in active], ensure_ascii=False)
@@ -245,7 +254,7 @@ header{{max-width:1120px;margin:auto;padding:28px 24px 20px}}.eyebrow{{color:var
 </main>
 <div id="singleView" aria-live="polite"><div class="singleWrap"><div class="singleTop"><a class="back" href="./">← 전체 보기</a><span class="singleStatus">SCAN READY</span></div><img id="singleImage" alt=""><div class="singleNote">화면 밝기를 높이고 카드 전체가 카메라에 보이게 하십시오.</div></div></div>
 <script>
-(()=>{{const activeIds=new Set({active_ids});const id=new URLSearchParams(location.search).get("node");if(!activeIds.has(id))return;document.body.classList.add("singleMode");const image=document.querySelector("#singleImage");image.src=`${{id}}.png`;image.alt=id;document.title=`${{id}} · THE KEY HINT NODE`;}})();
+(()=>{{const activeIds=new Set({active_ids});const id=new URLSearchParams(location.search).get("node");if(!activeIds.has(id))return;document.body.classList.add("singleMode");const image=document.querySelector("#singleImage");image.src=`${{id}}.png?v={PATTERN_REVISION}`;image.alt=id;document.title=`${{id}} · THE KEY HINT NODE`;}})();
 </script></body></html>'''
     (out / "index.html").write_text(page, encoding="utf-8")
 
@@ -257,9 +266,9 @@ def main() -> None:
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     nodes = registry_nodes(args.registry)
-    patterns = {node["id"]: make_pattern(str(node["id"]), int(node["seed"])) for node in nodes}
+    patterns = make_patterns(nodes)
     distance = min_rotational_distance(patterns)
-    if distance < .16:
+    if distance < MIN_PATTERN_DISTANCE:
         raise SystemExit(f"Pattern separation too low: {distance:.3f}")
     for node in nodes:
         node_id = str(node["id"])
@@ -269,10 +278,13 @@ def main() -> None:
         save_svg(node_id, grid, args.out)
     contact_sheet(nodes, args.out)
     manifest = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generator": "scripts/generate-hint-nodes.py",
         "patternRatio": PATTERN_RATIO,
         "grid": GRID,
+        "logicalGrid": LOGICAL_GRID,
+        "moduleScale": MODULE_SCALE,
+        "recognitionRevision": "ROBUST-V2",
         "nodeCount": len(nodes),
         "activeNodeCount": sum(node["tracking"] == "ACTIVE" for node in nodes),
         "minimumRotationalHammingDistance": round(distance, 4),

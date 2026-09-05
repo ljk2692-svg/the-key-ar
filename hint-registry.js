@@ -15,7 +15,7 @@
   ]);
 
   const CONFIG=Object.freeze({
-    version:"24.0.0",
+    version:"24.2.0",
     defaultAudience:"SCHOOL",
     defaultEventMode:"STANDARD_150",
     defaultRound:"ALL",
