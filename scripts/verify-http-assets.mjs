@@ -8,10 +8,24 @@ const sourcePaths=[
   "hint-registry.js",
   "hint-engine.js",
   "hint-protocol.css",
+  "hint-nodes/index.html",
+  "hint-nodes/manifest.json",
+  "hint-nodes/H-R1Q01.patt",
+  "hint-nodes/H-R1Q01.png",
   "hint-nodes/H-R2M02.patt",
+  "hint-nodes/H-R2M02.png",
   "hint-nodes/H-R3GUIDE.patt",
+  "hint-nodes/H-R3GUIDE.png",
+  "hint-nodes/H-R3M01.patt",
+  "hint-nodes/H-R3M01.png",
+  "hint-nodes/H-R3M05.patt",
+  "hint-nodes/H-R3M05.png",
+  "hint-nodes/H-R3M06.patt",
+  "hint-nodes/H-R3M06.png",
   "hint-nodes/H-R3M07.patt",
-  "hint-nodes/H-R3M08.patt"
+  "hint-nodes/H-R3M07.png",
+  "hint-nodes/H-R3M08.patt",
+  "hint-nodes/H-R3M08.png"
 ];
 const mainTargetPaths=[];
 for(const id of ["01","02","03","04","05"]){

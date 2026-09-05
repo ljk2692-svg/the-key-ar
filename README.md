@@ -16,12 +16,13 @@ Production WebAR scanner for THE KEY SYSTEM. The deployed participant entry is
 - Presentation: Three.js geometry provides the spatial hologram while the
   companion DOM layer keeps short Korean copy readable on portrait phones.
 - Deployment: `key-lens-final.html` embeds the HINT CSS, Registry snapshot,
-  engine, and four active patterns so Production can be updated atomically with
+  engine, and eight active patterns so Production can be updated atomically with
   one file. The separate modules remain the maintainable source of truth.
 
-The default V24 pilot mounts four confirmed nodes: `H-R2M02`, `H-R3GUIDE`,
-`H-R3M07`, and `H-R3M08`. Ten additional Registry entries and their generated
-assets are scaffolded until their source mission content is confirmed.
+V24.3 mounts eight confirmed nodes: `H-R1Q01`, `H-R2M02`, `H-R3GUIDE`,
+`H-R3M01`, `H-R3M05`, `H-R3M06`, `H-R3M07`, and `H-R3M08`. Six additional
+Registry entries and their generated assets remain disabled until the exact
+source layouts, options, or mission images are supplied.
 
 ## Internal configuration
 

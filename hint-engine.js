@@ -73,6 +73,8 @@
     if(preset==="SEQUENCE_REVEAL")return `<div class="hintVisualRail sequence gold">${Array.from({length:4},(_,i)=>`<span>${String(i+1).padStart(2,"0")}</span>`).join("")}</div>`;
     if(preset==="MOTION_GUIDE")return `<div class="hintVisualRail motion">${Array.from({length:6},(_,i)=>`<span>${i+1}</span>`).join("")}<span>LINK</span></div>`;
     if(preset==="SEARCH")return `<div class="hintVisualRail search">${Array.from({length:5},()=>"<span></span>").join("")}<span class="object">OBJECT</span></div>`;
+    if(preset==="OBSERVE")return `<div class="hintVisualRail observe">${Array.from({length:4},(_,i)=>`<span>${String(i+1).padStart(2,"0")}</span>`).join("")}<span class="common">COMMON</span></div>`;
+    if(preset==="PREFIX")return `<div class="hintVisualRail prefix">${Array.from({length:5},()=>"<span><b>□</b><i></i></span>").join("")}</div>`;
     return `<div class="hintVisualRail">${Array.from({length:4},(_,i)=>`<span>${String(i+1).padStart(2,"0")}</span>`).join("")}</div>`;
   }
 
@@ -255,7 +257,22 @@
       const badge=label(rec,"HINT PROTOCOL",rec.node.id,rec.node.accent==="GOLD"?"#d7b66d":"#76ddea",.88);badge.position.set(0,.86,.02);root.add(badge);reveal(rec,badge,.58,.45);
     }
 
+    function buildWordGroups(rec){
+      const leftX=-.31,rightX=.31;
+      [leftX,rightX].forEach((x,groupIndex)=>{
+        const groupFrame=frame(rec,.43,.62,groupIndex?0x2488ff:0x76ddea,.64);groupFrame.position.set(x,.02,.05);rec.visual.add(groupFrame);reveal(rec,groupFrame,.72+groupIndex*.12,.42);
+        for(let i=0;i<4;i++){
+          const y=.23-i*.15;
+          const slot=box(rec,"word-group-slot",.27,.072,.026,groupIndex?0x2488ff:0x76ddea,.38);slot.position.set(x,y,.08);rec.visual.add(slot);reveal(rec,slot,.92+i*.10+groupIndex*.06,.30);
+          if(groupIndex===0){
+            const path=link(rec,new THREE.Vector3(leftX+.16,y,.055),new THREE.Vector3(rightX-.16,y,.055),i===3?0xd7b66d:0x76ddea,.009,i===3?.70:.34);rec.visual.add(path);reveal(rec,path,1.42+i*.15,.32);
+          }
+        }
+      });
+      const rule=node(rec,.052,0xd7b66d,.94);rule.position.set(0,.02,.13);rec.visual.add(rule);reveal(rec,rule,1.92,.38);pulse(rec,rule,2.25,.12,4.2);
+    }
     function buildCompare(rec){
+      if(rec.node.visual?.variant==="WORD_GROUPS"){buildWordGroups(rec);return}
       const group=new THREE.Group();rec.visual.add(group);
       [-.26,.26].forEach((x,index)=>{
         const panel=box(rec,"compare-panel",.42,.45,.026,index?0x2488ff:0x76ddea,.34);panel.position.set(x,.05,.05);group.add(panel);reveal(rec,panel,.82+index*.16,.46);
@@ -283,8 +300,13 @@
       const left=box(rec,"combine-fragment",.40,.34,.05,0x76ddea,.56),right=box(rec,"combine-fragment",.40,.34,.05,0xd7b66d,.56);
       left.position.set(-.48,.03,.05);right.position.set(.48,.03,.05);left.rotation.z=.16;right.rotation.z=-.16;rec.visual.add(left,right);
       reveal(rec,left,.78,.42);reveal(rec,right,.90,.42);
+      let aperture=null;const semanticBars=[];
+      if(rec.node.visual?.rotateLeft){
+        aperture=ring(rec,.105,.012,0xf4fbff,.76);aperture.position.set(-.48,.03,.09);rec.visual.add(aperture);reveal(rec,aperture,1.04,.34);
+        [-.07,0,.07].forEach((y,index)=>{const bar=box(rec,"semantic-bar",.20,.018,.018,index===1?0xd7b66d:0xf4fbff,.62);bar.position.set(.48,y+.03,.09);rec.visual.add(bar);semanticBars.push(bar);reveal(rec,bar,1.08+index*.09,.28)});
+      }
       const merged=frame(rec,.54,.44,0xf4fbff,.78);merged.position.set(0,.03,.11);rec.visual.add(merged);reveal(rec,merged,2.0,.55);
-      rec.tickers.push((elapsed)=>{const p=easeOut(phase(elapsed,1.2,.75));left.position.x=-.48+.34*p;right.position.x=.48-.34*p});
+      rec.tickers.push((elapsed)=>{const p=easeOut(phase(elapsed,1.2,.75));left.position.x=-.48+.34*p;right.position.x=.48-.34*p;if(rec.node.visual?.rotateLeft){left.rotation.z=.16+p*Math.PI*.5;if(aperture){aperture.position.x=left.position.x;aperture.rotation.z=left.rotation.z}semanticBars.forEach(bar=>{bar.position.x=right.position.x})}});
     }
     function buildReveal(rec){
       const panel=box(rec,"reveal-panel",1.05,.52,.035,0x07111b,.90);panel.position.y=.03;rec.visual.add(panel);reveal(rec,panel,.74,.44);
@@ -295,6 +317,29 @@
     function buildDecode(rec){
       const center=node(rec,.105,0xd7b66d,.92);center.position.y=.03;rec.visual.add(center);reveal(rec,center,1.24,.46);pulse(rec,center,2.0,.07,3.8);
       [-.54,-.33,.33,.54].forEach((x,index)=>{const slot=frame(rec,.16,.25,index<2?0x2488ff:0x76ddea,.62);slot.position.set(x,.03,.06);rec.visual.add(slot);reveal(rec,slot,.72+index*.15,.34);const end=index<2?new THREE.Vector3((index===0?-.12:-.12),.03,.05):new THREE.Vector3(.12,.03,.05);const path=link(rec,new THREE.Vector3(x+(index<2?.09:-.09),.03,.05),end,index<2?0x2488ff:0x76ddea,.010,.46);rec.visual.add(path);reveal(rec,path,1.40+index*.10,.30)});
+    }
+    function buildObserve(rec){
+      const positions=[[-.37,.22],[.37,.22],[-.37,-.22],[.37,-.22]];
+      const center=new THREE.Vector3(0,0,.14);
+      positions.forEach(([x,y],index)=>{
+        const screen=frame(rec,.38,.27,index===3?0xd7b66d:0x76ddea,.66);screen.position.set(x,y,.06);rec.visual.add(screen);reveal(rec,screen,.66+index*.13,.38);
+        const scan=box(rec,"observe-scan",.27,.018,.018,index===3?0xd7b66d:0x2488ff,.58);scan.position.set(x,y,.09);rec.visual.add(scan);reveal(rec,scan,.88+index*.13,.28);
+        const path=link(rec,new THREE.Vector3(x+(x<0?.18:-.18),y+(y<0?.08:-.08),.07),center,index===3?0xd7b66d:0x76ddea,.009,index===3?.68:.36);rec.visual.add(path);reveal(rec,path,1.32+index*.12,.32);
+        rec.tickers.push((elapsed)=>{scan.position.y=y+Math.sin(elapsed*2.2+index*.9)*.07});
+      });
+      const common=ring(rec,.105,.014,0xd7b66d,.88);common.position.copy(center);rec.visual.add(common);reveal(rec,common,1.90,.42);pulse(rec,common,2.25,.10,3.8);
+      const signal=node(rec,.036,0xf4fbff,.96);signal.position.copy(center);rec.visual.add(signal);reveal(rec,signal,2.04,.32);pulse(rec,signal,2.35,.14,4.6);
+    }
+    function buildPrefix(rec){
+      const common=new THREE.Vector3(-.50,.02,.12);
+      const core=node(rec,.058,0xd7b66d,.94);core.position.copy(common);rec.visual.add(core);reveal(rec,core,.76,.38);pulse(rec,core,1.25,.12,4.0);
+      for(let i=0;i<5;i++){
+        const y=.29-i*.145;
+        const prefix=frame(rec,.13,.105,i===4?0xd7b66d:0x76ddea,.74);prefix.position.set(-.18,y,.08);rec.visual.add(prefix);reveal(rec,prefix,.84+i*.11,.30);
+        const stem=box(rec,"prefix-word-stem",.38,.072,.026,0x2488ff,.34);stem.position.set(.16,y,.06);rec.visual.add(stem);reveal(rec,stem,1.02+i*.11,.30);
+        const path=link(rec,common,new THREE.Vector3(-.25,y,.075),i===4?0xd7b66d:0x76ddea,.009,i===4?.68:.34);rec.visual.add(path);reveal(rec,path,1.28+i*.12,.28);
+      }
+      const guide=label(rec,"ONE POSITION","SHARED TRANSFORM","#76ddea",.64);guide.position.set(.06,-.49,.10);rec.visual.add(guide);reveal(rec,guide,2.10,.44);
     }
     function buildMotionGuide(rec){
       const center=new THREE.Vector3(0,.02,.08);const core=node(rec,.085,0xd7b66d,.95);core.position.copy(center);rec.visual.add(core);reveal(rec,core,1.45,.44);pulse(rec,core,2.1,.08,3.8);
@@ -359,7 +404,7 @@
 
     const BUILDERS=Object.freeze({
       COMPARE:buildCompare,RELATION:buildRelation,ORDER:buildOrder,SEARCH:buildSearch,
-      COMBINE:buildCombine,REVEAL:buildReveal,DECODE:buildDecode,MOTION_GUIDE:buildMotionGuide,
+      COMBINE:buildCombine,REVEAL:buildReveal,DECODE:buildDecode,OBSERVE:buildObserve,PREFIX:buildPrefix,MOTION_GUIDE:buildMotionGuide,
       CODE_RAIL:buildCodeRail,SEQUENCE_REVEAL:buildSequenceReveal
     });
 

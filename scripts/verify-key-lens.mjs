@@ -102,7 +102,9 @@ check("scaffold tracking disabled",Object.values(registry).filter(node=>node.imp
 check("mounted-node budget",completeNodes.length<=config.tracking.maxMountedNodes,`${completeNodes.length}/${config.tracking.maxMountedNodes}`);
 check("round tracking filter",engine.includes('roundParam==="ALL"||String(node.round)===roundParam'));
 const roundCounts=Object.fromEntries([1,2,3].map(round=>[round,completeNodes.filter(node=>node.round===round).length]));
-check("round group inventory",roundCounts[1]===0&&roundCounts[2]===1&&roundCounts[3]===3,`R1:${roundCounts[1]} R2:${roundCounts[2]} R3:${roundCounts[3]}`);
+check("round group inventory",roundCounts[1]===1&&roundCounts[2]===1&&roundCounts[3]===6,`R1:${roundCounts[1]} R2:${roundCounts[2]} R3:${roundCounts[3]}`);
+const sourcePendingIds=Object.values(registry).filter(node=>node.contentStatus==="MISSION_SOURCE_REQUIRED").map(node=>node.id);
+check("NEEDS SOURCE inventory",equalArrays(sourcePendingIds,["H-R1Q03","H-R1Q05","H-R1Q06","H-R3M02","H-R3M03","H-R3M04"]),`${sourcePendingIds.length} nodes`);
 check("event-mode level timing",config.eventModes.FAST_120.level2DelayMs<config.eventModes.STANDARD_150.level2DelayMs&&config.eventModes.STANDARD_150.level2DelayMs<config.eventModes.STRATEGY_180.level2DelayMs);
 
 check("NODE manifest alignment",manifest.nodeCount===registryIds.length&&equalArrays(manifest.nodes.map(node=>node.id),registryIds),`${manifest.nodeCount}/${registryIds.length}`);
@@ -129,17 +131,15 @@ check("MAIN/HINT UI distinction",html.includes("HINT NODE")&&engine.includes('pi
 
 const participantSource=[html,registrySource,engine].join("\n");
 check("QA master not loaded by participant",!participantSource.includes("content-master.json"));
-const pinTokens=privateMaster?privateMaster.missions.flatMap(item=>item.canonicalAnswer.match(/\b\d{4,}\b/g)||[]):[];
+const pinTokens=privateMaster?[...privateMaster.missions.flatMap(item=>item.canonicalAnswer.match(/\b\d{4,}\b/g)||[]),...(privateMaster.round3FinalCode?.match(/\b\d{4,}\b/g)||[])]:[];
 if(privateMaster)check("canonical passwords not exposed",pinTokens.length>=3&&!pinTokens.some(secret=>participantSource.includes(secret)),`${pinTokens.length} private tokens checked`);
 else skip("canonical passwords not exposed");
-const m07Copy=allStrings(registry["H-R3M07"].copy).join(" ");
-const m07Forbidden=privateMaster?.missions.find(item=>item.missionId==="R3-M07")?.forbiddenHintCopy||[];
-if(privateMaster)check("M07 direct answer blocked",m07Forbidden.length>0&&!m07Forbidden.some(value=>m07Copy.toUpperCase().includes(value.toUpperCase())));
-else skip("M07 direct answer blocked");
-const m08Copy=allStrings(registry["H-R3M08"].copy).join(" ");
-const m08Forbidden=privateMaster?.missions.find(item=>item.missionId==="R3-M08")?.forbiddenHintCopy||[];
-if(privateMaster)check("M08 direct instruction blocked",m08Forbidden.length>0&&!m08Forbidden.some(value=>m08Copy.includes(value)));
-else skip("M08 direct instruction blocked");
+if(privateMaster){
+  for(const item of privateMaster.missions.filter(entry=>entry.hintNodeId&&entry.forbiddenHintCopy?.length)){
+    const hintCopy=allStrings(registry[item.hintNodeId]?.copy).join(" ").toUpperCase();
+    check(`${item.hintNodeId} direct answer blocked`,!item.forbiddenHintCopy.some(value=>hintCopy.includes(value.toUpperCase())),`${item.forbiddenHintCopy.length} forbidden tokens`);
+  }
+}else skip("per-node direct answer blocked");
 check("Content Master correction flag",contentMaster.missions.find(item=>item.missionId==="R1-Q02")?.qa==="KNOWN_CORRECTION");
 if(privateMaster){
   check("private Content Master available",privateMaster.classification==="CONFIDENTIAL_OPERATIONS");
@@ -148,8 +148,22 @@ if(privateMaster){
   skip("private Content Master available");skip("Content Master ID alignment");
 }
 check("Content Master participant isolation",contentMaster.missions.every(item=>item.arDirectAnswerExposure===false&&item.canonicalAnswerPresentInRepository===false&&!Object.hasOwn(item,"canonicalAnswer")));
+const textExtensions=new Set([".css",".html",".js",".json",".md",".mjs",".txt"]);
+const repositoryText=[];
+function collectRepositoryText(directory){
+  for(const entry of fs.readdirSync(directory,{withFileTypes:true})){
+    if(entry.name===".git"||entry.name==="vendor")continue;
+    const full=path.join(directory,entry.name);
+    if(entry.isDirectory())collectRepositoryText(full);
+    else if(entry.isFile()&&textExtensions.has(path.extname(entry.name)))repositoryText.push(fs.readFileSync(full,"utf8"));
+  }
+}
+collectRepositoryText(root);
+if(privateMaster)repositoryText.push(JSON.stringify(privateMaster));
+const obsoleteR1Q02Value=["97","19"].join("");
+check("obsolete R1-Q02 value absent",!repositoryText.join("\n").includes(obsoleteR1Q02Value));
 
-check("V24.2 build label",html.includes('FINAL-PRODUCTION-V24.2-HINT-NODE-ROBUST-V2')&&config.version==="24.2.0");
+check("V24.3 build label",html.includes('FINAL-PRODUCTION-V24.3-HINT-CONTENT-WAVE-1')&&config.version==="24.3.0");
 check("standalone HINT CSS",html.includes('data-key-lens-hint-bundle="css"')&&!html.includes('href="./hint-protocol.css"'));
 const registryBundleIndex=html.indexOf('data-key-lens-hint-bundle="registry"'),patternsBundleIndex=html.indexOf('data-key-lens-hint-bundle="patterns"'),engineBundleIndex=html.indexOf('data-key-lens-hint-bundle="engine"');
 check("standalone HINT script order",registryBundleIndex>0&&registryBundleIndex<patternsBundleIndex&&patternsBundleIndex<engineBundleIndex&&!html.includes('src="./hint-engine.js"'));

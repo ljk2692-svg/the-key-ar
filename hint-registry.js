@@ -9,13 +9,15 @@
     "COMBINE",
     "REVEAL",
     "DECODE",
+    "OBSERVE",
+    "PREFIX",
     "MOTION_GUIDE",
     "CODE_RAIL",
     "SEQUENCE_REVEAL"
   ]);
 
   const CONFIG=Object.freeze({
-    version:"24.2.0",
+    version:"24.3.0",
     defaultAudience:"SCHOOL",
     defaultEventMode:"STANDARD_150",
     defaultRound:"ALL",
@@ -62,7 +64,17 @@
   });
 
   const REGISTRY=Object.freeze({
-    "H-R1Q01":scaffold({id:"H-R1Q01",round:1,mission:"Q01",visualPreset:"COMPARE",nodeSeed:101,title:"COMPARE TRACE"}),
+    "H-R1Q01":complete({
+      id:"H-R1Q01",round:1,mission:"Q01",visualPreset:"COMPARE",nodeSeed:101,title:"RELATION COMPARE",
+      systemLabel:"HINT PROTOCOL · COMPARE",accent:"CYAN",
+      copy:copy(
+        {line1:"단어 하나씩 보지 마세요.",line2:"두 묶음의 관계를 같은 기준으로 비교하십시오."},
+        {line1:"두 묶음에는 같은 규칙이 적용됩니다.",line2:"각 위치의 대응을 확인하십시오."},
+        {line1:"개별 단어보다 두 묶음의 관계를 보십시오.",line2:"동일한 기준으로 비교하십시오."},
+        {line1:"두 묶음에 공통으로 적용되는 규칙을 추적하십시오.",line2:"각 위치의 대응을 확인하십시오."}
+      ),
+      visual:Object.freeze({variant:"WORD_GROUPS",groups:2,itemsPerGroup:4})
+    }),
     "H-R1Q03":scaffold({id:"H-R1Q03",round:1,mission:"Q03",visualPreset:"ORDER",nodeSeed:103,title:"ORDER TRACE"}),
     "H-R1Q05":scaffold({id:"H-R1Q05",round:1,mission:"Q05",visualPreset:"DECODE",nodeSeed:105,title:"DECODE TRACE"}),
     "H-R1Q06":scaffold({id:"H-R1Q06",round:1,mission:"Q06",visualPreset:"COMBINE",nodeSeed:106,title:"COMBINE TRACE"}),
@@ -91,12 +103,42 @@
       visual:Object.freeze({slots:8})
     }),
 
-    "H-R3M01":scaffold({id:"H-R3M01",round:3,mission:"M01",visualPreset:"SEARCH",nodeSeed:301,title:"OBSERVE TRACE"}),
+    "H-R3M01":complete({
+      id:"H-R3M01",round:3,mission:"M01",visualPreset:"OBSERVE",nodeSeed:301,title:"COMMON SIGNAL",
+      systemLabel:"HINT PROTOCOL · OBSERVE",accent:"CYAN",
+      copy:copy(
+        {line1:"영상 하나의 내용보다",line2:"여러 영상에서 반복되는 공통점을 찾으십시오."},
+        {line1:"모든 영상이 함께 가리키는",line2:"장소 또는 단어를 확인하십시오."},
+        {line1:"각 기록의 차이보다 반복되는 신호를 보십시오.",line2:""},
+        {line1:"모든 기록이 가리키는 공통 위치나 명칭을 추적하십시오.",line2:""}
+      ),
+      visual:Object.freeze({frames:4,converge:true})
+    }),
     "H-R3M02":scaffold({id:"H-R3M02",round:3,mission:"M02",visualPreset:"COMPARE",nodeSeed:302,title:"FILTER TRACE"}),
     "H-R3M03":scaffold({id:"H-R3M03",round:3,mission:"M03",visualPreset:"COMPARE",nodeSeed:303,title:"GESTURE TRACE"}),
     "H-R3M04":scaffold({id:"H-R3M04",round:3,mission:"M04",visualPreset:"RELATION",nodeSeed:304,title:"RELATION TRACE"}),
-    "H-R3M05":scaffold({id:"H-R3M05",round:3,mission:"M05",visualPreset:"COMBINE",nodeSeed:305,title:"COMBINE TRACE"}),
-    "H-R3M06":scaffold({id:"H-R3M06",round:3,mission:"M06",visualPreset:"REVEAL",nodeSeed:306,title:"MASK TRACE"}),
+    "H-R3M05":complete({
+      id:"H-R3M05",round:3,mission:"M05",visualPreset:"COMBINE",nodeSeed:305,title:"DUAL FRAGMENT",
+      systemLabel:"HINT PROTOCOL · COMBINE",accent:"CYAN",
+      copy:copy(
+        {line1:"그림과 단어를 각각 따로 해석해보세요.",line2:"두 결과는 마지막에 연결됩니다."},
+        {line1:"그림은 보는 방향을 바꿔보고,",line2:"단어의 한국어 의미도 생각해보세요."},
+        {line1:"두 단서를 독립적으로 해석하십시오.",line2:"마지막 단계에서 결합됩니다."},
+        {line1:"이미지의 방향과 단어의 의미를 각각 변환하십시오.",line2:""}
+      ),
+      visual:Object.freeze({fragments:2,rotateLeft:true,merge:true})
+    }),
+    "H-R3M06":complete({
+      id:"H-R3M06",round:3,mission:"M06",visualPreset:"PREFIX",nodeSeed:306,title:"COMMON PREFIX",
+      systemLabel:"HINT PROTOCOL · WORD TRANSFORM",accent:"CYAN",
+      copy:copy(
+        {line1:"다섯 단어에 모두 같은 규칙이 적용됩니다.",line2:"바뀌는 위치를 함께 확인하십시오."},
+        {line1:"각 단어의 앞에",line2:"같은 알파벳 한 글자를 붙여보세요."},
+        {line1:"모든 데이터에 하나의 변환 규칙이 적용됩니다.",line2:"같은 위치를 확인하십시오."},
+        {line1:"각 단어 앞의 동일한 문자 슬롯을 검증하십시오.",line2:"완성 결과는 실제 단어여야 합니다."}
+      ),
+      visual:Object.freeze({words:5,sharedPrefix:true})
+    }),
 
     "H-R3M07":complete({
       id:"H-R3M07",round:3,mission:"M07",visualPreset:"SEQUENCE_REVEAL",nodeSeed:307,title:"FOUR-POINT RECOVERY",

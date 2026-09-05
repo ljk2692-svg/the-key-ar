@@ -1,8 +1,18 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "purpose": "공개 저장소용 CONTENT MASTER 검수 인덱스. 실제 정답은 비공개 운영 원본에만 둔다.",
   "confidentialAnswerStorage": "PRIVATE_OPERATIONS_MASTER",
   "missions": [
+    {
+      "missionId": "R1-Q01",
+      "hintNodeId": "H-R1Q01",
+      "canonicalAnswerRef": "PRIVATE:R1-Q01",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "HINT_CONFIRMED"
+    },
     {
       "missionId": "R1-Q02",
       "canonicalAnswerRef": "PRIVATE:R1-Q02",
@@ -11,6 +21,36 @@
       "staffGuideCheck": "REQUIRED",
       "arDirectAnswerExposure": false,
       "qa": "KNOWN_CORRECTION"
+    },
+    {
+      "missionId": "R1-Q03",
+      "hintNodeId": "H-R1Q03",
+      "canonicalAnswerRef": "PRIVATE:R1-Q03",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "NEEDS_SOURCE",
+      "staffGuideCheck": "NEEDS_SOURCE",
+      "arDirectAnswerExposure": false,
+      "qa": "NEEDS_SOURCE"
+    },
+    {
+      "missionId": "R1-Q05",
+      "hintNodeId": "H-R1Q05",
+      "canonicalAnswerRef": "PRIVATE:R1-Q05",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "NEEDS_SOURCE",
+      "staffGuideCheck": "NEEDS_SOURCE",
+      "arDirectAnswerExposure": false,
+      "qa": "NEEDS_SOURCE"
+    },
+    {
+      "missionId": "R1-Q06",
+      "hintNodeId": "H-R1Q06",
+      "canonicalAnswerRef": "PRIVATE:R1-Q06",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "NEEDS_SOURCE",
+      "staffGuideCheck": "NEEDS_SOURCE",
+      "arDirectAnswerExposure": false,
+      "qa": "NEEDS_SOURCE"
     },
     {
       "missionId": "R2-M01",
@@ -31,7 +71,68 @@
       "qa": "PASS_REFERENCE"
     },
     {
+      "missionId": "R3-M01",
+      "hintNodeId": "H-R3M01",
+      "canonicalAnswerRef": "PRIVATE:R3-M01",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "HINT_CONFIRMED"
+    },
+    {
+      "missionId": "R3-M02",
+      "hintNodeId": "H-R3M02",
+      "canonicalAnswerRef": "PRIVATE:R3-M02",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "NEEDS_SOURCE",
+      "staffGuideCheck": "NEEDS_SOURCE",
+      "arDirectAnswerExposure": false,
+      "qa": "NEEDS_SOURCE"
+    },
+    {
+      "missionId": "R3-M03",
+      "hintNodeId": "H-R3M03",
+      "canonicalAnswerRef": "PRIVATE:R3-M03",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "NEEDS_SOURCE",
+      "staffGuideCheck": "NEEDS_SOURCE",
+      "arDirectAnswerExposure": false,
+      "qa": "NEEDS_SOURCE"
+    },
+    {
+      "missionId": "R3-M04",
+      "hintNodeId": "H-R3M04",
+      "canonicalAnswerRef": "PRIVATE:R3-M04",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "NEEDS_SOURCE",
+      "staffGuideCheck": "NEEDS_SOURCE",
+      "arDirectAnswerExposure": false,
+      "qa": "NEEDS_SOURCE"
+    },
+    {
+      "missionId": "R3-M05",
+      "hintNodeId": "H-R3M05",
+      "canonicalAnswerRef": "PRIVATE:R3-M05",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "HINT_CONFIRMED"
+    },
+    {
+      "missionId": "R3-M06",
+      "hintNodeId": "H-R3M06",
+      "canonicalAnswerRef": "PRIVATE:R3-M06",
+      "canonicalAnswerPresentInRepository": false,
+      "printCheck": "REQUIRED",
+      "staffGuideCheck": "REQUIRED",
+      "arDirectAnswerExposure": false,
+      "qa": "HINT_CONFIRMED"
+    },
+    {
       "missionId": "R3-M07",
+      "hintNodeId": "H-R3M07",
       "canonicalAnswerRef": "PRIVATE:R3-M07",
       "canonicalAnswerPresentInRepository": false,
       "printCheck": "REQUIRED",
@@ -41,6 +142,7 @@
     },
     {
       "missionId": "R3-M08",
+      "hintNodeId": "H-R3M08",
       "canonicalAnswerRef": "PRIVATE:R3-M08",
       "canonicalAnswerPresentInRepository": false,
       "printCheck": "FIELD_REHEARSAL_REQUIRED",
